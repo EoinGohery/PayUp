@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1031902743624",
+    "firebase_url": "https://pay-up-66b7c.firebaseio.com",
+    "project_id": "pay-up-66b7c",
+    "storage_bucket": "pay-up-66b7c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031902743624:android:d06b39c4c9ae7d1a945c7d",
+        "android_client_info": {
+          "package_name": "com.c17206413.payup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1031902743624-sufqdoh94u3s06hdnivq195pg5kcppd4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.c17206413.payup",
+            "certificate_hash": "e5ce2ef45c150a66063e4639e66d216f762fad02"
+          }
+        },
+        {
+          "client_id": "1031902743624-lbgnmk8pffmvhj73osfk8cpt209jal6k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXXu50WEj3RQbqvSxJT2aV6mylLyw0RWQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1031902743624-lbgnmk8pffmvhj73osfk8cpt209jal6k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
