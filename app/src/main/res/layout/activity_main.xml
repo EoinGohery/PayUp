@@ -4,42 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="bottom"
+    app:layout_anchorGravity="bottom|center"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.PayUp.AppBarOverlay">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:minHeight="?actionBarSize"
-            android:padding="@dimen/appbar_padding"
-            android:text="@string/app_name"
-            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary" />
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/view_pager"
+    <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/purple_1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/settingsbutton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="62dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/purple_1"
+                android:textColor="#FFFFFF"
+                android:textColorHighlight="@color/white"
+                android:textColorHint="@color/black"
+                android:textColorLink="@color/black"
+                app:icon="@android:drawable/btn_radio"
+                app:iconGravity="textStart"
+                app:iconTint="@color/black"
+                app:rippleColor="@color/purple_1" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="352dp"
+                android:layout_height="65dp"
+                android:background="@color/purple_1"
+                android:textAlignment="textStart"
+                android:textDirection="firstStrongRtl"
+                app:tabIconTint="@color/black"
+                app:tabIndicatorColor="@color/white"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:tabTextColor="@color/black" />
+
+        </LinearLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="663dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        </androidx.viewpager.widget.ViewPager>
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/addbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email"
-        android:contentDescription="TODO" />
+        android:contentDescription="TODO"
+        app:backgroundTint="@color/purple_1"
+        app:fabSize="auto"
+        app:maxImageSize="44dp"
+        app:rippleColor="#FFFFFF"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
