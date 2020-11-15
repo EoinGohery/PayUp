@@ -71,7 +71,7 @@
             android:gravity="center"
             android:linksClickable="true"
             android:text="No account yet? Create one"
-            android:textSize="16dip" />
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/login_with_password"
@@ -86,8 +86,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/or"
-            android:textSize="18sp"
-            tools:text="@string/or" />
+            android:textSize="18sp"/>
 
         <Button
             android:id="@+id/login_twitter"
@@ -102,7 +101,8 @@
             android:translationY="-10dp"
             app:icon="@drawable/fui_ic_twitter_bird_white_24dp"
             app:iconGravity="start"
-            app:iconPadding="-20dp" />
+            app:iconPadding="-20dp"
+            app:iconTint="@color/white" />
 
         <Button
             android:id="@+id/login_google"
@@ -110,10 +110,9 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_gravity="top"
-            android:autoText="false"
             android:background="#C6C5C5"
             android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
-            android:gravity="center_horizontal|left|center_vertical"
+            android:gravity="center_horizontal|start|center_vertical"
             android:text="@string/login_with_google"
             android:textAlignment="center"
             android:textAllCaps="false"

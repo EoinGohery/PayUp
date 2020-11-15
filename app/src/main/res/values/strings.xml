@@ -1,14 +1,14 @@
 <resources>
     <string name="app_name">Pay Up</string>
     <string name="tab_text_1">Payments Due</string>
-    <string name="login_with_twitter">Twitter</string>
+    <string name="login_with_twitter">Sign in with Twitter</string>
     <string name="tab_text_2">Incoming</string>
     <string name="email">Email</string>
     <string name="or">- Or -</string>
     <string name="password">Password</string>
     <string name="login_with_password">Log in</string>
-    <string name="login_with_facebook">Facebook</string>
-    <string name="login_with_google">Google</string>
+    <string name="login_with_facebook">Sign in with Facebook</string>
+    <string name="login_with_google">Sign in with Google</string>
     <string name="facebook_application_id" translatable="false">YOUR_APP_ID</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fbYOUR_APP_ID</string>
     <string name="twitter_consumer_key" translatable="false">YOUR_CONSUMER_KEY</string>

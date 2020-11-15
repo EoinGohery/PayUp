@@ -5,13 +5,20 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.c17206413.payup.ui.main.SignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -19,15 +26,20 @@ import com.c17206413.payup.ui.main.SectionsPagerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int RC_SIGN_IN = 123;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final String TAG = "Login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -36,15 +48,18 @@ public class MainActivity extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
         FloatingActionButton fab = findViewById(R.id.addbutton);
         checkCurrentUser();
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                signOut();
             }
         });
+    }
+
+    private void signOut() {
+        // Firebase sign out
+        mAuth.signOut();
+        signInUser();
     }
 
     @Override
@@ -55,32 +70,43 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRestart() {
-
         super.onRestart();
+
     }
 
     public void checkCurrentUser() {
         // [START check_current_user]
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = mAuth.getCurrentUser();
         if (user != null) {
-            // User is signed in
+            getUserProfile();
         } else {
-            SigninUser();
+            signInUser();
         }
         // [END check_current_user]
     }
 
-    public void  SigninUser() {
+    public void  signInUser() {
         Intent intent = new Intent(this, SignIn.class);
-        //EditText editText = (EditText) findViewById(R.id.editText);
-        //String message = editText.getText().toString();
-        //intent.putExtra(EXTRA_MESSAGE, message);
-        startActivity(intent);
+        startActivityForResult(intent,0);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == 0) {
+            try {
+                getUserProfile();
+            } catch (Exception e) {
+                signInUser();
+            }
+        }
     }
 
     public void getUserProfile() {
         // [START get_user_profile]
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = mAuth.getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url
             String name = user.getDisplayName();
@@ -100,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getProviderData() {
         // [START get_provider_data]
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             for (UserInfo profile : user.getProviderData()) {
                 // Id of the provider (ex: google.com)
@@ -116,11 +142,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    public void signOut() {
-        // [START auth_sign_out]
-        FirebaseAuth.getInstance().signOut();
-        // [END auth_sign_out]
-    }
-
 }

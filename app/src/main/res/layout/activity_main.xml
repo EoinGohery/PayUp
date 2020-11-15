@@ -24,16 +24,18 @@
             <Button
                 android:id="@+id/settingsbutton"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="62dp"
-                android:layout_height="wrap_content"
+                android:layout_width="61dp"
+                android:layout_height="match_parent"
                 android:backgroundTint="@color/purple_1"
                 android:textColor="#FFFFFF"
                 android:textColorHighlight="@color/white"
                 android:textColorHint="@color/black"
                 android:textColorLink="@color/black"
-                app:icon="@android:drawable/btn_radio"
+                app:icon="@drawable/fui_ic_anonymous_white_24dp"
                 app:iconGravity="textStart"
-                app:iconTint="@color/black"
+                app:iconPadding="0dp"
+                app:iconSize="46dp"
+                app:iconTint="@color/white"
                 app:rippleColor="@color/purple_1" />
 
             <com.google.android.material.tabs.TabLayout
@@ -47,7 +49,7 @@
                 app:tabIndicatorColor="@color/white"
                 app:tabSelectedTextColor="@color/white"
                 app:tabTextAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:tabTextColor="@color/black" />
+                app:tabTextColor="@color/grey_4" />
 
         </LinearLayout>
 
