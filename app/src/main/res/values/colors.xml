@@ -5,6 +5,7 @@
     <color name="grey_1">#3A3A3A</color>
     <color name="grey_2">#737373</color>
     <color name="grey_3">#9F9F9F</color>
+    <color name="grey_4">#DFDFDF</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

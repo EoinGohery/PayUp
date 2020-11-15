@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_4"
+    android:foregroundTintMode="screen"
+    tools:context=".ui.main.SignIn">
+
+    <LinearLayout
+        android:id="@+id/parentLinear"
+        android:layout_width="301dp"
+        android:layout_height="655dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!--        <com.facebook.login.widget.LoginButton-->
+        <!--            android:id="@+id/login_with_facebook"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_gravity="center_horizontal"-->
+        <!--            android:text="@string/login_with_facebook" />-->
+
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="Company Logo"
+            app:srcCompat="@drawable/ic_launcher_foreground" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <EditText
+                android:id="@+id/input_email"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="Email"
+                android:inputType="textEmailAddress" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <EditText
+                android:id="@+id/input_password"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="Password"
+                android:inputType="textPassword" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/link_signup"
+            android:layout_width="fill_parent"
+            android:layout_height="33dp"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:linksClickable="true"
+            android:text="No account yet? Create one"
+            android:textSize="16dip" />
+
+        <Button
+            android:id="@+id/login_with_password"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="@color/grey_2"
+            android:text="@string/login_with_password" />
+
+        <TextView
+            android:id="@+id/orText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/or"
+            android:textSize="18sp"
+            tools:text="@string/or" />
+
+        <Button
+            android:id="@+id/login_twitter"
+            style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="@color/fui_bgTwitter"
+
+            android:text="@string/login_with_twitter"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:translationY="-10dp"
+            app:icon="@drawable/fui_ic_twitter_bird_white_24dp"
+            app:iconGravity="start" />
+
+        <Button
+            android:id="@+id/login_google"
+            style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_gravity="top"
+            android:background="#C6C5C5"
+            android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+            android:gravity="center_horizontal|left|center_vertical"
+            android:text="@string/login_with_google"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textIsSelectable="false"
+            android:translationY="-30dp"
+            app:icon="@drawable/fui_ic_googleg_color_24dp"
+            app:iconTint="@color/common_google_signin_btn_tint"
+            app:iconTintMode="src_atop" />
+
+        <Button
+            android:id="@+id/login_facebook"
+            style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="#C6C5C5"
+            android:backgroundTint="@color/fui_bgFacebook"
+            android:text="@string/login_with_facebook"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textIsSelectable="false"
+            android:translationY="-50dp"
+            app:icon="@drawable/fui_ic_facebook_white_22dp"
+            app:iconTint="@color/common_google_signin_btn_tint"
+            app:iconTintMode="src_atop" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

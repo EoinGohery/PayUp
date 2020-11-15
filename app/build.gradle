@@ -40,4 +40,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation platform('com.google.firebase:firebase-bom:26.1.0')
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
+    implementation 'com.google.android.material:material:1.0.0'
+   // implementation 'com.facebook.android:facebook-android-sdk:4.x'
+    //implementation 'com.twitter.sdk.android:twitter-core:3.x'
 }
