@@ -2,6 +2,7 @@ package com.c17206413.payup.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Button;
 import android.view.View;
 
@@ -15,11 +16,16 @@ import com.google.android.gms.tasks.Task;
 
 
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuthMultiFactorException;
+import com.google.firebase.auth.MultiFactorResolver;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
@@ -38,6 +44,11 @@ public class SignIn extends AppCompatActivity {
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
 
+    ProgressBar progressBar;
+    TextInputLayout email;
+    TextInputLayout password;
+    EditText passwordInput;
+    EditText emailInput;
     private FirebaseAuth mAuth;
 
     private GoogleSignInClient mGoogleSignInClient;
@@ -47,7 +58,9 @@ public class SignIn extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(com.c17206413.payup.R.layout.activity_signin);
         mAuth = FirebaseAuth.getInstance();
-
+        progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+        email = (TextInputLayout) findViewById(R.id.emailLayout);
+        password = (TextInputLayout) findViewById(R.id.passwordLayout);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -72,7 +85,9 @@ public class SignIn extends AppCompatActivity {
         Button emailLogin= (Button) findViewById(R.id.login_with_password);
         emailLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Do something in response to button click
+                String emailString =findViewById(R.id.input_email).toString();
+                String passwordString =findViewById(R.id.input_password).toString();
+                loginSignIn(emailString, passwordString);
             }
         });
 
@@ -126,6 +141,146 @@ public class SignIn extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+
+    private void loginSignIn(String email, String password) {
+        Log.d(TAG, "signIn:" + email);
+        if (!validateForm()) {
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        // [START sign_in_with_email]
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            checkCurrentUser();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithEmail:failure", task.getException());
+                            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                            // [START_EXCLUDE]
+//                            checkForMultiFactorFailure(task.getException());
+                            // [END_EXCLUDE]
+                        }
+
+                        // [START_EXCLUDE]
+                        if (!task.isSuccessful()) {
+                            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END sign_in_with_email]
+    }
+
+    private void sendEmailVerification() {
+        // Disable button
+//        mBinding.verifyEmailButton.setEnabled(false);
+
+        // Send verification email
+        // [START send_email_verification]
+        final FirebaseUser user = mAuth.getCurrentUser();
+        user.sendEmailVerification()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // [START_EXCLUDE]
+                        // Re-enable button
+//                        mBinding.verifyEmailButton.setEnabled(true);
+
+                        if (task.isSuccessful()) {
+                            Snackbar.make(findViewById(android.R.id.content), "Verification email sent to " + user.getEmail(), Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        } else {
+                            Log.e(TAG, "sendEmailVerification", task.getException());
+                            Snackbar.make(findViewById(android.R.id.content), "Failed to send verification email", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END send_email_verification]
+    }
+
+//    private void checkForMultiFactorFailure(Exception e) {
+//        // Multi-factor authentication with SMS is currently only available for
+//        // Google Cloud Identity Platform projects. For more information:
+//        // https://cloud.google.com/identity-platform/docs/android/mfa
+//        if (e instanceof FirebaseAuthMultiFactorException) {
+//            Log.w(TAG, "multiFactorFailure", e);
+//            Intent intent = new Intent();
+//            MultiFactorResolver resolver = ((FirebaseAuthMultiFactorException) e).getResolver();
+//            intent.putExtra("EXTRA_MFA_RESOLVER", resolver);
+//            setResult(MultiFactorActivity.RESULT_NEEDS_MFA_SIGN_IN, intent);
+//            finish();
+//        }
+//    }
+
+    private void createAccount(String email, String password) {
+        Log.d(TAG, "createAccount:" + email);
+        if (!validateForm()) {
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        // [START create_user_with_email]
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
+
+                        // [START_EXCLUDE]
+                        progressBar.setVisibility(View.INVISIBLE);
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END create_user_with_email]
+    }
+
+    private boolean validateForm() {
+        boolean valid = true;
+
+        emailInput = findViewById(R.id.input_email);
+        String emailString = emailInput.getText().toString();
+        if (emailString.isEmpty()) {
+            email.setError("Required.");
+            valid = false;
+        } else {
+            email.setError(null);
+        }
+
+        passwordInput = findViewById(R.id.input_password);
+        String passwordString = passwordInput.getText().toString();
+        if (passwordString.isEmpty()) {
+            password.setError("Required.");
+            valid = false;
+        } else {
+            password.setError(null);
+
+        }
+
+        return valid;
     }
 
     public void checkCurrentUser() {
