@@ -65,86 +65,167 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/link_signup"
-            android:layout_width="fill_parent"
-            android:layout_height="33dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"
-            android:linksClickable="true"
-            android:text="@string/no_account"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/login_with_password"
+        <LinearLayout
+            android:id="@+id/registerLayout"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:backgroundTint="@color/grey_2"
-            android:text="@string/login_with_password" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/orText"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/firstNameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <EditText
+                    android:id="@+id/input_first_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:hint="@string/first_name"
+                    android:inputType="textEmailAddress" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/lastNameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <EditText
+                    android:id="@+id/input_last_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:hint="@string/last_name"
+                    android:inputType="textEmailAddress" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/register"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:backgroundTint="@color/grey_2"
+                android:text="@string/register" />
+
+            <TextView
+                android:id="@+id/orTextRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/or"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/backToSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:backgroundTint="@color/grey_2"
+                android:text="@string/backToSignIn" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/signIn_Layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/or"
-            android:textSize="18sp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="visible">
 
-        <Button
-            android:id="@+id/login_twitter"
-            style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:backgroundTint="@color/fui_bgTwitter"
+            <Button
+                android:id="@+id/link_signup"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="fill_parent"
+                android:layout_height="35dp"
+                android:layout_marginBottom="24dp"
+                android:background="#FFFFFF"
+                android:gravity="center|top"
+                android:linksClickable="true"
+                android:text="@string/no_account"
+                android:textAllCaps="false"
+                android:textColor="@color/grey_2"
+                android:textColorHighlight="@android:color/transparent"
+                android:textColorHint="@android:color/transparent"
+                android:textColorLink="@android:color/transparent"
+                android:textCursorDrawable="@android:color/transparent"
+                android:textSize="12sp"
+                app:rippleColor="@android:color/transparent" />
 
-            android:text="@string/login_with_twitter"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:translationY="-10dp"
-            android:visibility="visible"
-            app:icon="@drawable/fui_ic_twitter_bird_white_24dp"
-            app:iconGravity="start"
-            app:iconPadding="-20dp"
-            app:iconTint="@color/white" />
+            <Button
+                android:id="@+id/login_with_password"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:backgroundTint="@color/grey_2"
+                android:text="@string/login_with_password" />
 
-        <Button
-            android:id="@+id/login_google"
-            style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_gravity="top"
-            android:background="#C6C5C5"
-            android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
-            android:gravity="center_horizontal|start|center_vertical"
-            android:text="@string/login_with_google"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="@color/black"
-            android:textIsSelectable="false"
-            android:translationY="-30dp"
-            app:icon="@drawable/googleg_standard_color_18"
-            app:iconPadding="-20dp"
-            app:iconTint="@color/common_google_signin_btn_tint"
-            app:iconTintMode="src_atop" />
+            <TextView
+                android:id="@+id/orText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/or"
+                android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/login_facebook"
-            style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:background="#C6C5C5"
-            android:backgroundTint="@color/fui_bgFacebook"
-            android:text="@string/login_with_facebook"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textIsSelectable="false"
-            android:translationY="-50dp"
-            app:icon="@drawable/fui_ic_facebook_white_22dp"
-            app:iconPadding="-20dp"
-            app:iconTint="@color/common_google_signin_btn_tint"
-            app:iconTintMode="src_atop" />
+            <Button
+                android:id="@+id/login_twitter"
+                style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:backgroundTint="@color/fui_bgTwitter"
+
+                android:text="@string/login_with_twitter"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:translationY="-10dp"
+                android:visibility="visible"
+                app:icon="@drawable/fui_ic_twitter_bird_white_24dp"
+                app:iconGravity="start"
+                app:iconPadding="-20dp"
+                app:iconTint="@color/white" />
+
+            <Button
+                android:id="@+id/login_google"
+                style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_gravity="top"
+                android:background="#C6C5C5"
+                android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+                android:gravity="center_horizontal|start|center_vertical"
+                android:text="@string/login_with_google"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:translationY="-30dp"
+                app:icon="@drawable/googleg_standard_color_18"
+                app:iconPadding="-20dp"
+                app:iconTint="@color/common_google_signin_btn_tint"
+                app:iconTintMode="src_atop" />
+
+            <Button
+                android:id="@+id/login_facebook"
+                style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="#C6C5C5"
+                android:backgroundTint="@color/fui_bgFacebook"
+                android:text="@string/login_with_facebook"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textIsSelectable="false"
+                android:translationY="-50dp"
+                app:icon="@drawable/fui_ic_facebook_white_22dp"
+                app:iconPadding="-20dp"
+                app:iconTint="@color/common_google_signin_btn_tint"
+                app:iconTintMode="src_atop" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

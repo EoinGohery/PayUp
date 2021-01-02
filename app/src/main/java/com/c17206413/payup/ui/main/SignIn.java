@@ -2,7 +2,7 @@ package com.c17206413.payup.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.text.Layout;
 import android.widget.Button;
 import android.view.View;
 
@@ -17,15 +17,15 @@ import com.google.android.gms.tasks.Task;
 
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuthMultiFactorException;
-import com.google.firebase.auth.MultiFactorResolver;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
@@ -33,11 +33,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.firebase.ui.auth.AuthUI;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class SignIn extends AppCompatActivity {
 
@@ -47,8 +42,14 @@ public class SignIn extends AppCompatActivity {
     ProgressBar progressBar;
     TextInputLayout email;
     TextInputLayout password;
+    TextInputLayout lastName;
+    TextInputLayout firstName;
+    LinearLayout signIn;
+    LinearLayout register;
     EditText passwordInput;
     EditText emailInput;
+    EditText firstNameInput;
+    EditText lastNameInput;
     private FirebaseAuth mAuth;
 
     private GoogleSignInClient mGoogleSignInClient;
@@ -59,7 +60,11 @@ public class SignIn extends AppCompatActivity {
         setContentView(com.c17206413.payup.R.layout.activity_signin);
         mAuth = FirebaseAuth.getInstance();
         progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+        signIn = (LinearLayout) findViewById(R.id.signIn_Layout);
         email = (TextInputLayout) findViewById(R.id.emailLayout);
+        register = (LinearLayout) findViewById(R.id.registerLayout);
+        firstName = (TextInputLayout) findViewById(R.id.firstNameLayout);
+        lastName = (TextInputLayout) findViewById(R.id.lastNameLayout);
         password = (TextInputLayout) findViewById(R.id.passwordLayout);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -68,10 +73,19 @@ public class SignIn extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
+
         Button googleButton = (Button) findViewById(R.id.login_google);
         googleButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 googleSignIn();
+            }
+        });
+
+        Button showRegisterButton = (Button) findViewById(R.id.link_signup);
+        showRegisterButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                signIn.setVisibility(View.GONE);
+                register.setVisibility(View.VISIBLE);
             }
         });
 
@@ -85,14 +99,28 @@ public class SignIn extends AppCompatActivity {
         Button emailLogin= (Button) findViewById(R.id.login_with_password);
         emailLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String emailString =findViewById(R.id.input_email).toString();
+                String emailString =findViewById(R.id.input_first_name).toString();
                 String passwordString =findViewById(R.id.input_password).toString();
                 loginSignIn(emailString, passwordString);
             }
         });
 
+        Button resisterButton= (Button) findViewById(R.id.register);
+        resisterButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
 
+            }
+        });
+
+        Button backToSingInButton= (Button) findViewById(R.id.backToSignIn);
+        backToSingInButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                register.setVisibility(View.GONE);
+                signIn.setVisibility(View.VISIBLE);
+            }
+        });
     }
+
 
     private void googleSignIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -261,7 +289,7 @@ public class SignIn extends AppCompatActivity {
     private boolean validateForm() {
         boolean valid = true;
 
-        emailInput = findViewById(R.id.input_email);
+        emailInput = findViewById(R.id.input_first_name);
         String emailString = emailInput.getText().toString();
         if (emailString.isEmpty()) {
             email.setError("Required.");
