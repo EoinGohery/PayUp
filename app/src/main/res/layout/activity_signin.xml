@@ -104,6 +104,10 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="37dp" />
+
             <Button
                 android:id="@+id/register"
                 android:layout_width="match_parent"
