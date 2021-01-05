@@ -46,7 +46,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
-    //implementation 'com.twitter.sdk.android:twitter-core:3.x'
 }
 
 apply plugin: 'com.google.gms.google-services'

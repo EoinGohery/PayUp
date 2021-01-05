@@ -216,8 +216,6 @@ public class SignIn extends AppCompatActivity {
                             Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
-
-                        // ...
                     }
                 });
     }
@@ -243,9 +241,7 @@ public class SignIn extends AppCompatActivity {
                             Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
-
                         progressBar.setVisibility(View.INVISIBLE);
-
                     }
                 });
     }
@@ -277,8 +273,6 @@ public class SignIn extends AppCompatActivity {
 //                            checkForMultiFactorFailure(task.getException());
                             // [END_EXCLUDE]
                         }
-
-
                     }
                 });
         progressBar.setVisibility(View.INVISIBLE);
@@ -315,7 +309,6 @@ public class SignIn extends AppCompatActivity {
                             Snackbar.make(findViewById(android.R.id.content), "Failed to send verification email", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
-                        // [END_EXCLUDE]
                     }
                 });
         // [END send_email_verification]
@@ -338,7 +331,6 @@ public class SignIn extends AppCompatActivity {
         if (!validateRegisterForm()) {
             return;
         }
-
         progressBar.setVisibility(View.VISIBLE);
 
         // [START create_user_with_email]
@@ -382,9 +374,7 @@ public class SignIn extends AppCompatActivity {
             valid = false;
         } else {
             password.setError(null);
-
         }
-
         return valid;
     }
 
