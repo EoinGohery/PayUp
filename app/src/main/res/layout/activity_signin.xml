@@ -10,21 +10,13 @@
 
     <LinearLayout
         android:id="@+id/parentLinear"
-        android:layout_width="301dp"
-        android:layout_height="655dp"
+        android:layout_width="332dp"
+        android:layout_height="747dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <!--        <com.facebook.login.widget.LoginButton-->
-        <!--            android:id="@+id/login_with_facebook"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_gravity="center_horizontal"-->
-        <!--            android:text="@string/login_with_facebook" />-->
-
 
         <ImageView
             android:id="@+id/imageView"
@@ -68,7 +60,7 @@
         <LinearLayout
             android:id="@+id/registerLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="400dp"
             android:orientation="vertical"
             android:visibility="gone">
 
@@ -135,7 +127,7 @@
         <LinearLayout
             android:id="@+id/signIn_Layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="400dp"
             android:orientation="vertical"
             android:visibility="visible">
 
@@ -143,7 +135,7 @@
                 android:id="@+id/link_signup"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="fill_parent"
-                android:layout_height="35dp"
+                android:layout_height="52dp"
                 android:layout_marginBottom="24dp"
                 android:background="#FFFFFF"
                 android:gravity="center|top"
@@ -155,7 +147,7 @@
                 android:textColorHint="@android:color/transparent"
                 android:textColorLink="@android:color/transparent"
                 android:textCursorDrawable="@android:color/transparent"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 app:rippleColor="@android:color/transparent" />
 
             <Button
@@ -230,6 +222,25 @@
                 app:iconTintMode="src_atop" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/link_terms_conditions"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginBottom="24dp"
+            android:background="#FFFFFF"
+            android:gravity="center|top"
+            android:linksClickable="true"
+            android:text="@string/terms_conditions"
+            android:textAllCaps="false"
+            android:textColor="@color/grey_2"
+            android:textColorHighlight="@android:color/transparent"
+            android:textColorHint="@android:color/transparent"
+            android:textColorLink="@android:color/transparent"
+            android:textCursorDrawable="@android:color/transparent"
+            android:textSize="12sp"
+            app:rippleColor="@android:color/transparent" />
 
     </LinearLayout>
 

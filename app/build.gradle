@@ -45,7 +45,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.android.material:material:1.0.0'
-   // implementation 'com.facebook.android:facebook-android-sdk:4.x'
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
     //implementation 'com.twitter.sdk.android:twitter-core:3.x'
 }
 

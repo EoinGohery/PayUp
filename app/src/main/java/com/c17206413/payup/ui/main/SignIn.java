@@ -10,10 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.c17206413.payup.R;
+import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
 
 import android.util.Log;
 import android.widget.EditText;
@@ -30,14 +30,24 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+
+import java.util.Arrays;
+
 public class SignIn extends AppCompatActivity {
 
-    private static final String TAG = "GoogleActivity";
-    private static final int RC_SIGN_IN = 9001;
+    private static final String TAG = "Sign In";
+    private static final int GOOGLE_SIGN_IN = 9001;
 
     ProgressBar progressBar;
     TextInputLayout email;
@@ -50,52 +60,31 @@ public class SignIn extends AppCompatActivity {
     EditText emailInput;
     EditText firstNameInput;
     EditText lastNameInput;
-    private FirebaseAuth mAuth;
 
+    private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
+    private CallbackManager mCallbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(com.c17206413.payup.R.layout.activity_signin);
+
         mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) { finish(); }
+
         progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+
         signIn = (LinearLayout) findViewById(R.id.signIn_Layout);
-        email = (TextInputLayout) findViewById(R.id.emailLayout);
         registerLayout = (LinearLayout) findViewById(R.id.registerLayout);
+
+        email = (TextInputLayout) findViewById(R.id.emailLayout);
         firstName = (TextInputLayout) findViewById(R.id.firstNameLayout);
         lastName = (TextInputLayout) findViewById(R.id.lastNameLayout);
         password = (TextInputLayout) findViewById(R.id.passwordLayout);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-
-        Button googleButton = (Button) findViewById(R.id.login_google);
-        googleButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                googleSignIn();
-            }
-        });
-
-        Button showRegisterButton = (Button) findViewById(R.id.link_signup);
-        showRegisterButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                signIn.setVisibility(View.GONE);
-                registerLayout.setVisibility(View.VISIBLE);
-            }
-        });
-
-        Button facebookButton = (Button) findViewById(R.id.login_facebook);
-        facebookButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Do something in response to button click
-            }
-        });
-
+        //email sign in
         Button emailLogin= (Button) findViewById(R.id.login_with_password);
         emailLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -105,6 +94,62 @@ public class SignIn extends AppCompatActivity {
             }
         });
 
+        //Google sign in
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        Button googleButton = (Button) findViewById(R.id.login_google);
+        googleButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                googleSignIn();
+            }
+        });
+
+        //Facebook login
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
+        mCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG, "facebook:onSuccess:" + loginResult);
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "facebook:onCancel");
+                Snackbar.make(findViewById(android.R.id.content), "Authentication Cancelled.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(TAG, "facebook:onError", error);
+                Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        Button facebookButton = (Button)findViewById(R.id.login_facebook);
+        facebookButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity1.this, (Arrays.asList("public_profile", "user_friends","user_birthday","user_about_me","email")));
+                LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("public_profile","email","user_friends"));
+            }
+        });
+
+        //enable registration form
+        Button showRegisterButton = (Button) findViewById(R.id.link_signup);
+        showRegisterButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                signIn.setVisibility(View.GONE);
+                registerLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //email registration
         Button registerButton= (Button) findViewById(R.id.register);
         registerButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -114,6 +159,7 @@ public class SignIn extends AppCompatActivity {
             }
         });
 
+        //enable social media sign in buttons
         Button backToSingInButton= (Button) findViewById(R.id.backToSignIn);
         backToSingInButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -123,10 +169,9 @@ public class SignIn extends AppCompatActivity {
         });
     }
 
-
     private void googleSignIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
     }
 
     @Override
@@ -134,7 +179,7 @@ public class SignIn extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == GOOGLE_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
@@ -144,11 +189,16 @@ public class SignIn extends AppCompatActivity {
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
+                Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
                 // ...
             }
+        } else {
+            mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
+        checkCurrentUser();
+        // [END check_current_user]
     }
-
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
@@ -159,8 +209,7 @@ public class SignIn extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            finish();
+                            checkCurrentUser();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -173,6 +222,35 @@ public class SignIn extends AppCompatActivity {
                 });
     }
 
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d(TAG, "handleFacebookAccessToken:" + token);
+        // [START_EXCLUDE silent]
+        progressBar.setVisibility(View.VISIBLE);
+        // [END_EXCLUDE]
+
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCredential:success");
+                            checkCurrentUser();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
+
+                        progressBar.setVisibility(View.INVISIBLE);
+
+                    }
+                });
+    }
+
+    //email login method
     private void loginSignIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
         if (!validateLoginInForm()) {
@@ -189,8 +267,7 @@ public class SignIn extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            finish();
+                            checkCurrentUser();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -206,6 +283,13 @@ public class SignIn extends AppCompatActivity {
                 });
         progressBar.setVisibility(View.INVISIBLE);
         // [END sign_in_with_email]
+    }
+
+    public void checkCurrentUser() {
+        // [START check_current_user]
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) { finish(); }
+        // [END check_current_user]
     }
 
     private void sendEmailVerification() {
@@ -248,6 +332,7 @@ public class SignIn extends AppCompatActivity {
 //        }
 //    }
 
+    //email registration method
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
         if (!validateRegisterForm()) {
@@ -279,6 +364,7 @@ public class SignIn extends AppCompatActivity {
         // [END create_user_with_email]
     }
 
+    //validate login strings correctness
     private boolean validateLoginInForm() {
         boolean valid = true;
 
@@ -302,6 +388,7 @@ public class SignIn extends AppCompatActivity {
         return valid;
     }
 
+    //validate login strings correctness
     private boolean validateRegisterForm() {
         boolean valid = true;
 
@@ -343,7 +430,7 @@ public class SignIn extends AppCompatActivity {
         return valid;
     }
 
-
+    //back pressed
     public void onBackPressed() {
         // disable going back to the MainActivity
         moveTaskToBack(true);

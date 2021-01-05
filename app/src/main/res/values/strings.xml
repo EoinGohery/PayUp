@@ -18,5 +18,8 @@
     <string name="twitter_consumer_key" translatable="false">YOUR_CONSUMER_KEY</string>
     <string name="twitter_consumer_secret" translatable="false">YOUR_CONSUMER_SECRET</string>
     <string name="backToSignIn">Back To Sign In</string>
+    <string name="facebook_app_id">440518313790406</string>
+    <string name="fb_login_protocol_scheme">fb440518313790406</string>
+    <string name="terms_conditions">Terms and Conditions</string>
 
 </resources>
