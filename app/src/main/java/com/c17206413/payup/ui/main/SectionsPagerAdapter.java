@@ -10,10 +10,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.c17206413.payup.R;
 
-/**
- * A [FragmentPagerAdapter] that returns a fragment corresponding to
- * one of the sections/tabs/pages.
- */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
@@ -26,12 +22,16 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+    public Fragment getItem(int pos) {
+        switch (pos) {
+            case 0:
+                return DueFragment.newInstance(pos);
+            case 1:
+                return IncomingFragment.newInstance(pos);
+            default:
+                return DueFragment.newInstance(pos + 1);
+        }
     }
-
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {

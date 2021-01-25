@@ -136,7 +136,7 @@ public class SignIn extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity1.this, (Arrays.asList("public_profile", "user_friends","user_birthday","user_about_me","email")));
-                LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("public_profile","email","user_friends"));
+                LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("public_profile","email","name"));
             }
         });
 
@@ -342,8 +342,7 @@ public class SignIn extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             progressBar.setVisibility(View.INVISIBLE);
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            finish();
+                            checkCurrentUser();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
