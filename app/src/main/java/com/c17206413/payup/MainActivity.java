@@ -5,36 +5,27 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.c17206413.payup.ui.main.SignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.c17206413.payup.ui.main.UserActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Button;
 
 import com.c17206413.payup.ui.main.SectionsPagerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private GoogleSignInClient mGoogleSignInClient;
-    private static final String TAG = "Login";
 
     // user details
     String providerId;
@@ -49,19 +40,33 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         checkCurrentUser();
         setContentView(R.layout.activity_main);
+        NestedScrollView scrollView = (NestedScrollView) findViewById (R.id.nestedScroll);
+        scrollView.setFillViewport (true);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        FloatingActionButton fab = findViewById(R.id.addbutton);
+        /*FloatingActionButton fab = findViewById(R.id.addbutton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 signOut();
             }
+        });*/
+
+        Button userButton= (Button) findViewById(R.id.userButton);
+        userButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                openUser();
+            }
         });
+    }
+
+    private void openUser() {
+        Intent intent = new Intent(this, UserActivity.class);
+        startActivityForResult(intent,0);
     }
 
     private void signOut() {

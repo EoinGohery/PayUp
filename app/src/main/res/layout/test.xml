@@ -19,9 +19,22 @@
             android:background="@color/purple_1"
             app:layout_scrollFlags="scroll|enterAlways|snap">
 
-            <Space
-                android:layout_width="20sp"
-                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/backButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/purple_1"
+                android:textColor="#FFFFFF"
+                android:textColorHighlight="@color/white"
+                android:textColorHint="@color/black"
+                android:textColorLink="@color/black"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="60dp"
+                app:iconTint="@color/white"
+                app:rippleColor="@color/purple_1"
+                app:srcCompat="@drawable/abc_vector_test" />
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
@@ -33,7 +46,7 @@
                 android:textSize="24sp" />
 
             <Button
-                android:id="@+id/userButton"
+                android:id="@+id/userbutton"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
@@ -45,7 +58,7 @@
                 app:icon="@drawable/fui_ic_anonymous_white_24dp"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
-                app:iconSize="34dp"
+                app:iconSize="46dp"
                 app:iconTint="@color/white"
                 app:rippleColor="@color/purple_1" />
         </LinearLayout>
@@ -69,25 +82,28 @@
                 app:tabSelectedTextColor="@color/white"
                 app:tabTextAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:tabTextColor="@color/grey_4" />
+
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedsv"
         android:layout_width="match_parent"
-        android:id="@+id/nestedScroll"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="mio.kon.yyb.nestedscrollviewbug.ScrollingActivity"
-        tools:showIn="@layout/activity_main">
+        android:fillViewport="false"
+        android:fitsSystemWindows="true"
+        app:layout_anchor="@+id/nestedsv"
+        app:layout_anchorGravity="center"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        </androidx.viewpager.widget.ViewPager>
 
+        </androidx.viewpager.widget.ViewPager>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -16,13 +16,9 @@ import com.c17206413.payup.R;
 
 public class IncomingFragment extends Fragment {
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
-
-    public static IncomingFragment newInstance(int index) {
+    public static IncomingFragment newInstance() {
         IncomingFragment fragment = new IncomingFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SECTION_NUMBER, index);
-        fragment.setArguments(bundle);
+
         return fragment;
     }
 

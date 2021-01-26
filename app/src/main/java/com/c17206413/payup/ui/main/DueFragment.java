@@ -13,18 +13,11 @@ import androidx.lifecycle.Observer;
 
 import com.c17206413.payup.R;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class DueFragment extends Fragment {
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
-
-    public static DueFragment newInstance(int index) {
+    public static DueFragment newInstance() {
         DueFragment fragment = new DueFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SECTION_NUMBER, index);
-        fragment.setArguments(bundle);
+
         return fragment;
     }
 

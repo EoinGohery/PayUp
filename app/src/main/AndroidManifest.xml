@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.main.SignIn"></activity>
+        <activity android:name=".ui.main.UserActivity"></activity>
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             tools:replace="android:value"

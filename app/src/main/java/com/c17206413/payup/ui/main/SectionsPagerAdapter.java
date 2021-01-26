@@ -13,7 +13,7 @@ import com.c17206413.payup.R;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_due, R.string.tab_incoming};
     private final Context mContext;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
@@ -25,11 +25,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int pos) {
         switch (pos) {
             case 0:
-                return DueFragment.newInstance(pos);
+                return DueFragment.newInstance();
             case 1:
-                return IncomingFragment.newInstance(pos);
+                return IncomingFragment.newInstance();
             default:
-                return DueFragment.newInstance(pos + 1);
+                return DueFragment.newInstance();
         }
     }
     @Nullable
@@ -40,7 +40,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        // Show 2 total pages.
         return 2;
     }
 }
