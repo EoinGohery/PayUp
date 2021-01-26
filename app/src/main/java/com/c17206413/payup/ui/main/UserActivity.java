@@ -1,6 +1,7 @@
 package com.c17206413.payup.ui.main;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +30,31 @@ public class UserActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        Button saveButton= (Button) findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                killActivity();
+            }
+        });
+
+        Button logOutButton= (Button) findViewById(R.id.logOutButton);
+        logOutButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                logOut();
+            }
+        });
+    }
+    private void logOut() {
+        Intent data = new Intent();
+        String text = "LogOut";
+        data.setData(Uri.parse(text));
+        setResult(RESULT_OK, data);
+        killActivity();
     }
 
+    private void killActivity() {
+        finish();
+    }
 
 }

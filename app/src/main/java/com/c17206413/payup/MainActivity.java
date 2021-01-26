@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void openUser() {
         Intent intent = new Intent(this, UserActivity.class);
-        startActivityForResult(intent,0);
+        startActivityForResult(intent,1);
     }
 
     private void signOut() {
@@ -115,6 +115,13 @@ public class MainActivity extends AppCompatActivity {
                 getUserProfile();
             } catch (Exception e) {
                 signInUser();
+            }
+        } else if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                String returnedResult = data.getDataString();
+                if (returnedResult.equals("LogOut")){
+                    signOut();
+                }
             }
         }
     }

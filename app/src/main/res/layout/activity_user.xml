@@ -73,32 +73,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="32dp" />
 
-            <LinearLayout
+            <Button
+                android:id="@+id/logOutButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:insetLeft="-2dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/com_facebook_loginview_log_out_button"
+                android:textColor="@color/black"
+                app:rippleColor="@color/grey_4"
+                app:strokeColor="#FFFFFF"
+                app:strokeWidth="1dp" />
 
-                <Button
-                    android:id="@+id/signOutButton"
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/com_facebook_loginview_log_out_button"
-                    android:translationX="40dp" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/saveButton"
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/fui_button_text_save"
-                    android:translationX="-40dp" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/saveButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:insetLeft="-2dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/fui_button_text_save"
+                android:textColor="@color/black"
+                app:rippleColor="@color/grey_4"
+                app:strokeColor="@color/grey_3"
+                app:strokeWidth="1dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
