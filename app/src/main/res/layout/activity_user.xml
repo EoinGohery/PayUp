@@ -63,6 +63,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="32dp" />
+
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
@@ -75,26 +79,52 @@
                 android:layout_height="32dp" />
 
             <Button
-                android:id="@+id/logOutButton"
+                android:id="@+id/noFrameButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
                 android:gravity="start|center_vertical"
                 android:insetLeft="-2dp"
                 android:insetTop="0dp"
                 android:insetRight="-2dp"
                 android:insetBottom="0dp"
-                android:text="@string/com_facebook_loginview_log_out_button"
+                android:text="@string/app_name"
                 android:textColor="@color/black"
                 app:rippleColor="@color/grey_4"
                 app:strokeColor="#FFFFFF"
                 app:strokeWidth="1dp" />
 
             <Button
+                android:id="@+id/frameButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="start|center_vertical"
+                android:insetLeft="-2dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/app_name"
+                android:textColor="@color/black"
+                app:rippleColor="@color/grey_4"
+                app:strokeColor="@color/grey_3"
+                app:strokeWidth="1dp" />
+
+            <Switch
+                android:id="@+id/darkModeSwitch"
+                android:layout_width="380dp"
+                android:layout_height="45dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/dark_mode"
+                android:textAlignment="inherit"
+                android:textAllCaps="true"
+                android:translationX="13dp" />
+
+            <Button
                 android:id="@+id/saveButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
                 android:gravity="start|center_vertical"
                 android:insetLeft="-2dp"
                 android:insetTop="0dp"
@@ -106,6 +136,23 @@
                 app:strokeColor="@color/grey_3"
                 app:strokeWidth="1dp" />
 
+            <Button
+                android:id="@+id/logOutButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="start|center_vertical"
+                android:insetLeft="-2dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/com_facebook_loginview_log_out_button"
+                android:textColor="@color/black"
+                app:rippleColor="@color/grey_4"
+                app:strokeColor="#FFFFFF"
+                app:strokeWidth="1dp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
