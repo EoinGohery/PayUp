@@ -5,7 +5,7 @@
     style="@style/Theme.AppCompat.DayNight.Dialog.Alert"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_4"
+    android:background="@color/colorBackground"
     tools:context=".ui.main.SignIn">
 
     <LinearLayout
@@ -35,8 +35,10 @@
                 android:id="@+id/input_email"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:background="@color/colorBackground"
                 android:hint="@string/email"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:textColor="@color/textColor" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -51,9 +53,11 @@
                 android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:background="@color/colorBackground"
                 android:hint="@string/password"
                 android:importantForAutofill="no"
-                android:inputType="textAutoCorrect|textPassword|textAutoComplete" />
+                android:inputType="textAutoCorrect|textPassword|textAutoComplete"
+                android:textColor="@color/textColor" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -104,7 +108,7 @@
                 android:id="@+id/register"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:backgroundTint="@color/grey_2"
+                android:backgroundTint="@color/colorSecondaryVariant"
                 android:text="@string/register" />
 
             <TextView
@@ -119,7 +123,7 @@
                 android:id="@+id/backToSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:backgroundTint="@color/grey_2"
+                android:backgroundTint="@color/colorSecondaryVariant"
                 android:text="@string/backToSignIn" />
 
         </LinearLayout>
@@ -137,12 +141,11 @@
                 android:layout_width="fill_parent"
                 android:layout_height="52dp"
                 android:layout_marginBottom="24dp"
-                android:background="#FFFFFF"
                 android:gravity="center|top"
                 android:linksClickable="true"
                 android:text="@string/no_account"
                 android:textAllCaps="false"
-                android:textColor="@color/grey_2"
+                android:textColor="@color/colorSecondaryVariant"
                 android:textColorHighlight="@android:color/transparent"
                 android:textColorHint="@android:color/transparent"
                 android:textColorLink="@android:color/transparent"
@@ -154,7 +157,7 @@
                 android:id="@+id/login_with_password"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:backgroundTint="@color/grey_2"
+                android:backgroundTint="@color/colorSecondaryVariant"
                 android:text="@string/login_with_password" />
 
             <TextView
@@ -163,6 +166,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/or"
+                android:textColor="@color/textColor"
                 android:textSize="18sp" />
 
             <Button
@@ -180,25 +184,20 @@
                 app:icon="@drawable/fui_ic_twitter_bird_white_24dp"
                 app:iconGravity="start"
                 app:iconPadding="-20dp"
-                app:iconTint="@color/white" />
+                app:iconTint="#FFFFFF" />
 
             <Button
                 android:id="@+id/login_google"
-                style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
+                style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:layout_gravity="top"
-                android:background="#C6C5C5"
-                android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
-                android:gravity="center_horizontal|start|center_vertical"
+                android:backgroundTint="@color/colorSurface"
                 android:text="@string/login_with_google"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textColor="@color/black"
                 android:textIsSelectable="false"
                 android:translationY="-30dp"
-                app:icon="@drawable/googleg_standard_color_18"
+                app:icon="@drawable/fui_ic_googleg_color_24dp"
                 app:iconPadding="-20dp"
                 app:iconTint="@color/common_google_signin_btn_tint"
                 app:iconTintMode="src_atop" />
@@ -208,12 +207,10 @@
                 style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:background="#C6C5C5"
                 android:backgroundTint="@color/fui_bgFacebook"
                 android:text="@string/login_with_facebook"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
                 android:textIsSelectable="false"
                 android:translationY="-50dp"
                 app:icon="@drawable/fui_ic_facebook_white_22dp"
@@ -229,12 +226,11 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginBottom="24dp"
-            android:background="#FFFFFF"
             android:gravity="center|top"
             android:linksClickable="true"
             android:text="@string/terms_conditions"
             android:textAllCaps="false"
-            android:textColor="@color/grey_2"
+            android:textColor="@color/textColor"
             android:textColorHighlight="@android:color/transparent"
             android:textColorHint="@android:color/transparent"
             android:textColorLink="@android:color/transparent"

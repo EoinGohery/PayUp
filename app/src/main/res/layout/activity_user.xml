@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/purple_1"
+            android:background="@color/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways|snap">
 
             <ImageButton
@@ -24,17 +24,11 @@
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
-                android:backgroundTint="@color/purple_1"
                 android:contentDescription="@string/back_button"
-                android:textColor="#FFFFFF"
-                android:textColorHighlight="@color/white"
-                android:textColorHint="@color/black"
-                android:textColorLink="@color/black"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 app:iconSize="60dp"
-                app:iconTint="@color/white"
-                app:rippleColor="@color/purple_1"
+                app:iconTint="@color/colorOnPrimary"
                 app:srcCompat="@drawable/abc_vector_test" />
 
             <TextView
@@ -89,25 +83,9 @@
                 android:insetRight="-2dp"
                 android:insetBottom="0dp"
                 android:text="@string/app_name"
-                android:textColor="@color/black"
-                app:rippleColor="@color/grey_4"
-                app:strokeColor="#FFFFFF"
-                app:strokeWidth="1dp" />
-
-            <Button
-                android:id="@+id/frameButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:gravity="start|center_vertical"
-                android:insetLeft="-2dp"
-                android:insetTop="0dp"
-                android:insetRight="-2dp"
-                android:insetBottom="0dp"
-                android:text="@string/app_name"
-                android:textColor="@color/black"
-                app:rippleColor="@color/grey_4"
-                app:strokeColor="@color/grey_3"
+                android:textColor="@color/textColor"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
                 app:strokeWidth="1dp" />
 
             <Switch
@@ -118,6 +96,7 @@
                 android:text="@string/dark_mode"
                 android:textAlignment="inherit"
                 android:textAllCaps="true"
+                android:textColor="@color/textColor"
                 android:translationX="13dp" />
 
             <Button
@@ -131,9 +110,9 @@
                 android:insetRight="-2dp"
                 android:insetBottom="0dp"
                 android:text="@string/fui_button_text_save"
-                android:textColor="@color/black"
-                app:rippleColor="@color/grey_4"
-                app:strokeColor="@color/grey_3"
+                android:textColor="@color/textColor"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
                 app:strokeWidth="1dp" />
 
             <Button
@@ -147,10 +126,10 @@
                 android:insetRight="-2dp"
                 android:insetBottom="0dp"
                 android:text="@string/com_facebook_loginview_log_out_button"
-                android:textColor="@color/black"
-                app:rippleColor="@color/grey_4"
-                app:strokeColor="#FFFFFF"
-                app:strokeWidth="1dp" />
+                android:textColor="@color/textColor"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="0dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

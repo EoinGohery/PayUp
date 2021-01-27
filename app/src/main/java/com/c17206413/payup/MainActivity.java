@@ -1,6 +1,7 @@
 package com.c17206413.payup;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -9,10 +10,12 @@ import com.c17206413.payup.ui.main.UserActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 
@@ -20,7 +23,6 @@ import com.c17206413.payup.ui.main.SectionsPagerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,12 +36,17 @@ public class MainActivity extends AppCompatActivity {
     String email;
     Uri photoUrl;
 
+    public static final String NIGHT_MODE = "NIGHT_MODE";
+    private SharedPreferences mPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         checkCurrentUser();
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
+        setTheme();
         NestedScrollView scrollView = (NestedScrollView) findViewById (R.id.nestedScroll);
         scrollView.setFillViewport (true);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
@@ -47,14 +54,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-
-        /*FloatingActionButton fab = findViewById(R.id.addbutton);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signOut();
-            }
-        });*/
 
         Button userButton= (Button) findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
@@ -71,9 +70,19 @@ public class MainActivity extends AppCompatActivity {
         signInUser();
     }
 
+    private void setTheme() {
+        boolean isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
+        if (isNightModeEnabled) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        setTheme();
         getUserProfile();
 
         //checkCurrentUser();
@@ -82,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRestart() {
         super.onRestart();
+        setTheme();
 
     }
 
@@ -97,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void  signInUser() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
         startActivityForResult(intent,0);
     }
