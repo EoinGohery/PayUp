@@ -2,7 +2,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -26,6 +25,7 @@
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
                 android:backgroundTint="@color/purple_1"
+                android:contentDescription="@string/back_button"
                 android:textColor="#FFFFFF"
                 android:textColorHighlight="@color/white"
                 android:textColorHint="@color/black"
@@ -67,6 +67,7 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="103dp"
+                android:contentDescription="@string/profile_picture"
                 app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 
             <Space

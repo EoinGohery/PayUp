@@ -86,12 +86,10 @@ public class SignIn extends AppCompatActivity {
 
         //email sign in
         Button emailLogin= (Button) findViewById(R.id.login_with_password);
-        emailLogin.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                String emailString = email.getEditText().getText().toString();
-                String passwordString = password.getEditText().getText().toString();
-                loginSignIn(emailString, passwordString);
-            }
+        emailLogin.setOnClickListener(v -> {
+            String emailString = email.getEditText().getText().toString();
+            String passwordString = password.getEditText().getText().toString();
+            loginSignIn(emailString, passwordString);
         });
 
         //Google sign in
@@ -101,14 +99,10 @@ public class SignIn extends AppCompatActivity {
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         Button googleButton = (Button) findViewById(R.id.login_google);
-        googleButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                googleSignIn();
-            }
-        });
+        googleButton.setOnClickListener(v -> googleSignIn());
 
         //Facebook login
-        FacebookSdk.sdkInitialize(this.getApplicationContext());
+        //FacebookSdk.sdkInitialize(this.getApplicationContext());
         mCallbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -122,7 +116,6 @@ public class SignIn extends AppCompatActivity {
                 Snackbar.make(findViewById(android.R.id.content), "Authentication Cancelled.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-
             @Override
             public void onError(FacebookException error) {
                 Log.d(TAG, "facebook:onError", error);
@@ -132,40 +125,31 @@ public class SignIn extends AppCompatActivity {
         });
 
         Button facebookButton = (Button)findViewById(R.id.login_facebook);
-        facebookButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity1.this, (Arrays.asList("public_profile", "user_friends","user_birthday","user_about_me","email")));
-                LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("public_profile","email","name"));
-            }
+        facebookButton.setOnClickListener(view -> {
+            //LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity1.this, (Arrays.asList("public_profile", "user_friends","user_birthday","user_about_me","email")));
+            LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("public_profile","email","name"));
         });
 
         //enable registration form
         Button showRegisterButton = (Button) findViewById(R.id.link_signup);
-        showRegisterButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                signIn.setVisibility(View.GONE);
-                registerLayout.setVisibility(View.VISIBLE);
-            }
+        showRegisterButton.setOnClickListener(v -> {
+            signIn.setVisibility(View.GONE);
+            registerLayout.setVisibility(View.VISIBLE);
         });
 
         //email registration
         Button registerButton= (Button) findViewById(R.id.register);
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                String emailString =  email.getEditText().getText().toString();
-                String passwordString = password.getEditText().getText().toString();
-                createAccount(emailString, passwordString);
-            }
+        registerButton.setOnClickListener(v -> {
+            String emailString =  email.getEditText().getText().toString();
+            String passwordString = password.getEditText().getText().toString();
+            createAccount(emailString, passwordString);
         });
 
         //enable social media sign in buttons
         Button backToSingInButton= (Button) findViewById(R.id.backToSignIn);
-        backToSingInButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                registerLayout.setVisibility(View.GONE);
-                signIn.setVisibility(View.VISIBLE);
-            }
+        backToSingInButton.setOnClickListener(v -> {
+            registerLayout.setVisibility(View.GONE);
+            signIn.setVisibility(View.VISIBLE);
         });
     }
 
@@ -203,19 +187,16 @@ public class SignIn extends AppCompatActivity {
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            checkCurrentUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithCredential:success");
+                        checkCurrentUser();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithCredential:failure", task.getException());
+                        Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
                     }
                 });
     }
@@ -228,21 +209,18 @@ public class SignIn extends AppCompatActivity {
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            checkCurrentUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        }
-                        progressBar.setVisibility(View.INVISIBLE);
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithCredential:success");
+                        checkCurrentUser();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithCredential:failure", task.getException());
+                        Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
                     }
+                    progressBar.setVisibility(View.INVISIBLE);
                 });
     }
 
@@ -257,22 +235,19 @@ public class SignIn extends AppCompatActivity {
 
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            checkCurrentUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                            // [START_EXCLUDE]
-//                            checkForMultiFactorFailure(task.getException());
-                            // [END_EXCLUDE]
-                        }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success");
+                        checkCurrentUser();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+                        Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+
+                        //checkForMultiFactorFailure(task.getException());
+
                     }
                 });
         progressBar.setVisibility(View.INVISIBLE);
@@ -288,30 +263,19 @@ public class SignIn extends AppCompatActivity {
 
     private void sendEmailVerification() {
         // Disable button
-//        mBinding.verifyEmailButton.setEnabled(false);
-
-        // Send verification email
-        // [START send_email_verification]
+        //mBinding.verifyEmailButton.setEnabled(false);
         final FirebaseUser user = mAuth.getCurrentUser();
-        user.sendEmailVerification()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // [START_EXCLUDE]
-                        // Re-enable button
-//                        mBinding.verifyEmailButton.setEnabled(true);
-
-                        if (task.isSuccessful()) {
-                            Snackbar.make(findViewById(android.R.id.content), "Verification email sent to " + user.getEmail(), Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        } else {
-                            Log.e(TAG, "sendEmailVerification", task.getException());
-                            Snackbar.make(findViewById(android.R.id.content), "Failed to send verification email", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        }
-                    }
-                });
-        // [END send_email_verification]
+        user.sendEmailVerification().addOnCompleteListener(this, task -> {
+                //mBinding.verifyEmailButton.setEnabled(true);
+                if (task.isSuccessful()) {
+                    Snackbar.make(findViewById(android.R.id.content), "Verification email sent to " + user.getEmail(), Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    Log.e(TAG, "sendEmailVerification", task.getException());
+                    Snackbar.make(findViewById(android.R.id.content), "Failed to send verification email", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
     }
 
 //    private void checkForMultiFactorFailure(Exception e) {
@@ -335,20 +299,17 @@ public class SignIn extends AppCompatActivity {
 
         // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            progressBar.setVisibility(View.INVISIBLE);
-                            checkCurrentUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Snackbar.make(findViewById(android.R.id.content), "Registration Failed.", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "createUserWithEmail:success");
+                        progressBar.setVisibility(View.INVISIBLE);
+                        checkCurrentUser();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                        Snackbar.make(findViewById(android.R.id.content), "Registration Failed.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
                     }
                 });
         progressBar.setVisibility(View.INVISIBLE);

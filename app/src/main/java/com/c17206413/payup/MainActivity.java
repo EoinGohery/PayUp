@@ -57,11 +57,7 @@ public class MainActivity extends AppCompatActivity {
         });*/
 
         Button userButton= (Button) findViewById(R.id.userButton);
-        userButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                openUser();
-            }
-        });
+        userButton.setOnClickListener(v -> openUser());
     }
 
     private void openUser() {
@@ -134,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
             name = user.getDisplayName();
             email = user.getEmail();
             photoUrl = user.getPhotoUrl();
-            boolean emailVerified = user.isEmailVerified();
+            //boolean emailVerified = user.isEmailVerified();
             uid = user.getUid();
         }
         // [END get_user_profile]
@@ -146,15 +142,15 @@ public class MainActivity extends AppCompatActivity {
         if (user != null) {
             for (UserInfo profile : user.getProviderData()) {
                 // Id of the provider (ex: google.com)
-                String providerId = profile.getProviderId();
+                providerId = profile.getProviderId();
 
                 // UID specific to the provider
-                String uid = profile.getUid();
+                uid = profile.getUid();
 
                 // Name, email address, and profile photo Url
-                String name = profile.getDisplayName();
-                String email = profile.getEmail();
-                Uri photoUrl = profile.getPhotoUrl();
+                name = profile.getDisplayName();
+                email = profile.getEmail();
+                photoUrl = profile.getPhotoUrl();
             }
         }
     }
