@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Pay Up</string>
-    <string name="tab_text_1">Payments Due</string>
+    <string name="tab_due">Payments Due</string>
+    <string name="back_button">Return to main activity</string>
+    <string name="user_button">Go to user activity</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="profile_picture">Profile picture</string>
     <string name="login_with_twitter">Sign in with Twitter</string>
-    <string name="tab_text_2">Incoming</string>
+    <string name="tab_incoming">Incoming</string>
     <string name="email">Email</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>

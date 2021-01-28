@@ -2,77 +2,88 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="bottom"
-    app:layout_anchorGravity="bottom|center"
-    tools:context=".MainActivity">
+    android:background="@color/colorBackground">
 
-    <LinearLayout
-        android:id="@+id/linearLayout3"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+            <Space
+                android:layout_width="20sp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/app_name"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/userButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/user_button"
+                android:textColor="@color/colorOnPrimary"
+                android:textColorHighlight="@color/colorRipple"
+                app:icon="@drawable/fui_ic_anonymous_white_24dp"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="34dp" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/purple_1"
             android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/settingsbutton"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="61dp"
-                android:layout_height="match_parent"
-                android:backgroundTint="@color/purple_1"
-                android:textColor="#FFFFFF"
-                android:textColorHighlight="@color/white"
-                android:textColorHint="@color/black"
-                android:textColorLink="@color/black"
-                app:icon="@drawable/fui_ic_anonymous_white_24dp"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconSize="46dp"
-                app:iconTint="@color/white"
-                app:rippleColor="@color/purple_1" />
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"
-                android:layout_width="352dp"
+                android:layout_width="match_parent"
                 android:layout_height="65dp"
-                android:background="@color/purple_1"
+                android:background="@color/colorPrimary"
                 android:textAlignment="textStart"
                 android:textDirection="firstStrongRtl"
-                app:tabIconTint="@color/black"
-                app:tabIndicatorColor="@color/white"
-                app:tabSelectedTextColor="@color/white"
+                app:tabIndicatorColor="@color/colorOnPrimary"
+                app:tabRippleColor="@color/colorTabs"
+                app:tabSelectedTextColor="@color/colorOnPrimary"
                 app:tabTextAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:tabTextColor="@color/grey_4" />
-
+                app:tabTextColor="@color/colorTabs" />
         </LinearLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="mio.kon.yyb.nestedscrollviewbug.ScrollingActivity"
+        tools:showIn="@layout/activity_main">
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="663dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"></androidx.viewpager.widget.ViewPager>
 
-        </androidx.viewpager.widget.ViewPager>
-    </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addbutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:contentDescription="TODO"
-        app:backgroundTint="@color/purple_1"
-        app:fabSize="auto"
-        app:maxImageSize="44dp"
-        app:rippleColor="#FFFFFF"
-        app:srcCompat="@android:drawable/ic_input_add" />
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
