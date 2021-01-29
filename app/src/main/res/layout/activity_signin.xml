@@ -22,6 +22,7 @@
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/app_name"
             app:srcCompat="@drawable/ic_launcher_foreground" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -35,6 +36,7 @@
                 android:id="@+id/input_email"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:autofillHints=""
                 android:background="@color/colorBackground"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
@@ -69,33 +71,19 @@
             android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/firstNameLayout"
+                android:id="@+id/nameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp">
 
                 <EditText
-                    android:id="@+id/input_first_name"
+                    android:id="@+id/input_name"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:hint="@string/first_name"
-                    android:inputType="textEmailAddress" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/lastNameLayout"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-
-                <EditText
-                    android:id="@+id/input_last_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:hint="@string/last_name"
+                    android:autofillHints=""
+                    android:background="@color/colorBackground"
+                    android:hint="@string/name"
                     android:inputType="textEmailAddress" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -230,7 +218,7 @@
             android:linksClickable="true"
             android:text="@string/terms_conditions"
             android:textAllCaps="false"
-            android:textColor="@color/textColor"
+            android:textColor="@color/colorSecondary"
             android:textColorHighlight="@android:color/transparent"
             android:textColorHint="@android:color/transparent"
             android:textColorLink="@android:color/transparent"

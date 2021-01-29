@@ -5,11 +5,11 @@
     <string name="user_button">Go to user activity</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="profile_picture">Profile picture</string>
+    <string name="accounts">Accounts</string>
     <string name="login_with_twitter">Sign in with Twitter</string>
     <string name="tab_incoming">Incoming</string>
     <string name="email">Email</string>
-    <string name="first_name">First Name</string>
-    <string name="last_name">Last Name</string>
+    <string name="name">Name</string>
     <string name="or">- Or -</string>
     <string name="password">Password</string>
     <string name="login_with_password">Log in</string>

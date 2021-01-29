@@ -22,6 +22,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.Arrays;
 
 public class UserActivity extends AppCompatActivity {
@@ -30,7 +32,6 @@ public class UserActivity extends AppCompatActivity {
     private boolean isNightModeEnabled = false;
 
     private static UserActivity singleton = null;
-
     public static UserActivity getInstance() {
         if(singleton == null)
         {
