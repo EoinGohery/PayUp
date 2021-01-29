@@ -40,13 +40,13 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Firestore Initialisation
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private FirebaseFirestore db;
 
     // user details
     String providerId, uid, name, email, language;
-    Uri photoUrl;
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
     private SharedPreferences mPrefs;
@@ -151,9 +151,7 @@ public class MainActivity extends AppCompatActivity {
         // [START get_user_profile]
         user = mAuth.getCurrentUser();
         if (user != null) {
-            name = user.getDisplayName();
             email = user.getEmail();
-            photoUrl = user.getPhotoUrl();
             uid = user.getUid();
             DocumentReference docIdRef = db.collection("users").document(uid);
             docIdRef.get().addOnCompleteListener(task -> {
@@ -161,41 +159,34 @@ public class MainActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         try {
+                            name = document.get("name").toString();
                             language = document.get("language").toString();
                             Configuration config = new Configuration();
                             Locale locale = new Locale(language);
                             Locale.setDefault(locale);
                             config.setLocale(locale);
                             getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-//                            recreate();
+                            recreate();
                         } catch (RuntimeException e) {
-                            Log.d("set language", "Failed with: ", e);
+                            Log.d("Get user data", "Failed with: ", e);
                         }
                     } else {
-                        Log.d("receive user info", "Failed with: ", task.getException());
+                        Log.d("Receive user info", "Failed with: ", task.getException());
                     }
                 }
             });
         }
     }
 
-
-
     public void getProviderData() {
         // [START get_provider_data]
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             for (UserInfo profile : user.getProviderData()) {
-                // Id of the provider (ex: google.com)
                 providerId = profile.getProviderId();
-
-                // UID specific to the provider
                 uid = profile.getUid();
-
-                // Name, email address, and profile photo Url
                 name = profile.getDisplayName();
                 email = profile.getEmail();
-                photoUrl = profile.getPhotoUrl();
             }
         }
     }

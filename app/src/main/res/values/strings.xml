@@ -1,13 +1,15 @@
 <resources>
-    <string name="app_name">Pay Up</string>
+    <string name="app_name" translatable="false">Pay Up</string>
     <string name="tab_due">Payments Due</string>
     <string name="back_button">Return to main activity</string>
     <string name="user_button">Go to user activity</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="profile_picture">Profile picture</string>
     <string name="accounts">Accounts</string>
+    <string name="new_expense">New Expense</string>
     <string name="login_with_twitter">Sign in with Twitter</string>
     <string name="tab_incoming">Incoming</string>
+    <string name="user">User</string>
     <string name="email">Email</string>
     <string name="name">Name</string>
     <string name="or">- Or -</string>
