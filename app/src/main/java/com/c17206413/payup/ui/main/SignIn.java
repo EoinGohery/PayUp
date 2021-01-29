@@ -1,6 +1,8 @@
 package com.c17206413.payup.ui.main;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Layout;
 import android.widget.Button;
@@ -42,8 +44,14 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class SignIn extends AppCompatActivity {
 
@@ -51,18 +59,15 @@ public class SignIn extends AppCompatActivity {
     private static final int GOOGLE_SIGN_IN = 9001;
 
     ProgressBar progressBar;
-    TextInputLayout email;
-    TextInputLayout password;
-    TextInputLayout lastName;
-    TextInputLayout firstName;
+    TextInputLayout emailInput;
+    TextInputLayout passwordInput;
+    TextInputLayout Input;
+    TextInputLayout nameInput;
     LinearLayout signIn;
     LinearLayout registerLayout;
-    EditText passwordInput;
-    EditText emailInput;
-    EditText firstNameInput;
-    EditText lastNameInput;
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
     private GoogleSignInClient mGoogleSignInClient;
     private CallbackManager mCallbackManager;
 
@@ -70,8 +75,9 @@ public class SignIn extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(com.c17206413.payup.R.layout.activity_signin);
-
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) { finish(); }
 
@@ -80,16 +86,15 @@ public class SignIn extends AppCompatActivity {
         signIn = (LinearLayout) findViewById(R.id.signIn_Layout);
         registerLayout = (LinearLayout) findViewById(R.id.registerLayout);
 
-        email = (TextInputLayout) findViewById(R.id.emailLayout);
-        firstName = (TextInputLayout) findViewById(R.id.firstNameLayout);
-        lastName = (TextInputLayout) findViewById(R.id.lastNameLayout);
-        password = (TextInputLayout) findViewById(R.id.passwordLayout);
+        emailInput = (TextInputLayout) findViewById(R.id.emailLayout);
+        nameInput = (TextInputLayout) findViewById(R.id.nameLayout);
+        passwordInput = (TextInputLayout) findViewById(R.id.passwordLayout);
 
         //email sign in
         Button emailLogin= (Button) findViewById(R.id.login_with_password);
         emailLogin.setOnClickListener(v -> {
-            String emailString = email.getEditText().getText().toString();
-            String passwordString = password.getEditText().getText().toString();
+            String emailString = emailInput.getEditText().getText().toString();
+            String passwordString = passwordInput.getEditText().getText().toString();
             loginSignIn(emailString, passwordString);
         });
 
@@ -127,8 +132,7 @@ public class SignIn extends AppCompatActivity {
 
         Button facebookButton = (Button)findViewById(R.id.login_facebook);
         facebookButton.setOnClickListener(view -> {
-            //LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity1.this, (Arrays.asList("public_profile", "user_friends","user_birthday","user_about_me","email")));
-            LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("public_profile","email","name"));
+            LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("email","name"));
         });
 
         //enable registration form
@@ -141,9 +145,10 @@ public class SignIn extends AppCompatActivity {
         //email registration
         Button registerButton= (Button) findViewById(R.id.register);
         registerButton.setOnClickListener(v -> {
-            String emailString =  email.getEditText().getText().toString();
-            String passwordString = password.getEditText().getText().toString();
-            createAccount(emailString, passwordString);
+            String emailString =  emailInput.getEditText().getText().toString();
+            String passwordString = passwordInput.getEditText().getText().toString();
+            String nameString =  nameInput.getEditText().getText().toString();
+            createAccount(emailString, passwordString, nameString);
         });
 
         //enable social media sign in buttons
@@ -186,12 +191,14 @@ public class SignIn extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
+        progressBar.setVisibility(View.VISIBLE);
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
+                        socialDocument();
                         checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -199,7 +206,47 @@ public class SignIn extends AppCompatActivity {
                         Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
+
+                    progressBar.setVisibility(View.INVISIBLE);
                 });
+    }
+
+    private void socialDocument() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        String Uid = user.getUid();
+        String name = user.getDisplayName();
+
+        DocumentReference docIdRef = db.collection("users").document(Uid);
+        docIdRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d("user data", "DocumentSnapshot data: " + document.getData());
+                } else {
+                    Log.d("user data", "No such document");
+                    newUserDocument(Uid, name);
+                }
+            } else {
+                Log.d("user data", "get failed with ", task.getException());
+            }
+        });
+    }
+
+    private void emailDocument(String Uid, String name) {
+        DocumentReference docIdRef = db.collection("users").document(Uid);
+        docIdRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d("user data", "DocumentSnapshot data: " + document.getData());
+                } else {
+                    Log.d("user data", "No such document");
+                    newUserDocument(Uid, name);
+                }
+            } else {
+                Log.d("user data", "get failed with ", task.getException());
+            }
+        });
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
@@ -214,6 +261,7 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
+                        socialDocument();
                         checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -231,7 +279,6 @@ public class SignIn extends AppCompatActivity {
         if (!validateLoginInForm()) {
             return;
         }
-
         progressBar.setVisibility(View.VISIBLE);
 
         // [START sign_in_with_email]
@@ -247,8 +294,6 @@ public class SignIn extends AppCompatActivity {
                         Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
 
-                        //checkForMultiFactorFailure(task.getException());
-
                     }
                 });
         progressBar.setVisibility(View.INVISIBLE);
@@ -262,36 +307,8 @@ public class SignIn extends AppCompatActivity {
         // [END check_current_user]
     }
 
-    private void sendEmailVerification() {
-        // Disable button
-        //mBinding.verifyEmailButton.setEnabled(false);
-        final FirebaseUser user = mAuth.getCurrentUser();
-        user.sendEmailVerification().addOnCompleteListener(this, task -> {
-                //mBinding.verifyEmailButton.setEnabled(true);
-                if (task.isSuccessful()) {
-                    Snackbar.make(findViewById(android.R.id.content), "Verification email sent to " + user.getEmail(), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                } else {
-                    Log.e(TAG, "sendEmailVerification", task.getException());
-                    Snackbar.make(findViewById(android.R.id.content), "Failed to send verification email", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            });
-    }
-
-//    private void checkForMultiFactorFailure(Exception e) {
-//        if (e instanceof FirebaseAuthMultiFactorException) {
-//            Log.w(TAG, "multiFactorFailure", e);
-//            Intent intent = new Intent();
-//            MultiFactorResolver resolver = ((FirebaseAuthMultiFactorException) e).getResolver();
-//            intent.putExtra("EXTRA_MFA_RESOLVER", resolver);
-//            setResult(MultiFactorActivity.RESULT_NEEDS_MFA_SIGN_IN, intent);
-//            finish();
-//        }
-//    }
-
     //email registration method
-    private void createAccount(String email, String password) {
+    private void createAccount(String email, String password, String name) {
         Log.d(TAG, "createAccount:" + email);
         if (!validateRegisterForm()) {
             return;
@@ -305,6 +322,7 @@ public class SignIn extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
                         progressBar.setVisibility(View.INVISIBLE);
+                        emailDocument(mAuth.getCurrentUser().getUid(), name);
                         checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -321,20 +339,20 @@ public class SignIn extends AppCompatActivity {
     private boolean validateLoginInForm() {
         boolean valid = true;
 
-        String emailString = email.getEditText().getText().toString();
+        String emailString = emailInput.getEditText().getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
-            email.setError("Required.");
+            emailInput.setError("Required.");
             valid = false;
         } else {
-            email.setError(null);
+            emailInput.setError(null);
         }
 
-        String passwordString = password.getEditText().getText().toString();
+        String passwordString = passwordInput.getEditText().getText().toString();
         if (passwordString.isEmpty()) {
-            password.setError("Required.");
+            passwordInput.setError("Required.");
             valid = false;
         } else {
-            password.setError(null);
+            passwordInput.setError(null);
         }
         return valid;
     }
@@ -343,42 +361,44 @@ public class SignIn extends AppCompatActivity {
     private boolean validateRegisterForm() {
         boolean valid = true;
 
-        String emailString = email.getEditText().getText().toString();
+        String emailString = emailInput.getEditText().getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
-            email.setError("Required.");
+            emailInput.setError("Required.");
             valid = false;
         } else {
-            email.setError(null);
+            emailInput.setError(null);
         }
 
-        String passwordString = password.getEditText().getText().toString();
+        String passwordString = passwordInput.getEditText().getText().toString();
         if (passwordString.isEmpty()) {
-            password.setError("Required.");
+            passwordInput.setError("Required.");
             valid = false;
         } else {
-            password.setError(null);
+            passwordInput.setError(null);
 
         }
 
-        String firstNameString = firstName.getEditText().getText().toString();
-        if (firstNameString.isEmpty()) {
-            firstName.setError("Required.");
+        String nameString = nameInput.getEditText().getText().toString();
+        if (nameString.isEmpty()) {
+            nameInput.setError("Required.");
             valid = false;
         } else {
-            firstName.setError(null);
-
-        }
-
-        String lastNameString = lastName.getEditText().getText().toString();
-        if (lastNameString.isEmpty()) {
-            lastName.setError("Required.");
-            valid = false;
-        } else {
-            lastName.setError(null);
+            nameInput.setError(null);
 
         }
 
         return valid;
+    }
+
+    private void newUserDocument(String Uid, String name) {
+        Map<String, Object> user = new HashMap<>();
+        user.put("name", name);
+        user.put("language", Locale.getDefault().getDisplayLanguage());
+
+        db.collection("users").document(Uid)
+                .set(user)
+                .addOnSuccessListener(aVoid -> Log.d("new user", "DocumentSnapshot successfully written!"))
+                .addOnFailureListener(e -> Log.w("new user", "Error writing document", e));
     }
 
     //back pressed

@@ -2,20 +2,27 @@ package com.c17206413.payup;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 
 import com.c17206413.payup.ui.main.SignIn;
 import com.c17206413.payup.ui.main.UserActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -23,18 +30,23 @@ import com.c17206413.payup.ui.main.SectionsPagerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Firestore Initialisation
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private FirebaseFirestore db;
 
     // user details
-    String providerId;
-    String uid;
-    String name;
-    String email;
-    Uri photoUrl;
+    String providerId, uid, name, email, language;
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
     private SharedPreferences mPrefs;
@@ -43,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         checkCurrentUser();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
@@ -62,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
     private void openUser() {
         Intent intent = new Intent(this, UserActivity.class);
         startActivityForResult(intent,1);
+        //UserActivity.getInstance().isNightModeEnabled();
     }
+
 
     private void signOut() {
         // Firebase sign out
@@ -115,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 0) {
             try {
@@ -137,14 +151,31 @@ public class MainActivity extends AppCompatActivity {
         // [START get_user_profile]
         user = mAuth.getCurrentUser();
         if (user != null) {
-            // Name, email address, and profile photo Url
-            name = user.getDisplayName();
             email = user.getEmail();
-            photoUrl = user.getPhotoUrl();
-            //boolean emailVerified = user.isEmailVerified();
             uid = user.getUid();
+            DocumentReference docIdRef = db.collection("users").document(uid);
+            docIdRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        try {
+                            name = document.get("name").toString();
+                            language = document.get("language").toString();
+                            Configuration config = new Configuration();
+                            Locale locale = new Locale(language);
+                            Locale.setDefault(locale);
+                            config.setLocale(locale);
+                            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                            recreate();
+                        } catch (RuntimeException e) {
+                            Log.d("Get user data", "Failed with: ", e);
+                        }
+                    } else {
+                        Log.d("Receive user info", "Failed with: ", task.getException());
+                    }
+                }
+            });
         }
-        // [END get_user_profile]
     }
 
     public void getProviderData() {
@@ -152,16 +183,10 @@ public class MainActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             for (UserInfo profile : user.getProviderData()) {
-                // Id of the provider (ex: google.com)
                 providerId = profile.getProviderId();
-
-                // UID specific to the provider
                 uid = profile.getUid();
-
-                // Name, email address, and profile photo Url
                 name = profile.getDisplayName();
                 email = profile.getEmail();
-                photoUrl = profile.getPhotoUrl();
             }
         }
     }

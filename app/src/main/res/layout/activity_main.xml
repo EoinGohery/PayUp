@@ -55,16 +55,27 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"
-                android:layout_width="match_parent"
+                android:layout_width="352dp"
                 android:layout_height="65dp"
                 android:background="@color/colorPrimary"
                 android:textAlignment="textStart"
                 android:textDirection="firstStrongRtl"
+                app:tabGravity="fill"
                 app:tabIndicatorColor="@color/colorOnPrimary"
                 app:tabRippleColor="@color/colorTabs"
                 app:tabSelectedTextColor="@color/colorOnPrimary"
                 app:tabTextAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:tabTextColor="@color/colorTabs" />
+
+            <ImageView
+                android:id="@+id/newExpenseButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/new_expense"
+                android:tint="@color/colorOnPrimary"
+                app:srcCompat="@android:drawable/ic_input_add" />
+                app:iconSize="34dp" />
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -82,7 +93,7 @@
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"></androidx.viewpager.widget.ViewPager>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </androidx.core.widget.NestedScrollView>
 

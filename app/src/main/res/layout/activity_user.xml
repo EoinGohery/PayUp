@@ -57,20 +57,21 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Space
+            <Button
+                android:id="@+id/userDetails"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="32dp" />
-
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="match_parent"
-                android:layout_height="103dp"
-                android:contentDescription="@string/profile_picture"
-                app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="32dp" />
+                android:layout_height="45dp"
+                android:gravity="start|center_vertical"
+                android:insetLeft="-2dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/user"
+                android:textColor="@color/textColor"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="0dp" />
 
             <Button
                 android:id="@+id/noFrameButton"
@@ -82,7 +83,7 @@
                 android:insetTop="0dp"
                 android:insetRight="-2dp"
                 android:insetBottom="0dp"
-                android:text="@string/app_name"
+                android:text="@string/accounts"
                 android:textColor="@color/textColor"
                 app:rippleColor="@color/colorRipple"
                 app:strokeColor="@color/colorSecondaryVariant"
