@@ -33,10 +33,12 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.stripe.android.PaymentConfiguration;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PaymentConfiguration.init(
+                getApplicationContext(),
+                "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
+        );
+
+
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         checkCurrentUser();
@@ -157,10 +166,11 @@ public class MainActivity extends AppCompatActivity {
             docIdRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
+                    assert document != null;
                     if (document.exists()) {
                         try {
-                            name = document.get("name").toString();
-                            language = document.get("language").toString();
+                            name = Objects.requireNonNull(document.get("name")).toString();
+                            language = Objects.requireNonNull(document.get("language")).toString();
                             Configuration config = new Configuration();
                             Locale locale = new Locale(language);
                             Locale.setDefault(locale);

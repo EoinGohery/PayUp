@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class SignIn extends AppCompatActivity {
 
@@ -61,7 +62,6 @@ public class SignIn extends AppCompatActivity {
     ProgressBar progressBar;
     TextInputLayout emailInput;
     TextInputLayout passwordInput;
-    TextInputLayout Input;
     TextInputLayout nameInput;
     LinearLayout signIn;
     LinearLayout registerLayout;
@@ -131,9 +131,7 @@ public class SignIn extends AppCompatActivity {
         });
 
         Button facebookButton = (Button)findViewById(R.id.login_facebook);
-        facebookButton.setOnClickListener(view -> {
-            LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("email","name"));
-        });
+        facebookButton.setOnClickListener(view -> LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("email","name")));
 
         //enable registration form
         Button showRegisterButton = (Button) findViewById(R.id.link_signup);
@@ -145,9 +143,9 @@ public class SignIn extends AppCompatActivity {
         //email registration
         Button registerButton= (Button) findViewById(R.id.register);
         registerButton.setOnClickListener(v -> {
-            String emailString =  emailInput.getEditText().getText().toString();
-            String passwordString = passwordInput.getEditText().getText().toString();
-            String nameString =  nameInput.getEditText().getText().toString();
+            String emailString =  Objects.requireNonNull(emailInput.getEditText()).getText().toString();
+            String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
+            String nameString =  Objects.requireNonNull(nameInput.getEditText()).getText().toString();
             createAccount(emailString, passwordString, nameString);
         });
 
@@ -174,6 +172,7 @@ public class SignIn extends AppCompatActivity {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+                assert account != null;
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
@@ -213,6 +212,7 @@ public class SignIn extends AppCompatActivity {
 
     private void socialDocument() {
         FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
         String Uid = user.getUid();
         String name = user.getDisplayName();
 
@@ -220,6 +220,7 @@ public class SignIn extends AppCompatActivity {
         docIdRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
+                assert document != null;
                 if (document.exists()) {
                     Log.d("user data", "DocumentSnapshot data: " + document.getData());
                 } else {
@@ -237,6 +238,7 @@ public class SignIn extends AppCompatActivity {
         docIdRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
+                assert document != null;
                 if (document.exists()) {
                     Log.d("user data", "DocumentSnapshot data: " + document.getData());
                 } else {
@@ -322,7 +324,7 @@ public class SignIn extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
                         progressBar.setVisibility(View.INVISIBLE);
-                        emailDocument(mAuth.getCurrentUser().getUid(), name);
+                        emailDocument(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), name);
                         checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -339,7 +341,7 @@ public class SignIn extends AppCompatActivity {
     private boolean validateLoginInForm() {
         boolean valid = true;
 
-        String emailString = emailInput.getEditText().getText().toString();
+        String emailString = Objects.requireNonNull(emailInput.getEditText()).getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             emailInput.setError("Required.");
             valid = false;
@@ -347,7 +349,7 @@ public class SignIn extends AppCompatActivity {
             emailInput.setError(null);
         }
 
-        String passwordString = passwordInput.getEditText().getText().toString();
+        String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
         if (passwordString.isEmpty()) {
             passwordInput.setError("Required.");
             valid = false;
@@ -361,7 +363,7 @@ public class SignIn extends AppCompatActivity {
     private boolean validateRegisterForm() {
         boolean valid = true;
 
-        String emailString = emailInput.getEditText().getText().toString();
+        String emailString = Objects.requireNonNull(emailInput.getEditText()).getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             emailInput.setError("Required.");
             valid = false;
@@ -369,7 +371,7 @@ public class SignIn extends AppCompatActivity {
             emailInput.setError(null);
         }
 
-        String passwordString = passwordInput.getEditText().getText().toString();
+        String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
         if (passwordString.isEmpty()) {
             passwordInput.setError("Required.");
             valid = false;
@@ -378,7 +380,7 @@ public class SignIn extends AppCompatActivity {
 
         }
 
-        String nameString = nameInput.getEditText().getText().toString();
+        String nameString = Objects.requireNonNull(nameInput.getEditText()).getText().toString();
         if (nameString.isEmpty()) {
             nameInput.setError("Required.");
             valid = false;

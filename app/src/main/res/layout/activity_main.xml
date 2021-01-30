@@ -73,8 +73,8 @@
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/new_expense"
-                android:tint="@color/colorOnPrimary"
-                app:srcCompat="@android:drawable/ic_input_add" />
+                app:srcCompat="@android:drawable/ic_input_add"
+                app:tint="@color/colorOnPrimary"
                 app:iconSize="34dp" />
         </LinearLayout>
 

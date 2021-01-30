@@ -159,15 +159,14 @@
 
             <Button
                 android:id="@+id/login_twitter"
-                style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
+                style="@style/Stripe3DS2Button"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:backgroundTint="@color/fui_bgTwitter"
 
+                android:backgroundTint="@color/fui_bgTwitter"
                 android:text="@string/login_with_twitter"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:translationY="-10dp"
                 android:visibility="visible"
                 app:icon="@drawable/fui_ic_twitter_bird_white_24dp"
                 app:iconGravity="start"
@@ -176,15 +175,15 @@
 
             <Button
                 android:id="@+id/login_google"
-                style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
+                style="@style/Stripe3DS2ActionBarButton"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:backgroundTint="@color/colorSurface"
+                android:backgroundTintMode="add"
                 android:text="@string/login_with_google"
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textIsSelectable="false"
-                android:translationY="-30dp"
                 app:icon="@drawable/fui_ic_googleg_color_24dp"
                 app:iconPadding="-20dp"
                 app:iconTint="@color/common_google_signin_btn_tint"
@@ -192,7 +191,7 @@
 
             <Button
                 android:id="@+id/login_facebook"
-                style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
+                style="@style/Stripe3DS2Button"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:backgroundTint="@color/fui_bgFacebook"
@@ -200,7 +199,6 @@
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textIsSelectable="false"
-                android:translationY="-50dp"
                 app:icon="@drawable/fui_ic_facebook_white_22dp"
                 app:iconPadding="-20dp"
                 app:iconTint="@color/common_google_signin_btn_tint"

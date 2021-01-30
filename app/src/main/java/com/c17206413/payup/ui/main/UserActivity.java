@@ -19,6 +19,7 @@ import android.widget.Switch;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
@@ -50,7 +51,7 @@ public class UserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user);
 
         // initiate Dark Mode Switch
-        Switch darkSwitch = (Switch) findViewById(R.id.darkModeSwitch);
+        SwitchCompat darkSwitch = (SwitchCompat) findViewById(R.id.darkModeSwitch);
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             darkSwitch.setChecked(true);
         }
