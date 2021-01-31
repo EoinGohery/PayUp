@@ -68,7 +68,7 @@ public class SignIn extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 
         signIn = (LinearLayout) findViewById(R.id.signIn_Layout);
         registerLayout = (LinearLayout) findViewById(R.id.registerLayout);

@@ -227,7 +227,7 @@
     </LinearLayout>
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/progressBar1"
         style="@android:style/Widget.Material.ProgressBar.Small.Title"
         android:layout_width="130dp"
         android:layout_height="123dp"

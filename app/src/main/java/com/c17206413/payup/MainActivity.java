@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.c17206413.payup.ui.main.ExpenseActivity;
 import com.c17206413.payup.ui.main.SectionsPagerAdapter;
 import com.c17206413.payup.ui.main.SignIn;
 import com.c17206413.payup.ui.main.UserActivity;
@@ -70,12 +71,21 @@ public class MainActivity extends AppCompatActivity {
 
         Button userButton= (Button) findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
+
+        Button newExpenseButton= (Button) findViewById(R.id.newExpenseButton);
+        newExpenseButton.setOnClickListener(v -> openPayment());
     }
 
     private void openUser() {
         Intent intent = new Intent(this, UserActivity.class);
         resumeActivityResultLauncher.launch(intent);
     }
+
+    private void openPayment() {
+        Intent intent = new Intent(this, ExpenseActivity.class);
+        resumeActivityResultLauncher.launch(intent);
+    }
+
 
 
     private void signOut() {
