@@ -6,26 +6,15 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.Switch;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 
-import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Arrays;
 
 public class UserActivity extends AppCompatActivity {
 
@@ -40,7 +29,6 @@ public class UserActivity extends AppCompatActivity {
         }
         return singleton;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,24 +50,12 @@ public class UserActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         Button saveButton= (Button) findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                killActivity();
-            }
-        });
+        saveButton.setOnClickListener(v -> killActivity());
 
         Button logOutButton= (Button) findViewById(R.id.logOutButton);
-        logOutButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                logOut();
-            }
-        });
+        logOutButton.setOnClickListener(v -> logOut());
 
 
-    }
-
-    public boolean isNightModeEnabled() {
-        return isNightModeEnabled;
     }
 
     @SuppressLint("ApplySharedPref")

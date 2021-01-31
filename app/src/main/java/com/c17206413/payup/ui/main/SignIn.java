@@ -1,49 +1,40 @@
 package com.c17206413.payup.ui.main;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Layout;
-import android.widget.Button;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
-import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.c17206413.payup.R;
-import com.facebook.FacebookSdk;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-
-import android.util.Log;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.material.textfield.TextInputLayout;
-
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -57,7 +48,6 @@ import java.util.Objects;
 public class SignIn extends AppCompatActivity {
 
     private static final String TAG = "Sign In";
-    private static final int GOOGLE_SIGN_IN = 9001;
 
     ProgressBar progressBar;
     TextInputLayout emailInput;
@@ -78,10 +68,7 @@ public class SignIn extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) { finish(); }
-
-        progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         signIn = (LinearLayout) findViewById(R.id.signIn_Layout);
         registerLayout = (LinearLayout) findViewById(R.id.registerLayout);
@@ -93,6 +80,7 @@ public class SignIn extends AppCompatActivity {
         //email sign in
         Button emailLogin= (Button) findViewById(R.id.login_with_password);
         emailLogin.setOnClickListener(v -> {
+            progressBar.setVisibility(View.VISIBLE);
             String emailString = Objects.requireNonNull(emailInput.getEditText()).getText().toString();
             String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
             loginSignIn(emailString, passwordString);
@@ -105,10 +93,18 @@ public class SignIn extends AppCompatActivity {
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         Button googleButton = (Button) findViewById(R.id.login_google);
-        googleButton.setOnClickListener(v -> googleSignIn());
+        googleButton.setOnClickListener(v -> {
+            progressBar.setVisibility(View.VISIBLE);
+            googleActivityResultLauncher.launch(mGoogleSignInClient.getSignInIntent());
+        });
 
         //Facebook login
-        //FacebookSdk.sdkInitialize(this.getApplicationContext());
+        Button facebookButton = (Button)findViewById(R.id.login_facebook);
+        facebookButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+            LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("email","name"));
+        });
+
         mCallbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -121,17 +117,16 @@ public class SignIn extends AppCompatActivity {
                 Log.d(TAG, "facebook:onCancel");
                 Snackbar.make(findViewById(android.R.id.content), "Authentication Cancelled.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                progressBar.setVisibility(View.INVISIBLE);
             }
             @Override
             public void onError(FacebookException error) {
                 Log.d(TAG, "facebook:onError", error);
                 Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
-
-        Button facebookButton = (Button)findViewById(R.id.login_facebook);
-        facebookButton.setOnClickListener(view -> LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("email","name")));
 
         //enable registration form
         Button showRegisterButton = (Button) findViewById(R.id.link_signup);
@@ -143,6 +138,7 @@ public class SignIn extends AppCompatActivity {
         //email registration
         Button registerButton= (Button) findViewById(R.id.register);
         registerButton.setOnClickListener(v -> {
+            progressBar.setVisibility(View.VISIBLE);
             String emailString =  Objects.requireNonNull(emailInput.getEditText()).getText().toString();
             String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
             String nameString =  Objects.requireNonNull(nameInput.getEditText()).getText().toString();
@@ -157,57 +153,66 @@ public class SignIn extends AppCompatActivity {
         });
     }
 
-    private void googleSignIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
-    }
-
+    //for facebook activity result
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == GOOGLE_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                assert account != null;
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
-                firebaseAuthWithGoogle(account.getIdToken());
-            } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-                Log.w(TAG, "Google sign in failed", e);
-                Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                // ...
-            }
-        } else {
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
-        }
-        finish();
-        // [END check_current_user]
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+    //handle google activity result
+    ActivityResultLauncher<Intent> googleActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    try {
+                        // Google Sign In was successful, authenticate with Firebase
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+                        assert account != null;
+                        Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
+                        firebaseAuthWithGoogle(account.getIdToken());
+                    } catch (ApiException e) {
+                        // Google Sign In failed, update UI appropriately
+                        Log.w(TAG, "Google sign in failed", e);
+                        Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        // ...
+                    }
+                }
+            });
+
+    //handle google authentication
     private void firebaseAuthWithGoogle(String idToken) {
-        progressBar.setVisibility(View.VISIBLE);
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        socialAuthentication(credential);
+    }
+
+    private void socialAuthentication(AuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
                         socialDocument();
+                        checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                         Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
-
-                    progressBar.setVisibility(View.INVISIBLE);
                 });
     }
+
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d(TAG, "handleFacebookAccessToken:" + token);
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        socialAuthentication(credential);
+    }
+
 
     private void socialDocument() {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -250,60 +255,40 @@ public class SignIn extends AppCompatActivity {
         });
     }
 
-    private void handleFacebookAccessToken(AccessToken token) {
-        Log.d(TAG, "handleFacebookAccessToken:" + token);
-        // [START_EXCLUDE silent]
-        progressBar.setVisibility(View.VISIBLE);
-        // [END_EXCLUDE]
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithCredential:success");
-                        socialDocument();
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-                    progressBar.setVisibility(View.INVISIBLE);
-                });
-    }
-
     //email login method
     private void loginSignIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
         if (!validateLoginInForm()) {
             return;
         }
-        progressBar.setVisibility(View.VISIBLE);
-
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
-                        finish();
+                        checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithEmail:failure", task.getException());
                         Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
+                        progressBar.setVisibility(View.INVISIBLE);
 
                     }
                 });
-        progressBar.setVisibility(View.INVISIBLE);
         // [END sign_in_with_email]
     }
 
     public void checkCurrentUser() {
         // [START check_current_user]
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) { finish(); }
+        if (user != null) { exitActivity(); }
+        else {
+            progressBar.setVisibility(View.INVISIBLE);
+            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
         // [END check_current_user]
     }
 
@@ -313,7 +298,6 @@ public class SignIn extends AppCompatActivity {
         if (!validateRegisterForm()) {
             return;
         }
-        progressBar.setVisibility(View.VISIBLE);
 
         // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -321,17 +305,16 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
-                        progressBar.setVisibility(View.INVISIBLE);
                         emailDocument(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), name);
-                        finish();
+                        checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
                         Snackbar.make(findViewById(android.R.id.content), "Registration Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
-        progressBar.setVisibility(View.INVISIBLE);
         // [END create_user_with_email]
     }
 
@@ -405,6 +388,14 @@ public class SignIn extends AppCompatActivity {
     public void onBackPressed() {
         // disable going back to the MainActivity
         moveTaskToBack(true);
+    }
+
+    private void exitActivity() {
+        Intent data = new Intent();
+        String text = "SignIn";
+        data.setData(Uri.parse(text));
+        setResult(RESULT_OK, data);
+        finish();
     }
 
 

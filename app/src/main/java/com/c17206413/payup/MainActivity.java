@@ -1,32 +1,25 @@
 package com.c17206413.payup;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Button;
 
-import com.c17206413.payup.ui.main.SignIn;
-import com.c17206413.payup.ui.main.UserActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import com.c17206413.payup.ui.main.SectionsPagerAdapter;
+import com.c17206413.payup.ui.main.SignIn;
+import com.c17206413.payup.ui.main.UserActivity;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -35,9 +28,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.stripe.android.PaymentConfiguration;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -83,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void openUser() {
         Intent intent = new Intent(this, UserActivity.class);
-        startActivityForResult(intent,1);
-        //UserActivity.getInstance().isNightModeEnabled();
+        resumeActivityResultLauncher.launch(intent);
     }
 
 
@@ -107,16 +97,12 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         setTheme();
-        getUserProfile();
-
-        //checkCurrentUser();
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
         setTheme();
-
     }
 
     public void checkCurrentUser() {
@@ -133,28 +119,28 @@ public class MainActivity extends AppCompatActivity {
     public void  signInUser() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
-        startActivityForResult(intent,0);
+        resumeActivityResultLauncher.launch(intent);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == 0) {
-            try {
-                getUserProfile();
-            } catch (Exception e) {
-                signInUser();
-            }
-        } else if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                String returnedResult = data.getDataString();
-                if (returnedResult.equals("LogOut")){
-                    signOut();
+    ActivityResultLauncher<Intent> resumeActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    assert data != null;
+                    String returnedResult = data.getDataString();
+                    if (returnedResult.equals("LogOut")) {
+                        signOut();
+                    } else if (returnedResult.equals("SignIn")) {
+                        try {
+                            checkCurrentUser();
+                        } catch (Exception e) {
+                            signInUser();
+                        }
+                    }
                 }
-            }
-        }
-    }
+            });
+
 
     public void getUserProfile() {
         // [START get_user_profile]
