@@ -93,8 +93,8 @@ public class SignIn extends AppCompatActivity {
         //email sign in
         Button emailLogin= (Button) findViewById(R.id.login_with_password);
         emailLogin.setOnClickListener(v -> {
-            String emailString = emailInput.getEditText().getText().toString();
-            String passwordString = passwordInput.getEditText().getText().toString();
+            String emailString = Objects.requireNonNull(emailInput.getEditText()).getText().toString();
+            String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
             loginSignIn(emailString, passwordString);
         });
 
@@ -185,7 +185,7 @@ public class SignIn extends AppCompatActivity {
         } else {
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
-        checkCurrentUser();
+        finish();
         // [END check_current_user]
     }
 
@@ -198,7 +198,6 @@ public class SignIn extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
                         socialDocument();
-                        checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -264,7 +263,6 @@ public class SignIn extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
                         socialDocument();
-                        checkCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -289,7 +287,7 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
-                        checkCurrentUser();
+                        finish();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -325,7 +323,7 @@ public class SignIn extends AppCompatActivity {
                         Log.d(TAG, "createUserWithEmail:success");
                         progressBar.setVisibility(View.INVISIBLE);
                         emailDocument(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), name);
-                        checkCurrentUser();
+                        finish();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
