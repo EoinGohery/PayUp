@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     // user details
-    String providerId, uid, name, email, language;
+    String providerId, providerUid, uid, name, email, language;
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
     private SharedPreferences mPrefs;
@@ -61,18 +62,18 @@ public class MainActivity extends AppCompatActivity {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
         setTheme();
-        NestedScrollView scrollView = (NestedScrollView) findViewById (R.id.nestedScroll);
-        scrollView.setFillViewport (true);
+        NestedScrollView scrollView = (NestedScrollView) findViewById(R.id.nestedScroll);
+        scrollView.setFillViewport(true);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        Button userButton= (Button) findViewById(R.id.userButton);
+        Button userButton = (Button) findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
 
-        Button newExpenseButton= (Button) findViewById(R.id.newExpenseButton);
+        Button newExpenseButton = (Button) findViewById(R.id.newExpenseButton);
         newExpenseButton.setOnClickListener(v -> openPayment());
     }
 
@@ -85,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ExpenseActivity.class);
         resumeActivityResultLauncher.launch(intent);
     }
-
 
 
     private void signOut() {
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         // [END check_current_user]
     }
 
-    public void  signInUser() {
+    public void signInUser() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
         resumeActivityResultLauncher.launch(intent);
@@ -156,41 +156,11 @@ public class MainActivity extends AppCompatActivity {
         // [START get_user_profile]
         user = mAuth.getCurrentUser();
         if (user != null) {
+            name = user.getDisplayName();
             email = user.getEmail();
             uid = user.getUid();
-            DocumentReference docIdRef = db.collection("users").document(uid);
-            docIdRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    assert document != null;
-                    if (document.exists()) {
-                        try {
-                            name = Objects.requireNonNull(document.get("name")).toString();
-                            language = Objects.requireNonNull(document.get("language")).toString();
-                            Configuration config = new Configuration();
-                            Locale locale = new Locale(language);
-                            Locale.setDefault(locale);
-                            config.setLocale(locale);
-                            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-                            recreate();
-                        } catch (RuntimeException e) {
-                            Log.d("Get user data", "Failed with: ", e);
-                        }
-                    } else {
-                        Log.d("Receive user info", "Failed with: ", task.getException());
-                    }
-                }
-            });
-        }
-    }
-
-    public void getProviderData() {
-        // [START get_provider_data]
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
             for (UserInfo profile : user.getProviderData()) {
                 providerId = profile.getProviderId();
-                uid = profile.getUid();
                 name = profile.getDisplayName();
                 email = profile.getEmail();
             }

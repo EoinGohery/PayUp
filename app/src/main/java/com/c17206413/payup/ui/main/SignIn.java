@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -27,6 +28,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -35,6 +39,8 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -195,8 +201,7 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
-                        socialDocument();
-                        checkCurrentUser();
+                        exitActivity();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -205,6 +210,7 @@ public class SignIn extends AppCompatActivity {
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
+        checkCurrentUser();
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
@@ -213,47 +219,6 @@ public class SignIn extends AppCompatActivity {
         socialAuthentication(credential);
     }
 
-
-    private void socialDocument() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        assert user != null;
-        String Uid = user.getUid();
-        String name = user.getDisplayName();
-
-        DocumentReference docIdRef = db.collection("users").document(Uid);
-        docIdRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                assert document != null;
-                if (document.exists()) {
-                    Log.d("user data", "DocumentSnapshot data: " + document.getData());
-                } else {
-                    Log.d("user data", "No such document");
-                    newUserDocument(Uid, name);
-                }
-            } else {
-                Log.d("user data", "get failed with ", task.getException());
-            }
-        });
-    }
-
-    private void emailDocument(String Uid, String name) {
-        DocumentReference docIdRef = db.collection("users").document(Uid);
-        docIdRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                assert document != null;
-                if (document.exists()) {
-                    Log.d("user data", "DocumentSnapshot data: " + document.getData());
-                } else {
-                    Log.d("user data", "No such document");
-                    newUserDocument(Uid, name);
-                }
-            } else {
-                Log.d("user data", "get failed with ", task.getException());
-            }
-        });
-    }
 
     //email login method
     private void loginSignIn(String email, String password) {
@@ -267,28 +232,25 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
-                        checkCurrentUser();
+                        exitActivity();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithEmail:failure", task.getException());
                         Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
-                        progressBar.setVisibility(View.INVISIBLE);
-
                     }
                 });
+        checkCurrentUser();
         // [END sign_in_with_email]
     }
 
     public void checkCurrentUser() {
         // [START check_current_user]
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) { exitActivity(); }
-        else {
-            progressBar.setVisibility(View.INVISIBLE);
-            Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+        if (user != null) {
+            exitActivity();
         }
+        else { progressBar.setVisibility(View.INVISIBLE); }
         // [END check_current_user]
     }
 
@@ -305,8 +267,18 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
-                        emailDocument(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), name);
-                        checkCurrentUser();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
+                        builder.setDisplayName(name);
+                        if (user !=null){
+                            user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
+                                if (!task1.isSuccessful()){
+                                    Snackbar.make(findViewById(android.R.id.content), name, Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+                                }
+                            });
+                        }
+                        exitActivity();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -315,6 +287,7 @@ public class SignIn extends AppCompatActivity {
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
+        checkCurrentUser();
         // [END create_user_with_email]
     }
 
@@ -371,17 +344,6 @@ public class SignIn extends AppCompatActivity {
         }
 
         return valid;
-    }
-
-    private void newUserDocument(String Uid, String name) {
-        Map<String, Object> user = new HashMap<>();
-        user.put("name", name);
-        user.put("language", Locale.getDefault().getDisplayLanguage());
-
-        db.collection("users").document(Uid)
-                .set(user)
-                .addOnSuccessListener(aVoid -> Log.d("new user", "DocumentSnapshot successfully written!"))
-                .addOnFailureListener(e -> Log.w("new user", "Error writing document", e));
     }
 
     //back pressed

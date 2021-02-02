@@ -14,17 +14,19 @@ const stripe = require('stripe')(functions.config().stripe.secret, {
 /**
  * When a user is created, create a Stripe customer object for them.
  */
-exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
-    const customer = await stripe.customers.create({
-      email: user.email,
-      metadata: { firebaseUID: user.uid },
-    });
-  
-    await admin.firestore().collection('stripe_customers').doc(user.uid).set({
-      customer_id: customer.id,
-    });
-    return;
+exports.createUserDocument = functions.auth.user().onCreate(async (user) => {
+  const customer = await stripe.customers.create({
+    email: user.email,
+    metadata: { firebaseUID: user.uid },
   });
+
+  await admin.firestore().collection('users').doc(user.uid).set({
+    customer_id: customer.id,
+    name: user.displayName,
+  });
+  return;
+});
+
 /**
  * Set up an ephemeral key.
  *
@@ -45,7 +47,7 @@ exports.createEphemeralKey = functions.https.onCall(async (data, context) => {
     if (!uid) throw new Error('Not authenticated!');
     // Get stripe customer id
     const customer = (
-      await admin.firestore().collection('stripe_customers').doc(uid).get()
+      await admin.firestore().collection('users').doc(uid).get()
     ).data().customer_id;
     const key = await stripe.ephemeralKeys.create(
       { customer },
@@ -102,7 +104,7 @@ const updatePaymentRecord = async (id) => {
   // Get customer's doc in Firestore.
   const customersSnap = await admin
     .firestore()
-    .collection('stripe_customers')
+    .collection('users')
     .where('customer_id', '==', customerId)
     .get();
   if (customersSnap.size !== 1) throw new Error('User not found!');
@@ -144,7 +146,6 @@ exports.handleWebhookEvents = functions.https.onRequest(async (req, resp) => {
     resp.status(401).send('Webhook Error: Invalid Secret');
     return;
   }
-
   if (relevantEvents.has(event.type)) {
     try {
       switch (event.type) {
@@ -176,7 +177,7 @@ exports.handleWebhookEvents = functions.https.onRequest(async (req, resp) => {
  * When a user deletes their account, clean up after them.
  */
 exports.cleanupUser = functions.auth.user().onDelete(async (user) => {
-  const dbRef = admin.firestore().collection('stripe_customers');
+  const dbRef = admin.firestore().collection('users');
   const customer = (await dbRef.doc(user.uid).get()).data();
   await stripe.customers.del(customer.customer_id);
   // Delete the customers payments & payment methods in firestore.

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
@@ -15,11 +16,15 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.c17206413.payup.R;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class UserActivity extends AppCompatActivity {
 
     private static final String NIGHT_MODE = "NIGHT_MODE";
     private boolean isNightModeEnabled = false;
+
+    private FirebaseFirestore db;
 
     private static UserActivity singleton = null;
     public static UserActivity getInstance() {
@@ -37,6 +42,8 @@ public class UserActivity extends AppCompatActivity {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         this.isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
         setContentView(R.layout.activity_user);
+
+        db = FirebaseFirestore.getInstance();
 
         // initiate Dark Mode Switch
         SwitchCompat darkSwitch = (SwitchCompat) findViewById(R.id.darkModeSwitch);
@@ -56,6 +63,13 @@ public class UserActivity extends AppCompatActivity {
         logOutButton.setOnClickListener(v -> logOut());
 
 
+    }
+
+    private void checkDocument(String Uid, String name) {
+        DocumentReference docIdRef = db.collection("users").document(Uid);
+        docIdRef.update("name", name)
+                .addOnSuccessListener(aVoid -> Log.d("Document", "DocumentSnapshot successfully updated!"))
+                .addOnFailureListener(e -> Log.w("Document", "Error updating document", e));
     }
 
     @SuppressLint("ApplySharedPref")
