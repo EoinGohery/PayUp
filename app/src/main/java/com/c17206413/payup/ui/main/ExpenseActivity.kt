@@ -3,7 +3,6 @@ package com.c17206413.payup.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.c17206413.payup.R
 import com.google.android.material.snackbar.Snackbar
@@ -53,40 +52,44 @@ class ExpenseActivity : AppCompatActivity() {
         paymentCollection.add(hashMapOf(
                 "amount" to 8800,
                 "currency" to "hkd"
-        ))
+            )).addOnSuccessListener { documentReference ->
+                Log.d("payment", "DocumentSnapshot added with ID: ${documentReference.id}")
+                documentReference.addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.w("payment", "Listen failed.", e)
+                        return@addSnapshotListener
+                    }
 
-                .addOnSuccessListener { documentReference ->
-                    Log.d("payment", "DocumentSnapshot added with ID: ${documentReference.id}")
-                    documentReference.addSnapshotListener { snapshot, e ->
-                        if (e != null) {
-                            Log.w("payment", "Listen failed.", e)
-                            return@addSnapshotListener
+                    if (snapshot != null && snapshot.exists()) {
+                        Log.d("payment", "Current data: ${snapshot.data}")
+                        val clientSecret = snapshot.data?.get("client_secret")
+                        Log.d("payment", "Create paymentIntent returns $clientSecret")
+                        clientSecret?.let {
+                            stripe.confirmPayment(this, ConfirmPaymentIntentParams.createWithPaymentMethodId(
+                                    paymentMethodId,
+                                    (it as String)
+                            ))
+
+                            amount.text = getString(R.string.payment_success)
+                            Snackbar.make(findViewById(android.R.id.content), "Payment Complete", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show()
                         }
-
-                        if (snapshot != null && snapshot.exists()) {
-                            Log.d("payment", "Current data: ${snapshot.data}")
-                            val clientSecret = snapshot.data?.get("client_secret")
-                            Log.d("payment", "Create paymentIntent returns $clientSecret")
-                            clientSecret?.let {
-                                stripe.confirmPayment(this, ConfirmPaymentIntentParams.createWithPaymentMethodId(
-                                        paymentMethodId,
-                                        (it as String)
-                                ))
-
-                                checkoutSummary.text = "Thank you for your payment"
-                                Snackbar.make(findViewById(android.R.id.content), "Payment Complete", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show()
-                            }
-                        } else {
-                            Log.e("payment", "Current payment intent : null")
-                            payButton.isEnabled = true
-                        }
+                    } else {
+                        amount.text = getString(R.string.payment_fail)
+                        Snackbar.make(findViewById(android.R.id.content), "Payment Failed", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show()
+                        Log.e("payment", "Current payment intent : null")
+                        payButton.isEnabled = true
                     }
                 }
-                .addOnFailureListener { e ->
-                    Log.w("payment", "Error adding document", e)
-                    payButton.isEnabled = true
-                }
+            }
+            .addOnFailureListener { e ->
+                amount.text = getString(R.string.payment_fail)
+                Snackbar.make(findViewById(android.R.id.content), "Payment Failed", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show()
+                Log.w("payment", "Error adding document", e)
+                payButton.isEnabled = true
+            }
     }
 
     private fun setupPaymentSession () {
@@ -110,10 +113,18 @@ class ExpenseActivity : AppCompatActivity() {
                             Log.d("PaymentSession", "Ready to charge");
                             payButton.isEnabled = true
 
-                            data.paymentMethod?.let {
-                                Log.d("PaymentSession", "PaymentMethod $it selected")
-                                paymentmethod.text = "${it.card?.brand} card ends with ${it.card?.last4}"
-                                selectedPaymentMethod = it
+                            if (data.useGooglPay) {
+                                data.paymentMethod?.let {
+                                    Log.d("PaymentSession", "PaymentMethod $it selected")
+                                    paymentmethod.text = "${it.card?.brand} card ends with ${it.card?.last4}"
+                                    selectedPaymentMethod = it
+                                }
+                            } else {
+                                data.paymentMethod?.let {
+                                    Log.d("PaymentSession", "PaymentMethod $it selected")
+                                    paymentmethod.text = "${it.card?.brand} card ends with ${it.card?.last4}"
+                                    selectedPaymentMethod = it
+                                }
                             }
                         }
                     }

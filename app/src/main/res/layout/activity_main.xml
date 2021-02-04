@@ -69,16 +69,16 @@
 
             <Button
                 android:id="@+id/newExpenseButton"
-                style="@style/Widget.AppCompat.Button"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/new_expense"
-                app:icon="@android:drawable/ic_menu_add"
+                app:icon="@android:drawable/ic_input_add"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 app:iconSize="40dp"
                 app:iconTint="@color/colorOnPrimary"
-                app:rippleColor="@color/colorRipple"
+                app:rippleColor="@color/colorPrimary"
                 app:srcCompat="@android:drawable/ic_input_add" />
         </LinearLayout>
 

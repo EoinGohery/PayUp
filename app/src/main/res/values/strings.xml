@@ -10,7 +10,11 @@
     <string name="login_with_twitter">Sign in with Twitter</string>
     <string name="tab_incoming">Incoming</string>
     <string name="user">User</string>
+    <string name="payment_success">Payment Successful</string>
+    <string name="payment_fail">Payment Successful</string>
     <string name="email">Email</string>
+    <string name="payment_method">Select a Payment Method</string>
+    <string name="confirm_payment">Confirm Payment</string>
     <string name="name">Name</string>
     <string name="or">- Or -</string>
     <string name="password">Password</string>
