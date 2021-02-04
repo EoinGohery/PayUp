@@ -66,7 +66,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     private void checkDocument(String Uid, String name) {
-        DocumentReference docIdRef = db.collection("users").document(Uid);
+        DocumentReference docIdRef = db.collection("stripe_customers").document(Uid);
         docIdRef.update("name", name)
                 .addOnSuccessListener(aVoid -> Log.d("Document", "DocumentSnapshot successfully updated!"))
                 .addOnFailureListener(e -> Log.w("Document", "Error updating document", e));

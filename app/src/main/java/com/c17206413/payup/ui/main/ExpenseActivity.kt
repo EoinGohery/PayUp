@@ -5,15 +5,15 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseUser
+import com.c17206413.payup.R
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.stripe.android.*
 import com.stripe.android.model.ConfirmPaymentIntentParams
 import com.stripe.android.model.PaymentMethod
 import com.stripe.android.view.BillingAddressFields
-
-import com.c17206413.payup.R
 import kotlinx.android.synthetic.main.activity_payment.*
 
 
@@ -27,6 +27,8 @@ class ExpenseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment)
+
+        currentUser = FirebaseAuth.getInstance().currentUser
 
         setupPaymentSession()
 
@@ -43,7 +45,8 @@ class ExpenseActivity : AppCompatActivity() {
         payButton.isEnabled = false
 
         val paymentCollection = Firebase.firestore
-                .collection("stripe_customers").document(currentUser?.uid?:"")
+                .collection("users")
+                .document(currentUser?.uid ?: "")
                 .collection("payments")
 
         // Add a new document with a generated ID
@@ -51,6 +54,7 @@ class ExpenseActivity : AppCompatActivity() {
                 "amount" to 8800,
                 "currency" to "hkd"
         ))
+
                 .addOnSuccessListener { documentReference ->
                     Log.d("payment", "DocumentSnapshot added with ID: ${documentReference.id}")
                     documentReference.addSnapshotListener { snapshot, e ->
@@ -70,7 +74,8 @@ class ExpenseActivity : AppCompatActivity() {
                                 ))
 
                                 checkoutSummary.text = "Thank you for your payment"
-                                Toast.makeText(applicationContext, "Payment Done!!", Toast.LENGTH_LONG).show()
+                                Snackbar.make(findViewById(android.R.id.content), "Payment Complete", Snackbar.LENGTH_LONG)
+                                        .setAction("Action", null).show()
                             }
                         } else {
                             Log.e("payment", "Current payment intent : null")
@@ -96,7 +101,7 @@ class ExpenseActivity : AppCompatActivity() {
                 .build())
 
         paymentSession.init(
-                object: PaymentSession.PaymentSessionListener {
+                object : PaymentSession.PaymentSessionListener {
                     override fun onPaymentSessionDataChanged(data: PaymentSessionData) {
                         Log.d("PaymentSession", "PaymentSession has changed: $data")
                         Log.d("PaymentSession", "${data.isPaymentReadyToCharge} <> ${data.paymentMethod}")
@@ -114,11 +119,11 @@ class ExpenseActivity : AppCompatActivity() {
                     }
 
                     override fun onCommunicatingStateChanged(isCommunicating: Boolean) {
-                        Log.d("PaymentSession",  "isCommunicating $isCommunicating")
+                        Log.d("PaymentSession", "isCommunicating $isCommunicating")
                     }
 
                     override fun onError(errorCode: Int, errorMessage: String) {
-                        Log.e("PaymentSession",  "onError: $errorCode, $errorMessage")
+                        Log.e("PaymentSession", "onError: $errorCode, $errorMessage")
                     }
                 }
         )
