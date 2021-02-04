@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.c17206413.payup.R
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.wallet.IsReadyToPayRequest
+import com.google.android.gms.wallet.PaymentsClient
+import com.google.android.gms.wallet.WalletConstants
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.ktx.firestore
@@ -14,6 +18,8 @@ import com.stripe.android.model.ConfirmPaymentIntentParams
 import com.stripe.android.model.PaymentMethod
 import com.stripe.android.view.BillingAddressFields
 import kotlinx.android.synthetic.main.activity_payment.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 class ExpenseActivity : AppCompatActivity() {
@@ -22,6 +28,9 @@ class ExpenseActivity : AppCompatActivity() {
     private lateinit var paymentSession: PaymentSession
     private lateinit var selectedPaymentMethod: PaymentMethod
     private val stripe: Stripe by lazy { Stripe(applicationContext, "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF") }
+
+    //private lateinit var paymentsClient: PaymentsClient
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +49,7 @@ class ExpenseActivity : AppCompatActivity() {
             paymentSession.presentPaymentMethodSelection()
         }
     }
+
     private fun confirmPayment(paymentMethodId: String) {
         payButton.isEnabled = false
 
@@ -100,33 +110,34 @@ class ExpenseActivity : AppCompatActivity() {
                 .setShippingInfoRequired(false)
                 .setShippingMethodsRequired(false)
                 .setBillingAddressFields(BillingAddressFields.None)
-                .setShouldShowGooglePay(true)
+                .setPaymentMethodTypes(listOf(PaymentMethod.Type.Card, PaymentMethod.Type.PayPal))
+                .setShouldShowGooglePay(false)
                 .build())
 
         paymentSession.init(
                 object : PaymentSession.PaymentSessionListener {
                     override fun onPaymentSessionDataChanged(data: PaymentSessionData) {
-                        Log.d("PaymentSession", "PaymentSession has changed: $data")
-                        Log.d("PaymentSession", "${data.isPaymentReadyToCharge} <> ${data.paymentMethod}")
+
+                        if (data.useGooglePay) {
+                            Log.d("PaymentSession", "PaymentMethod GooglePay selected")
+                            paymentmethod.text = getString(R.string.pay_with_google)
+
+
+                        } else {
+                            data.paymentMethod?.let {
+                                Log.d("PaymentSession", "PaymentMethod $it selected")
+                                paymentmethod.text = "${it.card?.brand} card ends with ${it.card?.last4}"
+                                selectedPaymentMethod = it
+                            }
+                        }
 
                         if (data.isPaymentReadyToCharge) {
                             Log.d("PaymentSession", "Ready to charge");
                             payButton.isEnabled = true
-
-                            if (data.useGooglPay) {
-                                data.paymentMethod?.let {
-                                    Log.d("PaymentSession", "PaymentMethod $it selected")
-                                    paymentmethod.text = "${it.card?.brand} card ends with ${it.card?.last4}"
-                                    selectedPaymentMethod = it
-                                }
-                            } else {
-                                data.paymentMethod?.let {
-                                    Log.d("PaymentSession", "PaymentMethod $it selected")
-                                    paymentmethod.text = "${it.card?.brand} card ends with ${it.card?.last4}"
-                                    selectedPaymentMethod = it
-                                }
-                            }
                         }
+
+                        Log.d("PaymentSession", "PaymentSession has changed: $data")
+                        Log.d("PaymentSession", "${data.isPaymentReadyToCharge} <> ${data.paymentMethod}")
                     }
 
                     override fun onCommunicatingStateChanged(isCommunicating: Boolean) {
@@ -146,3 +157,5 @@ class ExpenseActivity : AppCompatActivity() {
         paymentSession.handlePaymentData(requestCode, resultCode, data ?: Intent())
     }
 }
+
+

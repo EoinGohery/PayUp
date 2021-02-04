@@ -25,6 +25,13 @@
             android:contentDescription="@string/app_name"
             app:srcCompat="@drawable/ic_launcher_foreground" />
 
+        <com.stripe.android.view.CardInputWidget
+            android:id="@+id/cardInputWidget"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp" />
+
         <TextView
             android:id="@+id/paymentstatus"
             android:layout_width="match_parent"
