@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.c17206413.payup">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,14 +22,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.main.SignIn"></activity>
-        <activity android:name=".ui.main.UserActivity"></activity>
+        <activity android:name=".ui.main.SignIn" />
+        <activity android:name=".ui.main.UserActivity" />
+        <activity android:name=".ui.main.ExpenseActivity" />
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             tools:replace="android:value"
             android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
 
     </application>
-    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>

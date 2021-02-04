@@ -67,15 +67,19 @@
                 app:tabTextAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:tabTextColor="@color/colorTabs" />
 
-            <ImageView
+            <Button
                 android:id="@+id/newExpenseButton"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/new_expense"
-                android:tint="@color/colorOnPrimary"
+                app:icon="@android:drawable/ic_input_add"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="40dp"
+                app:iconTint="@color/colorOnPrimary"
+                app:rippleColor="@color/colorPrimary"
                 app:srcCompat="@android:drawable/ic_input_add" />
-                app:iconSize="34dp" />
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
