@@ -18,6 +18,8 @@ import androidx.appcompat.widget.SwitchCompat;
 import com.c17206413.payup.R;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.stripe.android.PaymentConfiguration;
+import com.stripe.android.Stripe;
 
 public class UserActivity extends AppCompatActivity {
 
@@ -62,6 +64,8 @@ public class UserActivity extends AppCompatActivity {
         Button logOutButton= (Button) findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(v -> logOut());
 
+        Button stripeAccountButton= (Button) findViewById(R.id.stripeAccountButton);
+        stripeAccountButton.setOnClickListener(v -> startActivity(new Intent(UserActivity.this, SripeOnboardingView.class)));
 
     }
 

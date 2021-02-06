@@ -8,7 +8,7 @@ const logging = new Logging({
   projectId: process.env.GCLOUD_PROJECT,
 });
 const stripe = require('stripe')(functions.config().stripe.secret, {
-  apiVersion: '2020-03-02',
+  apiVersion: '2020-08-27',
 });
 
 /**
@@ -59,6 +59,36 @@ exports.createEphemeralKey = functions.https.onCall(async (data, context) => {
   }
 });
 
+exports.authorizeStripeAccount = functions.https.onCall(async (data, context) => {
+  // Checking that the user is authenticated.
+  if (!context.auth) {
+    // Throwing an HttpsError so that the client gets the error details.
+    throw new functions.https.HttpsError(
+      'failed-precondition',
+      'The function must be called while authenticated!'
+    );
+  }
+  const uid = context.auth.uid;
+  try {
+    if (!uid) throw new Error('Not authenticated!');
+    // Get stripe customer id
+    const code = data.code;
+    const response = await stripe.oauth.token({
+      grant_type: 'authorization_code',
+      code: code,
+    });
+    
+    var connected_account_id = response.stripe_user_id;
+
+    await admin.firestore().collection('users').doc(uid).update({
+      connected_account_id: connected_account_id,
+    });
+    return "Complete";
+  } catch (error) {
+    throw new functions.https.HttpsError('internal', error.message);
+  }
+});
+
 /**
  * When a payment document is written on the client,
  * this function is triggered to create the PaymentIntent in Stripe.
@@ -95,83 +125,6 @@ exports.createStripePayment = functions.firestore
   });
 
 /**
- * Helper function to update a payment record in Cloud Firestore.
- */
-const updatePaymentRecord = async (payment) => {
-  const customerId = payment.customer;
-  // Get customer's doc in Firestore.
-  const customersSnap = await admin
-    .firestore()
-    .collection('users')
-    .where('customer_id', '==', customerId)
-    .get();
-  if (customersSnap.size !== 1) throw new Error('User not found!');
-  // Update record in Firestore
-  const paymentsSnap = await customersSnap.docs[0].ref
-    .collection('payments')
-    .where('id', '==', payment.id)
-    .get();
-  if (paymentsSnap.size !== 1) throw new Error('Payment not found!');
-  await paymentsSnap.docs[0].ref.set(payment);
-};
-
-/**
- * A webhook handler function for the relevant Stripe events.
- * @see https://stripe.com/docs/payments/handling-payment-events?lang=node#build-your-own-webhook
- */
-// exports.handleWebhookEvents = functions.https.onRequest(async (req, resp) => {
-//   const relevantEvents = new Set([
-//     'payment_intent.succeeded',
-//     'payment_intent.processing',
-//     'payment_intent.payment_failed',
-//     'payment_intent.canceled',
-//   ]);
-
-//   let event;
-
-//   // Instead of getting the `Stripe.Event`
-//   // object directly from `req.body`,
-//   // use the Stripe webhooks API to make sure
-//   // this webhook call came from a trusted source
-//   try {
-//     event = stripe.webhooks.constructEvent(
-//       req.rawBody,
-//       req.headers['stripe-signature'],
-//       functions.config().stripe.webhooksecret
-//     );
-//   } catch (error) {
-//     console.error('❗️ Webhook Error: Invalid Secret');
-//     resp.status(401).send('Webhook Error: Invalid Secret');
-//     return;
-//   }
-//   if (relevantEvents.has(event.type)) {
-//     try {
-//       switch (event.type) {
-//         case 'payment_intent.succeeded':
-//         case 'payment_intent.processing':
-//         case 'payment_intent.payment_failed':
-//         case 'payment_intent.canceled':
-//           const id = event.data.object.id;
-//           await updatePaymentRecord(id);
-//           break;
-//         default:
-//           throw new Error('Unhandled relevant event!');
-//       }
-//     } catch (error) {
-//       console.error(
-//         `❗️ Webhook error for [${event.data.object.id}]`,
-//         error.message
-//       );
-//       resp.status(400).send('Webhook handler failed. View Function logs.');
-//       return;
-//     }
-//   }
-
-//   // Return a response to Stripe to acknowledge receipt of the event.
-//   resp.json({ received: true });
-// });
-
-/**
  * When a user deletes their account, clean up after them.
  */
 exports.cleanupUser = functions.auth.user().onDelete(async (user) => {
@@ -185,16 +138,13 @@ exports.cleanupUser = functions.auth.user().onDelete(async (user) => {
     .get();
   snapshot.forEach((snap) => snap.ref.delete());
   await dbRef.doc(user.uid).delete();
-  return;
+  //delete the connected account attached to this user
+  const connected_account_id = customer.connected_account_id
+  await stripe.oauth.deauthorize({
+    client_id: 'ca_IOBii6j7E2TGUDjLMBChG5j65L8sq8GN',
+    stripe_user_id: connected_account_id,
+  });
 });
-
-/**
- * To keep on top of errors, we should raise a verbose error report with Stackdriver rather
- * than simply relying on console.error. This will calculate users affected + send you email
- * alerts, if you've opted into receiving them.
- */
-
-// [START reporterror]
 
 function reportError(err, context = {}) {
   // This is the name of the StackDriver log stream that will receive the log

@@ -117,6 +117,22 @@
                 app:strokeWidth="1dp" />
 
             <Button
+                android:id="@+id/stripeAccountButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="start|center_vertical"
+                android:insetLeft="-2dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="Stripe"
+                android:textColor="@color/textColor"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="1dp" />
+
+            <Button
                 android:id="@+id/logOutButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
