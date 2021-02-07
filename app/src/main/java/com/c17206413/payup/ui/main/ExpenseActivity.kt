@@ -1,5 +1,6 @@
 package com.c17206413.payup.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -100,12 +101,13 @@ class ExpenseActivity : AppCompatActivity() {
                 .setShippingInfoRequired(false)
                 .setShippingMethodsRequired(false)
                 .setBillingAddressFields(BillingAddressFields.None)
-                .setPaymentMethodTypes(listOf(PaymentMethod.Type.Card, PaymentMethod.Type.PayPal))
+                .setPaymentMethodTypes(listOf(PaymentMethod.Type.Card))
                 .setShouldShowGooglePay(false)
                 .build())
 
         paymentSession.init(
                 object : PaymentSession.PaymentSessionListener {
+                    @SuppressLint("SetTextI18n")
                     override fun onPaymentSessionDataChanged(data: PaymentSessionData) {
 
                         if (data.useGooglePay) {
@@ -122,7 +124,7 @@ class ExpenseActivity : AppCompatActivity() {
                         }
 
                         if (data.isPaymentReadyToCharge) {
-                            Log.d("PaymentSession", "Ready to charge");
+                            Log.d("PaymentSession", "Ready to charge")
                             payButton.isEnabled = true
                         }
 

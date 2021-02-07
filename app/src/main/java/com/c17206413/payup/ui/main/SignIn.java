@@ -2,7 +2,6 @@ package com.c17206413.payup.ui.main;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.widget.ProgressBar;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -28,9 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -39,31 +34,24 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 public class SignIn extends AppCompatActivity {
 
     private static final String TAG = "Sign In";
 
-    ProgressBar progressBar;
-    TextInputLayout emailInput;
-    TextInputLayout passwordInput;
-    TextInputLayout nameInput;
-    LinearLayout signIn;
-    LinearLayout registerLayout;
+    private ProgressBar progressBar;
+    private TextInputLayout emailInput;
+    private TextInputLayout passwordInput;
+    private TextInputLayout nameInput;
+    private LinearLayout signIn;
+    private LinearLayout registerLayout;
 
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private FirebaseUser user;
     private GoogleSignInClient mGoogleSignInClient;
     private CallbackManager mCallbackManager;
 
@@ -73,7 +61,6 @@ public class SignIn extends AppCompatActivity {
         setContentView(com.c17206413.payup.R.layout.activity_signin);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
         progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 
         signIn = (LinearLayout) findViewById(R.id.signIn_Layout);
@@ -210,7 +197,6 @@ public class SignIn extends AppCompatActivity {
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
-        checkCurrentUser();
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
@@ -240,18 +226,7 @@ public class SignIn extends AppCompatActivity {
                                 .setAction("Action", null).show();
                     }
                 });
-        checkCurrentUser();
         // [END sign_in_with_email]
-    }
-
-    public void checkCurrentUser() {
-        // [START check_current_user]
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            exitActivity();
-        }
-        else { progressBar.setVisibility(View.INVISIBLE); }
-        // [END check_current_user]
     }
 
     //email registration method
@@ -267,7 +242,7 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        user = mAuth.getCurrentUser();
                         UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
                         builder.setDisplayName(name);
                         if (user !=null){
@@ -287,7 +262,6 @@ public class SignIn extends AppCompatActivity {
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
-        checkCurrentUser();
         // [END create_user_with_email]
     }
 
@@ -340,24 +314,18 @@ public class SignIn extends AppCompatActivity {
             valid = false;
         } else {
             nameInput.setError(null);
-
         }
-
         return valid;
 
     }
 
-    //back pressed
     public void onBackPressed() {
         // disable going back to the MainActivity
         moveTaskToBack(true);
     }
 
     private void exitActivity() {
-        Intent data = new Intent();
-        String text = "SignIn";
-        data.setData(Uri.parse(text));
-        setResult(RESULT_OK, data);
+        setResult(RESULT_OK);
         finish();
     }
 
