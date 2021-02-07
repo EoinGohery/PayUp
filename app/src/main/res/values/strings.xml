@@ -7,6 +7,8 @@
     <string name="profile_picture">Profile picture</string>
     <string name="accounts">Accounts</string>
     <string name="new_expense">New Expense</string>
+    <string name="stripe_account">Stripe Account</string>
+    <string name="stripe_powered">Powered by Stripe</string>
     <string name="login_with_twitter">Sign in with Twitter</string>
     <string name="tab_incoming">Incoming</string>
     <string name="user">User</string>

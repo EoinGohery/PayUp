@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4A1EAF</color>
-    <color name="colorPrimaryVariant">#5D34A8</color>
+    <color name="colorPrimary">#6B23B1</color>
+    <color name="colorPrimaryVariant">#4D2C8A</color>
     <color name="colorOnPrimary">#FFFFFF</color>
 
     <color name="colorSecondary">#DFFDFDFD</color>

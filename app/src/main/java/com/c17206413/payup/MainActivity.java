@@ -3,11 +3,7 @@ package com.c17206413.payup;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Button;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.c17206413.payup.ui.main.ExpenseActivity;
@@ -25,13 +22,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.stripe.android.PaymentConfiguration;
-
-import java.util.Locale;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     // user details
-    String providerId, providerUid, uid, name, email, language;
+    private static String providerId, providerUid, uid, name, email, language;
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
     private SharedPreferences mPrefs;
@@ -79,12 +71,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void openUser() {
         Intent intent = new Intent(this, UserActivity.class);
-        resumeActivityResultLauncher.launch(intent);
+        userResultLauncher.launch(intent);
     }
 
     private void openPayment() {
         Intent intent = new Intent(this, ExpenseActivity.class);
-        resumeActivityResultLauncher.launch(intent);
+        paymentResultLauncher.launch(intent);
     }
 
 
@@ -129,27 +121,46 @@ public class MainActivity extends AppCompatActivity {
     public void signInUser() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
-        resumeActivityResultLauncher.launch(intent);
+        loginResultLauncher.launch(intent);
     }
 
-    ActivityResultLauncher<Intent> resumeActivityResultLauncher = registerForActivityResult(
+    ActivityResultLauncher<Intent> loginResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    checkCurrentUser();
+                }
+            });
+
+
+    ActivityResultLauncher<Intent> userResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        String returnedResult = data.getDataString();
+                        if (returnedResult.equals("LogOut")) {
+                            signInUser();
+                        }
+                    }
+
+                }
+            });
+
+    ActivityResultLauncher<Intent> paymentResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     Intent data = result.getData();
                     assert data != null;
                     String returnedResult = data.getDataString();
-                    if (returnedResult.equals("LogOut")) {
-                        signOut();
-                    } else if (returnedResult.equals("SignIn")) {
-                        try {
-                            checkCurrentUser();
-                        } catch (Exception e) {
-                            signInUser();
-                        }
+                    if (returnedResult.equals("result")) {
+                        //TODO
                     }
                 }
             });
+
 
 
     public void getUserProfile() {
