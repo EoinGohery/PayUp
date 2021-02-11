@@ -14,10 +14,10 @@ import androidx.core.widget.NestedScrollView;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.c17206413.payup.ui.main.ExpenseActivity;
 import com.c17206413.payup.ui.main.SectionsPagerAdapter;
-import com.c17206413.payup.ui.main.SignIn;
-import com.c17206413.payup.ui.main.UserActivity;
+import com.c17206413.payup.ui.accounts.SignIn;
+import com.c17206413.payup.ui.accounts.MenuActivity;
+import com.c17206413.payup.ui.payment.CreatePaymentActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -66,17 +66,17 @@ public class MainActivity extends AppCompatActivity {
         userButton.setOnClickListener(v -> openUser());
 
         Button newExpenseButton = (Button) findViewById(R.id.newExpenseButton);
-        newExpenseButton.setOnClickListener(v -> openPayment());
+        newExpenseButton.setOnClickListener(v -> createPayment());
     }
 
     private void openUser() {
-        Intent intent = new Intent(this, UserActivity.class);
+        Intent intent = new Intent(this, MenuActivity.class);
         userResultLauncher.launch(intent);
     }
 
-    private void openPayment() {
-        Intent intent = new Intent(this, ExpenseActivity.class);
-        paymentResultLauncher.launch(intent);
+    private void createPayment() {
+        Intent intent = new Intent(this, CreatePaymentActivity.class);
+        createPaymentResultLauncher.launch(intent);
     }
 
 
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                     if (data != null) {
                         String returnedResult = data.getDataString();
                         if (returnedResult.equals("LogOut")) {
+                            signOut();
                             signInUser();
                         }
                     }
@@ -148,19 +149,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-    ActivityResultLauncher<Intent> paymentResultLauncher = registerForActivityResult(
+    ActivityResultLauncher<Intent> createPaymentResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    assert data != null;
-                    String returnedResult = data.getDataString();
-                    if (returnedResult.equals("result")) {
-                        //TODO
-                    }
+                    //TODO
                 }
             });
-
 
 
     public void getUserProfile() {

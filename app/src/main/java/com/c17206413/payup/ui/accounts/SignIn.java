@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.main;
+package com.c17206413.payup.ui.accounts;
 
 import android.app.Activity;
 import android.content.Intent;

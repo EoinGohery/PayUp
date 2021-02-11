@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.main;
+package com.c17206413.payup.ui.accounts;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -25,7 +25,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class UserActivity extends AppCompatActivity {
+public class MenuActivity extends AppCompatActivity {
 
     private static final String NIGHT_MODE = "NIGHT_MODE";
     private static final String TAG = USER_SERVICE;
@@ -46,7 +46,7 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
-        setContentView(R.layout.activity_user);
+        setContentView(R.layout.activity_menu);
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -69,7 +69,7 @@ public class UserActivity extends AppCompatActivity {
         logOutButton.setOnClickListener(v -> logOut());
 
         stripeAccount= (TextView) findViewById(R.id.stripeAccountButton);
-        stripeAccount.setOnClickListener(v -> startActivity(new Intent(UserActivity.this, SripeOnboardingView.class)));
+        stripeAccount.setOnClickListener(v -> startActivity(new Intent(MenuActivity.this, SripeOnboardingView.class)));
 
         Button accountButton= (Button) findViewById(R.id.accountsButton);
         accountButton.setOnClickListener(v -> {
@@ -152,7 +152,6 @@ public class UserActivity extends AppCompatActivity {
     }
 
     private void logOut() {
-        mAuth.signOut();
         Intent data = new Intent();
         String text = "LogOut";
         data.setData(Uri.parse(text));
