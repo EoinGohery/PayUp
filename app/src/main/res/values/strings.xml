@@ -6,6 +6,7 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="profile_picture">Profile picture</string>
     <string name="accounts">Accounts</string>
+    <string name="create_expense">Create Expense</string>
     <string name="new_expense">New Expense</string>
     <string name="stripe_account">Stripe Account</string>
     <string name="stripe_powered">Powered by Stripe</string>
@@ -34,5 +35,8 @@
     <string name="facebook_app_id">440518313790406</string>
     <string name="fb_login_protocol_scheme">fb440518313790406</string>
     <string name="terms_conditions">Terms and Conditions</string>
+    <string name="total_price">Total Price</string>
+    <string name="price_pp">Price per Person: 0</string>
+    <string name="username">Username</string>
 
 </resources>

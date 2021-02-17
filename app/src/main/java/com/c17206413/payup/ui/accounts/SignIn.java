@@ -139,7 +139,7 @@ public class SignIn extends AppCompatActivity {
         });
 
         //enable social media sign in buttons
-        Button backToSingInButton= (Button) findViewById(R.id.backToSignIn);
+        Button backToSingInButton= (Button) findViewById(R.id.createPaymentButton);
         backToSingInButton.setOnClickListener(v -> {
             registerLayout.setVisibility(View.GONE);
             signIn.setVisibility(View.VISIBLE);

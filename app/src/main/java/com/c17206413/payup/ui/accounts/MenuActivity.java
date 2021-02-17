@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.c17206413.payup.R;
+import com.c17206413.payup.ui.Model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -118,7 +119,7 @@ public class MenuActivity extends AppCompatActivity {
                         String account = document.getString("connected_account_id");
                         String customer = document.getString("customer_id");
                         String docName = document.getString("name");
-                        setFields( docName, customer, account);
+                        setFields(uid, docName, customer, account);
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -130,7 +131,8 @@ public class MenuActivity extends AppCompatActivity {
         }
     }
 
-    public void setFields(String name, String customer_id, String account_id) {
+    public void setFields(String uid, String name, String customer_id, String account_id) {
+        User user = new User(uid, name, "default");
         this.name = name;
         this.account_id = account_id;
         this.customer_id = customer_id;

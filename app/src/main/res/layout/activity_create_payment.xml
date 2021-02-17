@@ -18,95 +18,82 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_launcher_foreground" />
-
-        <LinearLayout
-            android:id="@+id/registerLayout"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailLayout"
+                android:id="@+id/serviceNameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp">
 
                 <EditText
-                    android:id="@+id/input_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:autofillHints=""
-                    android:background="@color/colorBackground"
-                    android:hint="@string/email"
-                    android:inputType="textEmailAddress"
-                    android:textColor="@color/textColor" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passwordLayout"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-
-                <EditText
-                    android:id="@+id/input_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:background="@color/colorBackground"
-                    android:hint="@string/password"
-                    android:importantForAutofill="no"
-                    android:inputType="textAutoCorrect|textPassword|textAutoComplete"
-                    android:textColor="@color/textColor" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/nameLayout"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-
-                <EditText
-                    android:id="@+id/input_name"
+                    android:id="@+id/input_service_name"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:autofillHints=""
                     android:background="@color/colorBackground"
                     android:hint="@string/name"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="text"
+                    android:textColor="@color/textColor" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Space
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/priceLayout"
                 android:layout_width="match_parent"
-                android:layout_height="37dp" />
+                android:layout_height="60dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
 
-            <TextView
-                android:id="@+id/orTextRegister"
+            <EditText
+                android:id="@+id/input_price"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/or"
-                android:textSize="18sp" />
+                android:layout_height="60dp"
+                android:autofillHints=""
+                android:background="@color/colorBackground"
+                android:hint="@string/total_price"
+                android:inputType="numberDecimal" />
 
-            <Button
-                android:id="@+id/backToSignIn"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:backgroundTint="@color/colorSecondaryVariant"
-                android:text="@string/backToSignIn" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        </LinearLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="37dp" />
+
+        <TextView
+            android:id="@+id/pricePP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/price_pp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/beneficaryRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="37dp" />
+
+        <Button
+            android:id="@+id/createPaymentButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:text="@string/create_expense" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="37dp" />
 
     </LinearLayout>
 
@@ -121,7 +108,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></ProgressBar>
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -46,56 +46,7 @@ class CheckoutActivity : AppCompatActivity() {
 
         stripe.confirmPayment(this, ConfirmPaymentIntentParams.createWithPaymentMethodId(
                 paymentMethodId, paymentIntentClientSecret))
-        }
-
-        /*val paymentCollection = Firebase.firestore
-                .collection("users")
-                .document(currentUser?.uid ?: "")
-                .collection("payments")
-
-        // Add a new document with a generated ID
-        paymentCollection.add(hashMapOf(
-                "amount" to 8800,
-                "currency" to "hkd"
-            )).addOnSuccessListener { documentReference ->
-                Log.d("payment", "DocumentSnapshot added with ID: ${documentReference.id}")
-                documentReference.addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        Log.w("payment", "Listen failed.", e)
-                        return@addSnapshotListener
-                    }
-
-                    if (snapshot != null && snapshot.exists()) {
-                        Log.d("payment", "Current data: ${snapshot.data}")
-                        val clientSecret = snapshot.data?.get("client_secret")
-                        Log.d("payment", "Create paymentIntent returns $clientSecret")
-                        clientSecret?.let {
-                            stripe.confirmPayment(this, ConfirmPaymentIntentParams.createWithPaymentMethodId(
-                                    paymentMethodId,
-                                    (it as String)
-                            ))
-
-                            amount.text = getString(R.string.payment_success)
-                            Snackbar.make(findViewById(android.R.id.content), "Payment Complete", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show()
-                        }
-                    } else {
-                        amount.text = getString(R.string.payment_fail)
-                        Snackbar.make(findViewById(android.R.id.content), "Payment Failed", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show()
-                        Log.e("payment", "Current payment intent : null")
-                        payButton.isEnabled = true
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                amount.text = getString(R.string.payment_fail)
-                Snackbar.make(findViewById(android.R.id.content), "Payment Failed", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show()
-                Log.w("payment", "Error adding document", e)
-                payButton.isEnabled = true
-            }
-    }*/
+    }
 
     private fun setupPaymentSession () {
         // Setup Customer Session
@@ -143,9 +94,7 @@ class CheckoutActivity : AppCompatActivity() {
                     override fun onError(errorCode: Int, errorMessage: String) {
                         Log.e("PaymentSession", "onError: $errorCode, $errorMessage")
                     }
-                }
-        )
-
+                })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

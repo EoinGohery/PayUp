@@ -14,7 +14,7 @@ import androidx.core.widget.NestedScrollView;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.c17206413.payup.ui.main.SectionsPagerAdapter;
+import com.c17206413.payup.ui.Adapter.SectionsPagerAdapter;
 import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
