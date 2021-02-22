@@ -56,36 +56,31 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="37dp" />
-
         <TextView
-            android:id="@+id/pricePP"
+            android:id="@+id/price_per_person"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/price_pp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/beneficaryRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="37dp" />
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:paddingStart="13dp"
+            android:paddingEnd="0dp"
+            android:text="@string/price_pp"
+            android:textColor="@color/colorSecondary"
+            android:textSize="16sp" />
 
         <Button
-            android:id="@+id/createPaymentButton"
+            android:id="@+id/create_payment_button"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:backgroundTint="@color/colorPrimary"
             android:text="@string/create_expense" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/searchRecycler"
+            android:id="@+id/user_recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

@@ -17,12 +17,15 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class CreatePaymentActivity extends AppCompatActivity {
+public class CreatePaymentActivity extends AppCompatActivity implements UserAdapter.UserListener {
     private RecyclerView searchRecycler;
+    private RecyclerView addedRecycler;
 
     private UserAdapter userAdapter;
     private List<User> mUsers;
+    private List<User> addedUsers;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,12 +33,11 @@ public class CreatePaymentActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_create_payment);
 
-        searchRecycler = (RecyclerView) findViewById(R.id.searchRecycler);
+        searchRecycler = (RecyclerView) findViewById(R.id.user_recycler);
         searchRecycler.setHasFixedSize(true);
         searchRecycler.setLayoutManager(new LinearLayoutManager(this));
-        
+
         mUsers = new ArrayList<>();
-        
         readUsers();
     }
 
@@ -46,16 +48,17 @@ public class CreatePaymentActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         mUsers.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String id = document.getId();
                             String username = document.getString("name");
                             //String profileUrl = document.getString("ProfileUrl");
                             User user = new User(id, username, "default");
+                            assert firebaseUser != null;
                             if (!user.getId().equals(firebaseUser.getUid())) {
                                 mUsers.add(user);
                             }
                         }
-                        userAdapter = new UserAdapter(this, mUsers);
+                        userAdapter = new UserAdapter(this, mUsers, this);
                         searchRecycler.setAdapter(userAdapter);
 
                     } else {
@@ -65,5 +68,12 @@ public class CreatePaymentActivity extends AppCompatActivity {
                 });
 
 
+    }
+
+    @Override
+    public void onUserClick(int position) {
+        mUsers.get(position).swapSelected();
+        userAdapter = new UserAdapter(this, mUsers, this);
+        searchRecycler.setAdapter(userAdapter);
     }
 }

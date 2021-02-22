@@ -107,6 +107,7 @@ exports.createStripePayment = functions.firestore
           stripeAccount: customer,
           idempotencyKey: idempotencyKey, }
       );
+      const clientSecret = payment.client_secret;
       // If the result is successful, write it back to the database.
       await snap.ref.set(payment);
     } catch (error) {
