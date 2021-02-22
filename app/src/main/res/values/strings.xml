@@ -36,7 +36,7 @@
     <string name="fb_login_protocol_scheme">fb440518313790406</string>
     <string name="terms_conditions">Terms and Conditions</string>
     <string name="total_price">Total Price</string>
-    <string name="price_pp">Price per Person: 0</string>
+    <string name="price_pp">Price per Person: </string>
     <string name="username">Username</string>
 
 </resources>

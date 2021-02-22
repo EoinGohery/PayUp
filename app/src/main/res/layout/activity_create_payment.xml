@@ -10,7 +10,7 @@
 
     <LinearLayout
         android:id="@+id/parentLinear"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="740dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -19,31 +19,31 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/serviceNameLayout"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/serviceNameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <EditText
+                android:id="@+id/input_service_name"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
+                android:autofillHints=""
+                android:background="@color/colorBackground"
+                android:hint="@string/name"
+                android:inputType="text"
+                android:textColor="@color/textColor" />
 
-                <EditText
-                    android:id="@+id/input_service_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:autofillHints=""
-                    android:background="@color/colorBackground"
-                    android:hint="@string/name"
-                    android:inputType="text"
-                    android:textColor="@color/textColor" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/priceLayout"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
+            android:id="@+id/priceLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
 
             <EditText
                 android:id="@+id/input_price"
@@ -52,9 +52,10 @@
                 android:autofillHints=""
                 android:background="@color/colorBackground"
                 android:hint="@string/total_price"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                android:textColor="@color/textColor" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/price_per_person"
@@ -62,10 +63,11 @@
             android:layout_height="60dp"
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
+            android:background="@color/colorBackground"
             android:paddingStart="13dp"
             android:paddingEnd="0dp"
             android:text="@string/price_pp"
-            android:textColor="@color/colorSecondary"
+            android:textColor="@color/textColor"
             android:textSize="16sp" />
 
         <Button
