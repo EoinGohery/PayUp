@@ -29,9 +29,6 @@ exports.createUserDocument = functions.auth.user().onCreate(async (user) => {
 
 /**
  * Set up an ephemeral key.
- *
- * @see https://stripe.com/docs/mobile/android/basic#set-up-ephemeral-key
- * @see https://stripe.com/docs/mobile/ios/basic#ephemeral-key
  */
 exports.createEphemeralKey = functions.https.onCall(async (data, context) => {
   // Checking that the user is authenticated.
@@ -90,34 +87,42 @@ exports.authorizeStripeAccount = functions.https.onCall(async (data, context) =>
 });
 
 /**
- * When a payment document is written on the client,
- * this function is triggered to create the PaymentIntent in Stripe.
- *
- * @see https://stripe.com/docs/mobile/android/basic#complete-the-payment
+ * When a payment document is written on the client, this function is triggered to create the PaymentIntent in Stripe.
  */
 exports.createStripePayment = functions.firestore
-  .document('users/{userId}/payments/{pushId}')
+  .document('users/{userId}/incoming/{pushId}')
   .onCreate(async (snap, context) => {
-    const { amount, currency } = snap.data();
+    const { amount, currency, user_id, service_name} = snap.data();
+    const ownerId = context.params.userId;
     try {
       // Look up the Stripe customer id.
-      const customer = (await snap.ref.parent.parent.get()).data().customer_id;
-      // Create a charge using the pushId as the idempotency key
-      // to protect against double charges.
+      const customer = (await snap.ref.parent.parent.get()).data().connected_account_id;
+      // Create a charge using the pushId as the idempotency key to protect against double charges.
       const idempotencyKey = context.params.pushId;
       const payment = await stripe.paymentIntents.create(
         {
-          amount,
-          currency,
-          customer,
-        },
-        { idempotencyKey }
+          payment_method_types: ['card'],
+          amount: amount,
+          currency: currency,
+          metadata: {'service_name': service_name, 'userID' : user_id}
+        }, {
+          stripeAccount: customer,
+          idempotencyKey: idempotencyKey, }
       );
+      const clientSecret = payment.client_secret;
       // If the result is successful, write it back to the database.
-      await snap.ref.set(payment);
+      //await snap.ref.set(payment);
+
+      await admin.firestore().collection('users').doc(user_id).collection('due').doc(idempotencyKey).set({
+        service_name: service_name,
+        amount: amount,
+        clientSecret: clientSecret,
+        user_id: ownerId,
+        active: true
+      });
+
     } catch (error) {
-      // We want to capture errors and render them in a user-friendly way, while
-      // still logging an exception with StackDriver
+      // We want to capture errors and render them in a user-friendly way, while still logging an exception with StackDriver
       console.log(error);
       await snap.ref.set({ error: userFacingMessage(error) }, { merge: true });
       await reportError(error, { user: context.params.userId });
@@ -153,7 +158,6 @@ function reportError(err, context = {}) {
   const logName = 'errors';
   const log = logging.log(logName);
 
-  // https://cloud.google.com/logging/docs/api/ref_v2beta1/rest/v2beta1/MonitoredResource
   const metadata = {
     resource: {
       type: 'cloud_function',
@@ -161,7 +165,6 @@ function reportError(err, context = {}) {
     },
   };
 
-  // https://cloud.google.com/error-reporting/reference/rest/v1beta1/ErrorEvent
   const errorEvent = {
     message: err.stack,
     serviceContext: {
@@ -181,8 +184,6 @@ function reportError(err, context = {}) {
     });
   });
 }
-
-// [END reporterror]
 
 /**
  * Sanitize the error message for the user.

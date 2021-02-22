@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.main
+package com.c17206413.payup.ui.payment
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -6,18 +6,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.c17206413.payup.R
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.*
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.stripe.android.*
 import com.stripe.android.model.ConfirmPaymentIntentParams
 import com.stripe.android.model.PaymentMethod
 import com.stripe.android.view.BillingAddressFields
-import kotlinx.android.synthetic.main.activity_payment.*
+import kotlinx.android.synthetic.main.activity_checkout.*
 
 
-class ExpenseActivity : AppCompatActivity() {
+class CheckoutActivity : AppCompatActivity() {
 
     private var currentUser: FirebaseUser? = null
     private lateinit var paymentSession: PaymentSession
@@ -25,14 +22,17 @@ class ExpenseActivity : AppCompatActivity() {
     private val stripe: Stripe by lazy { Stripe(applicationContext, "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF") }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_payment)
+        setContentView(R.layout.activity_checkout)
 
         currentUser = FirebaseAuth.getInstance().currentUser
+
+        val extras = intent.extras
+        val paymentIntentClientSecret = extras!!.getString("paymentIntentClientSecret")
 
         setupPaymentSession()
 
         payButton.setOnClickListener {
-            confirmPayment(selectedPaymentMethod.id!!)
+            confirmPayment(selectedPaymentMethod.id!!, paymentIntentClientSecret!!)
         }
 
         paymentmethod.setOnClickListener {
@@ -41,56 +41,11 @@ class ExpenseActivity : AppCompatActivity() {
         }
     }
 
-    private fun confirmPayment(paymentMethodId: String) {
+    private fun confirmPayment(paymentMethodId: String, paymentIntentClientSecret: String) {
         payButton.isEnabled = false
 
-        val paymentCollection = Firebase.firestore
-                .collection("users")
-                .document(currentUser?.uid ?: "")
-                .collection("payments")
-
-        // Add a new document with a generated ID
-        paymentCollection.add(hashMapOf(
-                "amount" to 8800,
-                "currency" to "hkd"
-            )).addOnSuccessListener { documentReference ->
-                Log.d("payment", "DocumentSnapshot added with ID: ${documentReference.id}")
-                documentReference.addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        Log.w("payment", "Listen failed.", e)
-                        return@addSnapshotListener
-                    }
-
-                    if (snapshot != null && snapshot.exists()) {
-                        Log.d("payment", "Current data: ${snapshot.data}")
-                        val clientSecret = snapshot.data?.get("client_secret")
-                        Log.d("payment", "Create paymentIntent returns $clientSecret")
-                        clientSecret?.let {
-                            stripe.confirmPayment(this, ConfirmPaymentIntentParams.createWithPaymentMethodId(
-                                    paymentMethodId,
-                                    (it as String)
-                            ))
-
-                            amount.text = getString(R.string.payment_success)
-                            Snackbar.make(findViewById(android.R.id.content), "Payment Complete", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show()
-                        }
-                    } else {
-                        amount.text = getString(R.string.payment_fail)
-                        Snackbar.make(findViewById(android.R.id.content), "Payment Failed", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show()
-                        Log.e("payment", "Current payment intent : null")
-                        payButton.isEnabled = true
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                amount.text = getString(R.string.payment_fail)
-                Snackbar.make(findViewById(android.R.id.content), "Payment Failed", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show()
-                Log.w("payment", "Error adding document", e)
-                payButton.isEnabled = true
-            }
+        stripe.confirmPayment(this, ConfirmPaymentIntentParams.createWithPaymentMethodId(
+                paymentMethodId, paymentIntentClientSecret))
     }
 
     private fun setupPaymentSession () {
@@ -139,9 +94,7 @@ class ExpenseActivity : AppCompatActivity() {
                     override fun onError(errorCode: Int, errorMessage: String) {
                         Log.e("PaymentSession", "onError: $errorCode, $errorMessage")
                     }
-                }
-        )
-
+                })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

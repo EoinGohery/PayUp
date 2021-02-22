@@ -1,19 +1,24 @@
 package com.c17206413.payup.ui.main;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 
 import com.c17206413.payup.R;
+import com.c17206413.payup.ui.payment.CheckoutActivity;
 
 public class DueFragment extends Fragment {
+
+    private String paymentIntentClientSecret = "";
 
     public static DueFragment newInstance() {
         DueFragment fragment = new DueFragment();
@@ -26,7 +31,30 @@ public class DueFragment extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_due, container, false);
-        //final TextView textView = root.findViewById(R.id.section_label);
+
+        Button expenseActivityButton = root.findViewById(R.id.button2);
+        expenseActivityButton.setOnClickListener(v -> launchPayment());
+
+
         return root;
     }
+
+    private void launchPayment() {
+        Intent intent = new Intent(getActivity(), CheckoutActivity.class);
+        intent.putExtra("paymentIntentClientSecret", paymentIntentClientSecret);
+        paymentResultLauncher.launch(intent);
+    }
+
+    ActivityResultLauncher<Intent> paymentResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    assert data != null;
+                    String returnedResult = data.getDataString();
+                    if (returnedResult.equals("result")) {
+                        //TODO
+                    }
+                }
+            });
 }

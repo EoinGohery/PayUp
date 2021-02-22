@@ -69,7 +69,6 @@
                 android:insetBottom="1dp"
                 android:text="@string/accounts"
                 android:textColor="@color/textColor"
-                android:visibility="visible"
                 app:rippleColor="@color/colorRipple"
                 app:strokeColor="@color/colorSecondaryVariant"
                 app:strokeWidth="0dp" />

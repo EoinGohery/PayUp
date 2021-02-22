@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.main;
+package com.c17206413.payup.ui.accounts;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;

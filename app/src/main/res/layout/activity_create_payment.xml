@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Theme.AppCompat.DayNight.Dialog.Alert"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".ui.accounts.SignIn">
+
+    <LinearLayout
+        android:id="@+id/parentLinear"
+        android:layout_width="350dp"
+        android:layout_height="740dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/serviceNameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <EditText
+                android:id="@+id/input_service_name"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:autofillHints=""
+                android:background="@color/colorBackground"
+                android:hint="@string/name"
+                android:inputType="text"
+                android:textColor="@color/textColor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/priceLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <EditText
+                android:id="@+id/input_price"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:autofillHints=""
+                android:background="@color/colorBackground"
+                android:hint="@string/total_price"
+                android:inputType="numberDecimal"
+                android:textColor="@color/textColor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/price_per_person"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:background="@color/colorBackground"
+            android:paddingStart="13dp"
+            android:paddingEnd="0dp"
+            android:text="@string/price_pp"
+            android:textColor="@color/textColor"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/create_payment_button"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:text="@string/create_expense" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/user_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="37dp" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="@android:style/Widget.Material.ProgressBar.Small.Title"
+        android:layout_width="130dp"
+        android:layout_height="123dp"
+        android:clickable="false"
+        android:hapticFeedbackEnabled="false"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

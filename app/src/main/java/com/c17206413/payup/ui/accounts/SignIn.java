@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.main;
+package com.c17206413.payup.ui.accounts;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -139,7 +139,7 @@ public class SignIn extends AppCompatActivity {
         });
 
         //enable social media sign in buttons
-        Button backToSingInButton= (Button) findViewById(R.id.backToSignIn);
+        Button backToSingInButton= (Button) findViewById(R.id.create_payment_button);
         backToSingInButton.setOnClickListener(v -> {
             registerLayout.setVisibility(View.GONE);
             signIn.setVisibility(View.VISIBLE);

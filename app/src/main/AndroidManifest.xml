@@ -22,10 +22,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.main.SignIn" />
-        <activity android:name=".ui.main.UserActivity" />
-        <activity android:name=".ui.main.ExpenseActivity" />
-        <activity android:name=".ui.main.SripeOnboardingView" />
+        <activity android:name=".ui.accounts.SignIn"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.accounts.MenuActivity" />
+        <activity android:name=".ui.payment.CheckoutActivity" />
+        <activity android:name=".ui.payment.CreatePaymentActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.accounts.SripeOnboardingView" />
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             tools:replace="android:value"

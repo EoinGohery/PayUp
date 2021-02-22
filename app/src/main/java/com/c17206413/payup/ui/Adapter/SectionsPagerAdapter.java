@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.main;
+package com.c17206413.payup.ui.Adapter;
 
 import android.content.Context;
 
@@ -9,6 +9,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.c17206413.payup.R;
+import com.c17206413.payup.ui.main.DueFragment;
+import com.c17206413.payup.ui.main.IncomingFragment;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 

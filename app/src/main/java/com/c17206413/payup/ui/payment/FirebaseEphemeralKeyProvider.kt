@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.main
+package com.c17206413.payup.ui.payment
 
 import android.util.Log
 import com.google.firebase.functions.FirebaseFunctionsException
