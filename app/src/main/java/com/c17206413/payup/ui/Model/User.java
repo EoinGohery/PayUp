@@ -38,15 +38,9 @@ public class User {
         this.imageUrl = imageUrl;
     }
 
-    public Boolean getSelected() {
-        return isSelected;
-    }
+    public Boolean getSelected() { return isSelected; }
 
-    public void setSelected(Boolean selected) {
-        isSelected = selected;
-    }
-    public void swapSelected() {
-        isSelected = !isSelected;
-    }
+    public void setSelected(Boolean selected) { isSelected = selected; }
 
+    public void swapSelected() { isSelected = !isSelected; }
 }

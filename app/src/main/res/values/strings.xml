@@ -14,6 +14,7 @@
     <string name="tab_incoming">Incoming</string>
     <string name="user">User</string>
     <string name="payment_success">Payment Successful</string>
+    <string name="pricePerP">Price per person: </string>
     <string name="pay_with_google">Proceed with Google Pay</string>
     <string name="payment_fail">Payment Successful</string>
     <string name="email">Email</string>

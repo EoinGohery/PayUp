@@ -38,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String NIGHT_MODE = "NIGHT_MODE";
     private SharedPreferences mPrefs;
 
+    public static String getUid() {
+        return uid;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

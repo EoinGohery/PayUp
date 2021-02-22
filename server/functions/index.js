@@ -90,9 +90,10 @@ exports.authorizeStripeAccount = functions.https.onCall(async (data, context) =>
  * When a payment document is written on the client, this function is triggered to create the PaymentIntent in Stripe.
  */
 exports.createStripePayment = functions.firestore
-  .document('users/{userId}/payments/{pushId}')
+  .document('users/{userId}/incoming/{pushId}')
   .onCreate(async (snap, context) => {
-    const { amount, currency} = snap.data();
+    const { amount, currency, user_id, service_name} = snap.data();
+    const ownerId = context.params.userId;
     try {
       // Look up the Stripe customer id.
       const customer = (await snap.ref.parent.parent.get()).data().connected_account_id;
@@ -103,13 +104,23 @@ exports.createStripePayment = functions.firestore
           payment_method_types: ['card'],
           amount: amount,
           currency: currency,
+          metadata: {'service_name': service_name, 'userID' : user_id}
         }, {
           stripeAccount: customer,
           idempotencyKey: idempotencyKey, }
       );
       const clientSecret = payment.client_secret;
       // If the result is successful, write it back to the database.
-      await snap.ref.set(payment);
+      //await snap.ref.set(payment);
+
+      await admin.firestore().collection('users').doc(user_id).collection('due').doc(idempotencyKey).set({
+        service_name: service_name,
+        amount: amount,
+        clientSecret: clientSecret,
+        user_id: ownerId,
+        active: true
+      });
+
     } catch (error) {
       // We want to capture errors and render them in a user-friendly way, while still logging an exception with StackDriver
       console.log(error);
