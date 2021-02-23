@@ -5,14 +5,16 @@ public class Payment {
     private String serviceName;
     private String currency;
     private String username;
+    private String type;
     private String amount;
     private String clientSecret;
     private String id;
 
-    public Payment(String id, String serviceName, String currency, String username, String amount, String clientSecret) {
+    public Payment(String id, String serviceName, String currency, String username, String amount, String clientSecret, String type) {
         this.serviceName = serviceName;
         this.currency = currency;
         this.username = username;
+        this.type = type;
         this.amount = amount;
         this.clientSecret = clientSecret;
         this.id = id;
@@ -64,5 +66,13 @@ public class Payment {
 
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

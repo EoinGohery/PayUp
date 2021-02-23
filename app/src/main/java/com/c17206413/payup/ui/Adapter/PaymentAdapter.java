@@ -40,6 +40,11 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
         holder.price.setText(paymentDetails.getAmount());
         holder.userName.setText(paymentDetails.getUsername());
         holder.serviceName.setText(paymentDetails.getServiceName());
+        if (paymentDetails.getType().equals("due")) {
+            holder.payButton.setText(R.string.app_name);
+        } else if (paymentDetails.getType().equals("incoming")) {
+            holder.payButton.setText(R.string.cancel);
+        }
     }
 
     @Override
@@ -52,6 +57,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
         public TextView price;
         public TextView userName;
         public PaymentListener PaymentListener;
+        public Button payButton;
 
         public ViewHolder(View itemView, PaymentListener paymentListener) {
             super(itemView);
@@ -64,8 +70,9 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
 
             itemView.setOnClickListener(this);
 
-            Button payButton = (Button) itemView.findViewById(R.id.pay_button);
+            payButton = (Button) itemView.findViewById(R.id.pay_button);
             payButton.setOnClickListener(v -> PaymentListener.payButtonOnClick(v, getAdapterPosition()));
+
         }
 
         @Override

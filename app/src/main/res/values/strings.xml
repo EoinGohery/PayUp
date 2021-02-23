@@ -40,5 +40,6 @@
     <string name="total_price">Total Price</string>
     <string name="price_pp">Price per Person: </string>
     <string name="username">Username</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

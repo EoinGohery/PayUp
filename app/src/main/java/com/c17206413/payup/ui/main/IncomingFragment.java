@@ -76,7 +76,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                             //TODO (check currency of transaction and convert appropriately)
                             String amount = NumberFormat.getCurrencyInstance().format((Integer.parseInt(document.getString("amount"))/100));
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret);
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming");
                             mPayments.add(paymentDetails);
                         }
                         paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
@@ -88,7 +88,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                 });
     }
 
-    private void launchPayment(Payment paymentDetail) {
+    private void viewPayment(Payment paymentDetail) {
         Intent intent = new Intent(getActivity(), PaymentDetailsActivity.class);
         intent.putExtra("clientSecret", paymentDetail.getClientSecret());
         paymentDetailScreenLauncher.launch(intent);
@@ -101,6 +101,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                     Intent data = result.getData();
                     assert data != null;
                     String returnedResult = data.getDataString();
+                    readPayments();
                     if (returnedResult.equals("result")) {
                         //TODO (add result)
                     }
@@ -110,13 +111,13 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     @Override
     public void onPaymentDetailsClick(int position) {
         Payment paymentDetail = mPayments.get(position);
-        //TODO (add payment details screen)
+        viewPayment(paymentDetail);
     }
 
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
         Payment paymentDetail = mPayments.get(adapterPosition);
-        launchPayment(paymentDetail);
+        //TODO (cancel a payment)
     }
 
 }

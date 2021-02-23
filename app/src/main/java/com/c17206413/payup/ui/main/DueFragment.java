@@ -19,6 +19,7 @@ import com.c17206413.payup.R;
 import com.c17206413.payup.ui.Adapter.PaymentAdapter;
 import com.c17206413.payup.ui.Model.Payment;
 import com.c17206413.payup.ui.payment.CheckoutActivity;
+import com.c17206413.payup.ui.view.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -76,7 +77,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                             //TODO (check currency of transaction and convert appropriately)
                             String amount = NumberFormat.getCurrencyInstance().format((Integer.parseInt(document.getString("amount"))/100));
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret);
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due");
                             mPayments.add(paymentDetails);
                         }
                         paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
@@ -104,10 +105,30 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                     Intent data = result.getData();
                     assert data != null;
                     String returnedResult = data.getDataString();
+                    readPayments();
                     if (returnedResult.equals("result")) {
-                        readPayments();
                         Snackbar.make(root.findViewById(android.R.id.content), "Payment Succeeded.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
+                    }
+                }
+            });
+
+    private void viewPayment(Payment paymentDetail) {
+        Intent intent = new Intent(getActivity(), PaymentDetailsActivity.class);
+        intent.putExtra("clientSecret", paymentDetail.getClientSecret());
+        paymentDetailScreenLauncher.launch(intent);
+    }
+
+    ActivityResultLauncher<Intent> paymentDetailScreenLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    assert data != null;
+                    String returnedResult = data.getDataString();
+                    readPayments();
+                    if (returnedResult.equals("result")) {
+                        //TODO (add result)
                     }
                 }
             });
@@ -115,7 +136,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
     @Override
     public void onPaymentDetailsClick(int position) {
         Payment paymentDetail = mPayments.get(position);
-        //TODO (add payment details screen)
+        viewPayment(paymentDetail);
     }
 
     @Override
