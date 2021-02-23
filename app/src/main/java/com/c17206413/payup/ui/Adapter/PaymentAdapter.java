@@ -11,32 +11,32 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.c17206413.payup.R;
-import com.c17206413.payup.ui.Model.PaymentDetails;
+import com.c17206413.payup.ui.Model.Payment;
 
 import java.util.List;
 
 public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHolder> {
 
     private final Context mContext;
-    private final List<PaymentDetails> mPayments;
-    private final PaymentDetailsListener paymentDetailsListener;
+    private final List<Payment> mPayments;
+    private final PaymentListener paymentListener;
 
-    public PaymentAdapter(Context mContext, List<PaymentDetails> mPayments, PaymentDetailsListener paymentDetailsListener) {
+    public PaymentAdapter(Context mContext, List<Payment> mPayments, PaymentListener paymentListener) {
         this.mPayments = mPayments;
         this.mContext = mContext;
-        this.paymentDetailsListener = paymentDetailsListener;
+        this.paymentListener = paymentListener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.payment_item, parent, false);
-        return new ViewHolder(view, paymentDetailsListener);
+        return new ViewHolder(view, paymentListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PaymentDetails paymentDetails = mPayments.get(position);
+        Payment paymentDetails = mPayments.get(position);
         holder.price.setText(paymentDetails.getAmount());
         holder.userName.setText(paymentDetails.getUsername());
         holder.serviceName.setText(paymentDetails.getServiceName());
@@ -51,12 +51,12 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
         public TextView serviceName;
         public TextView price;
         public TextView userName;
-        public PaymentDetailsListener PaymentDetailsListener;
+        public PaymentListener PaymentListener;
 
-        public ViewHolder(View itemView, PaymentDetailsListener paymentDetailsListener) {
+        public ViewHolder(View itemView, PaymentListener paymentListener) {
             super(itemView);
 
-            this.PaymentDetailsListener = paymentDetailsListener;
+            this.PaymentListener = paymentListener;
 
             serviceName = itemView.findViewById(R.id.service_name);
             price = itemView.findViewById(R.id.price);
@@ -65,16 +65,16 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
             itemView.setOnClickListener(this);
 
             Button payButton = (Button) itemView.findViewById(R.id.pay_button);
-            payButton.setOnClickListener(v -> PaymentDetailsListener.payButtonOnClick(v, getAdapterPosition()));
+            payButton.setOnClickListener(v -> PaymentListener.payButtonOnClick(v, getAdapterPosition()));
         }
 
         @Override
         public void onClick(View v) {
-            PaymentDetailsListener.onPaymentDetailsClick(getAdapterPosition());
+            PaymentListener.onPaymentDetailsClick(getAdapterPosition());
         }
     }
 
-    public interface PaymentDetailsListener {
+    public interface PaymentListener {
         void onPaymentDetailsClick(int position);
 
         void payButtonOnClick(View v, int adapterPosition);

@@ -1,6 +1,6 @@
 package com.c17206413.payup.ui.Model;
 
-public class PaymentDetails {
+public class Payment {
 
     private String serviceName;
     private String currency;
@@ -9,7 +9,7 @@ public class PaymentDetails {
     private String clientSecret;
     private String id;
 
-    public PaymentDetails(String id, String serviceName, String currency, String username, String amount, String clientSecret) {
+    public Payment(String id, String serviceName, String currency, String username, String amount, String clientSecret) {
         this.serviceName = serviceName;
         this.currency = currency;
         this.username = username;

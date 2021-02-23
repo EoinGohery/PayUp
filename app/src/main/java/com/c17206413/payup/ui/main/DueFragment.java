@@ -17,8 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
 import com.c17206413.payup.ui.Adapter.PaymentAdapter;
-import com.c17206413.payup.ui.Model.PaymentDetails;
+import com.c17206413.payup.ui.Model.Payment;
 import com.c17206413.payup.ui.payment.CheckoutActivity;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -27,11 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DueFragment extends Fragment implements PaymentAdapter.PaymentDetailsListener{
+public class DueFragment extends Fragment implements PaymentAdapter.PaymentListener{
 
     private FirebaseFirestore db;
 
-    private List<PaymentDetails> mPayments;
+    private List<Payment> mPayments;
     private RecyclerView dueRecycler;
     private View root;
 
@@ -75,18 +76,19 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentDetai
                             //TODO (check currency of transaction and convert appropriately)
                             String amount = NumberFormat.getCurrencyInstance().format((Integer.parseInt(document.getString("amount"))/100));
                             String id = document.getId();
-                            PaymentDetails paymentDetails = new PaymentDetails(id, serviceName, currency, name, amount, clientSecret);
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret);
                             mPayments.add(paymentDetails);
                         }
                         paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
                         dueRecycler.setAdapter(paymentAdapter);
                     } else {
-                        //TODO (log and Snackbar)
+                        Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
                     }
                 });
     }
 
-    private void launchPayment(PaymentDetails paymentDetail) {
+    private void launchPayment(Payment paymentDetail) {
         Intent intent = new Intent(getActivity(), CheckoutActivity.class);
         intent.putExtra("clientSecret", paymentDetail.getClientSecret());
         intent.putExtra("amount", paymentDetail.getAmount());
@@ -104,20 +106,21 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentDetai
                     String returnedResult = data.getDataString();
                     if (returnedResult.equals("result")) {
                         readPayments();
-                        //TODO (snackbar)
+                        Snackbar.make(root.findViewById(android.R.id.content), "Payment Succeeded.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
                     }
                 }
             });
 
     @Override
     public void onPaymentDetailsClick(int position) {
-        PaymentDetails paymentDetail = mPayments.get(position);
+        Payment paymentDetail = mPayments.get(position);
         //TODO (add payment details screen)
     }
 
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
-        PaymentDetails paymentDetail = mPayments.get(adapterPosition);
+        Payment paymentDetail = mPayments.get(adapterPosition);
         launchPayment(paymentDetail);
     }
 

@@ -135,10 +135,12 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         for (int i=0; i < addedUsers.size(); i++) {
             User user = addedUsers.get(i);
             String uid = user.getId();
+            String name = user.getUsername();
             String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + 1))));
 
             Map<String, Object> paymentDetails = new HashMap<>();
             paymentDetails.put("user_id", uid);
+            paymentDetails.put("user_name", name);
             paymentDetails.put("currency", currency);
             paymentDetails.put("amount", amount);
             paymentDetails.put("service_name", serviceName);
@@ -151,6 +153,8 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
         }
         finish();
+
+        //TODO add all payment to payment collection
     }
 
     private void readUsers() {
