@@ -135,7 +135,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         for (int i=0; i < addedUsers.size(); i++) {
             User user = addedUsers.get(i);
             String uid = user.getId();
-            int amount = (int) Math.round((perPerson / (addedUsers.size() + 1)));
+            String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + 1))));
 
             Map<String, Object> paymentDetails = new HashMap<>();
             paymentDetails.put("user_id", uid);

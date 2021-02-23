@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">Pay Up</string>
-    <string name="tab_due">Payments Due</string>
+    <string name="tab_due">Due</string>
+    <string name="tab_history">History</string>
     <string name="back_button">Return to main activity</string>
     <string name="user_button">Go to user activity</string>
     <string name="dark_mode">Dark Mode</string>

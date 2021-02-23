@@ -4,6 +4,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 const { Logging } = require('@google-cloud/logging');
+const { user } = require('firebase-functions/lib/providers/auth');
 const logging = new Logging({
   projectId: process.env.GCLOUD_PROJECT,
 });
@@ -93,10 +94,10 @@ exports.createStripePayment = functions.firestore
   .document('users/{userId}/incoming/{pushId}')
   .onCreate(async (snap, context) => {
     const { amount, currency, user_id, service_name} = snap.data();
-    const ownerId = context.params.userId;
     try {
       // Look up the Stripe customer id.
       const customer = (await snap.ref.parent.parent.get()).data().connected_account_id;
+      const username = (await snap.ref.parent.parent.get()).data().name;
       // Create a charge using the pushId as the idempotency key to protect against double charges.
       const idempotencyKey = context.params.pushId;
       const payment = await stripe.paymentIntents.create(
@@ -117,7 +118,7 @@ exports.createStripePayment = functions.firestore
         service_name: service_name,
         amount: amount,
         clientSecret: clientSecret,
-        user_id: ownerId,
+        user_name: username,
         active: true
       });
 

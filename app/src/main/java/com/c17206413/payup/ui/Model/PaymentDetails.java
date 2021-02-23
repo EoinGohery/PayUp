@@ -2,24 +2,36 @@ package com.c17206413.payup.ui.Model;
 
 public class PaymentDetails {
 
-    private String id;
+    private String serviceName;
+    private String currency;
     private String username;
-    private String imageUrl;
-    private Boolean isSelected;
+    private String amount;
+    private String clientSecret;
+    private String id;
 
-    public PaymentDetails(String id, String username, String imageUrl) {
-        this.id = id;
+    public PaymentDetails(String id, String serviceName, String currency, String username, String amount, String clientSecret) {
+        this.serviceName = serviceName;
+        this.currency = currency;
         this.username = username;
-        this.imageUrl = imageUrl;
-        this.isSelected = false;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
+        this.amount = amount;
+        this.clientSecret = clientSecret;
         this.id = id;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String getUsername() {
@@ -30,24 +42,27 @@ public class PaymentDetails {
         this.username = username;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getAmount() {
+        return amount;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 
-    public Boolean getSelected() {
-        return isSelected;
+    public String getId() {
+        return id;
     }
 
-    public void setSelected(Boolean selected) {
-        isSelected = selected;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void swapSelected() {
-        isSelected = !isSelected;
+    public String getClientSecret() {
+        return clientSecret;
     }
 
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
 }

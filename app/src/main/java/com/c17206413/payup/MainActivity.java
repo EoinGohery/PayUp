@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
                 "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
         );
 
-
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         checkCurrentUser();
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> loginResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
+                if (result.getResultCode() == RESULT_OK) {
                     checkCurrentUser();
                 }
             });
@@ -140,13 +139,12 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> userResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
+                if (result.getResultCode() == RESULT_OK) {
                     Intent data = result.getData();
                     if (data != null) {
                         String returnedResult = data.getDataString();
                         if (returnedResult.equals("LogOut")) {
                             signOut();
-                            signInUser();
                         }
                     }
 
@@ -156,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> createPaymentResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
+                if (result.getResultCode() == RESULT_OK) {
                     //TODO
                 }
             });
