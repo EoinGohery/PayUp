@@ -75,9 +75,9 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                             String name = document.getString("user_name");
                             String clientSecret = document.getString("clientSecret");
                             //TODO (check currency of transaction and convert appropriately)
-                            String amount = NumberFormat.getCurrencyInstance().format((Integer.parseInt(document.getString("amount"))/100));
+                            String amount = NumberFormat.getCurrencyInstance().format((Double.parseDouble(document.getString("amount"))/100));
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due");
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true);
                             mPayments.add(paymentDetails);
                         }
                         paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);

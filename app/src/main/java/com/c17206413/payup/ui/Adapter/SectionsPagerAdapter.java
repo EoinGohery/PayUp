@@ -10,12 +10,13 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.c17206413.payup.R;
 import com.c17206413.payup.ui.main.DueFragment;
+import com.c17206413.payup.ui.main.HistoryFragment;
 import com.c17206413.payup.ui.main.IncomingFragment;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_due, R.string.tab_incoming};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_due, R.string.tab_incoming, R.string.tab_history};
     private final Context mContext;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
@@ -30,6 +31,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return DueFragment.newInstance();
             case 1:
                 return IncomingFragment.newInstance();
+            case 2:
+                return HistoryFragment.newInstance();
             default:
                 return DueFragment.newInstance();
         }
@@ -42,6 +45,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 }

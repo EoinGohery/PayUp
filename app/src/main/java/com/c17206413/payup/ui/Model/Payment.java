@@ -9,8 +9,9 @@ public class Payment {
     private String amount;
     private String clientSecret;
     private String id;
+    private Boolean active;
 
-    public Payment(String id, String serviceName, String currency, String username, String amount, String clientSecret, String type) {
+    public Payment(String id, String serviceName, String currency, String username, String amount, String clientSecret, String type, Boolean active) {
         this.serviceName = serviceName;
         this.currency = currency;
         this.username = username;
@@ -18,6 +19,7 @@ public class Payment {
         this.amount = amount;
         this.clientSecret = clientSecret;
         this.id = id;
+        this.active = active;
     }
 
     public String getServiceName() {
@@ -74,5 +76,13 @@ public class Payment {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

@@ -1,13 +1,17 @@
 package com.c17206413.payup.ui.Adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.c17206413.payup.R;
@@ -42,8 +46,16 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
         holder.serviceName.setText(paymentDetails.getServiceName());
         if (paymentDetails.getType().equals("due")) {
             holder.payButton.setText(R.string.app_name);
+            holder.indicator.setVisibility(View.INVISIBLE);
+            holder.indicator.setImageResource(R.drawable.ic_arrow_down);
         } else if (paymentDetails.getType().equals("incoming")) {
             holder.payButton.setText(R.string.cancel);
+            holder.indicator.setVisibility(View.INVISIBLE);
+            holder.indicator.setImageResource(R.drawable.ic_arrow_up);
+        }
+        if (!paymentDetails.getActive()) {
+            holder.indicator.setVisibility(View.VISIBLE);
+            holder.payButton.setVisibility(View.GONE);
         }
     }
 
@@ -58,6 +70,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
         public TextView userName;
         public PaymentListener PaymentListener;
         public Button payButton;
+        public ImageView indicator;
 
         public ViewHolder(View itemView, PaymentListener paymentListener) {
             super(itemView);
@@ -67,6 +80,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
             serviceName = itemView.findViewById(R.id.service_name);
             price = itemView.findViewById(R.id.price);
             userName = itemView.findViewById(R.id.user_id);
+            indicator = itemView.findViewById(R.id.in_out_indicator);
 
             itemView.setOnClickListener(this);
 
