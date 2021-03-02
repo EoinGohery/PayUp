@@ -116,6 +116,11 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
     private void viewPayment(Payment paymentDetail) {
         Intent intent = new Intent(getActivity(), PaymentDetailsActivity.class);
         intent.putExtra("clientSecret", paymentDetail.getClientSecret());
+        intent.putExtra("amount", paymentDetail.getAmount());
+        intent.putExtra("serviceName", paymentDetail.getServiceName());
+        intent.putExtra("id", paymentDetail.getId());
+        intent.putExtra("active", paymentDetail.getActive());
+        intent.putExtra("user", paymentDetail.getUsername());
         paymentDetailScreenLauncher.launch(intent);
     }
 
@@ -126,10 +131,10 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                     Intent data = result.getData();
                     assert data != null;
                     String returnedResult = data.getDataString();
-                    readPayments();
-                    if (returnedResult.equals("result")) {
+                    if (returnedResult.equals("success")) {
                         //TODO (add result)
                     }
+                    readPayments();
                 }
             });
 

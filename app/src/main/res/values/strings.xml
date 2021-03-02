@@ -7,6 +7,7 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="profile_picture">Profile picture</string>
     <string name="accounts">Accounts</string>
+    <string name="checkout">Checkout</string>
     <string name="create_expense">Create Expense</string>
     <string name="new_expense">New Expense</string>
     <string name="stripe_account">Stripe Account</string>
@@ -41,5 +42,7 @@
     <string name="price_pp">Price per Person: </string>
     <string name="username">Username</string>
     <string name="cancel">Cancel</string>
+    <string name="paid">Paid</string>
+    <string name="unpaid">Unpaid</string>
 
 </resources>

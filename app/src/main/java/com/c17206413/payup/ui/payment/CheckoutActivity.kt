@@ -27,12 +27,19 @@ class CheckoutActivity : AppCompatActivity() {
         currentUser = FirebaseAuth.getInstance().currentUser
 
         val extras = intent.extras
-        val paymentIntentClientSecret = extras!!.getString("paymentIntentClientSecret")
+        val clientSecret = extras!!.getString("clientSecret")
+        val amount = extras.getString("amount")
+        val serviceName = extras.getString("serviceName")
+        val paymentId = extras.getString("id")
+
+        amount_indicator.text = amount
+        service_name_checkout.text = serviceName
+        payButton.isEnabled = false
 
         setupPaymentSession()
 
         payButton.setOnClickListener {
-            confirmPayment(selectedPaymentMethod.id!!, paymentIntentClientSecret!!)
+            confirmPayment(selectedPaymentMethod.id!!, clientSecret!!)
         }
 
         paymentmethod.setOnClickListener {

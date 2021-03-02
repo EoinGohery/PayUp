@@ -91,6 +91,11 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     private void viewPayment(Payment paymentDetail) {
         Intent intent = new Intent(getActivity(), PaymentDetailsActivity.class);
         intent.putExtra("clientSecret", paymentDetail.getClientSecret());
+        intent.putExtra("amount", paymentDetail.getAmount());
+        intent.putExtra("serviceName", paymentDetail.getServiceName());
+        intent.putExtra("id", paymentDetail.getId());
+        intent.putExtra("active", paymentDetail.getActive());
+        intent.putExtra("user", paymentDetail.getUsername());
         paymentDetailScreenLauncher.launch(intent);
     }
 

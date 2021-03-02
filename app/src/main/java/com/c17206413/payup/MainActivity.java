@@ -1,6 +1,5 @@
 package com.c17206413.payup;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,14 +14,13 @@ import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.c17206413.payup.ui.Adapter.SectionsPagerAdapter;
-import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.MenuActivity;
+import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.stripe.android.PaymentConfiguration;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,13 +28,12 @@ public class MainActivity extends AppCompatActivity {
     //Firestore Initialisation
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private FirebaseFirestore db;
 
     // user details
     private static String providerId, providerUid, uid, name, email, language;
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
-    private SharedPreferences mPrefs;
+    private static SharedPreferences mPrefs;
 
     public static String getUid() {
         return uid;
@@ -52,12 +49,11 @@ public class MainActivity extends AppCompatActivity {
         );
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
         checkCurrentUser();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
         setTheme();
-        NestedScrollView scrollView = (NestedScrollView) findViewById(R.id.nestedScroll);
+        NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -65,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        Button userButton = (Button) findViewById(R.id.userButton);
+        Button userButton = findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
 
-        Button newExpenseButton = (Button) findViewById(R.id.newExpenseButton);
+        Button newExpenseButton = findViewById(R.id.newExpenseButton);
         newExpenseButton.setOnClickListener(v -> createPayment());
     }
 
@@ -89,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         signInUser();
     }
 
-    private void setTheme() {
+    public static void setTheme() {
         boolean isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
         if (isNightModeEnabled) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
