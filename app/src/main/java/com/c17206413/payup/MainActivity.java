@@ -1,10 +1,13 @@
 package com.c17206413.payup;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -24,6 +27,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     // user details
-    private static String providerId, uid, name, email, language, customer_id, account_id;
+    private static String providerId, uid, name, email, language, customer_id, account_id, username;;
 
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
@@ -143,9 +147,49 @@ public class MainActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
                     checkCurrentUser();
+                    askName();
                 }
             });
 
+    private void askName() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Name:");
+
+        // Set up the input
+        final EditText input = new EditText(MainActivity.this);
+        input.setHint("Username");
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", (dialog, which) -> setName(input.getText().toString()));
+
+        builder.show();
+    }
+
+    private void setName(String name) {
+        username = name;
+        if (username!=null) {
+            FirebaseUser user = mAuth.getCurrentUser();
+            UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
+            builder.setDisplayName(username);
+            if (user != null) {
+                user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
+                    if (!task1.isSuccessful()) {
+                        Snackbar.make(findViewById(android.R.id.content), username, Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+                });
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                DocumentReference userRef = db.collection("users").document(user.getUid());
+                userRef
+                        .update("name", username)
+                        .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                        .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+            }
+        }
+    }
 
     ActivityResultLauncher<Intent> userResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -206,6 +250,4 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.customer_id = customer_id;
         MainActivity.uid = uid;
     }
-
-
 }

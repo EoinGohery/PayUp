@@ -70,24 +70,6 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/nameLayout"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-
-                <EditText
-                    android:id="@+id/input_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:autofillHints=""
-                    android:background="@color/colorBackground"
-                    android:hint="@string/name"
-                    android:inputType="textEmailAddress" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="37dp" />
