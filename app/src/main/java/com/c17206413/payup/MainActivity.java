@@ -3,6 +3,7 @@ package com.c17206413.payup;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -16,21 +17,30 @@ import androidx.viewpager.widget.ViewPager;
 import com.c17206413.payup.ui.Adapter.SectionsPagerAdapter;
 import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.accounts.SignIn;
+import com.c17206413.payup.ui.accounts.SripeOnboardingView;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.stripe.android.PaymentConfiguration;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "Main";
+
     //Firestore Initialisation
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private FirebaseFirestore db;
 
     // user details
-    private static String providerId, providerUid, uid, name, email, language;
+    private static String providerId, uid, name, email, language, customer_id, account_id;
+
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
     private static SharedPreferences mPrefs;
@@ -48,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
         );
 
+        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         checkCurrentUser();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -74,8 +85,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createPayment() {
-        Intent intent = new Intent(this, CreatePaymentActivity.class);
-        createPaymentResultLauncher.launch(intent);
+        if (account_id==null) {
+            startActivity(new Intent(MainActivity.this, SripeOnboardingView.class));
+        } else {
+            Intent intent = new Intent(this, CreatePaymentActivity.class);
+            createPaymentResultLauncher.launch(intent);
+        }
     }
 
 
@@ -155,19 +170,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-
     public void getUserProfile() {
         // [START get_user_profile]
-        user = mAuth.getCurrentUser();
         if (user != null) {
-            name = user.getDisplayName();
             email = user.getEmail();
             uid = user.getUid();
             for (UserInfo profile : user.getProviderData()) {
                 providerId = profile.getProviderId();
-                name = profile.getDisplayName();
-                email = profile.getEmail();
             }
+            DocumentReference docRef = db.collection("users").document(uid);
+            docRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    assert document != null;
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        String account = document.getString("connected_account_id");
+                        String customer = document.getString("customer_id");
+                        String docName = document.getString("name");
+                        setFields(uid, docName, customer, account);
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                    finish();
+                }
+            });
         }
     }
+
+    public void setFields(String uid, String name, String customer_id, String account_id) {
+        MainActivity.name = name;
+        MainActivity.account_id = account_id;
+        MainActivity.customer_id = customer_id;
+        MainActivity.uid = uid;
+    }
+
+
 }

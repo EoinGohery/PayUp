@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,8 +18,6 @@ import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
 import com.c17206413.payup.ui.Adapter.UserAdapter;
 import com.c17206413.payup.ui.Model.User;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +28,7 @@ import com.stripe.android.PaymentConfiguration;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -58,6 +56,8 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
     private String current = "";
     private double perPerson;
 
+    private Locale locale;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,20 +67,22 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                 "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
         );
 
+        locale = Locale.getDefault();
+
         setContentView(R.layout.activity_create_payment);
 
         db = FirebaseFirestore.getInstance();
 
-        searchRecycler = (RecyclerView) findViewById(R.id.user_recycler);
+        searchRecycler = findViewById(R.id.user_recycler);
         searchRecycler.setHasFixedSize(true);
         searchRecycler.setLayoutManager(new LinearLayoutManager(this));
 
-        priceInput = (TextInputLayout) findViewById(R.id.priceLayout);
-        nameInput = (TextInputLayout) findViewById(R.id.serviceNameLayout);
+        priceInput = findViewById(R.id.priceLayout);
+        nameInput = findViewById(R.id.serviceNameLayout);
 
-        pricePP = (TextView) findViewById(R.id.price_per_person);
+        pricePP = findViewById(R.id.price_per_person);
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+        progressBar = findViewById(R.id.progressBar1);
 
         Objects.requireNonNull(priceInput.getEditText()).setRawInputType(Configuration.KEYBOARD_12KEY);
         Objects.requireNonNull(priceInput.getEditText()).addTextChangedListener(new TextWatcher(){
@@ -107,19 +109,19 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                     current = formatted;
                     priceInput.getEditText().setText(formatted);
                     priceInput.getEditText().setSelection(formatted.length());
-
                     priceInput.getEditText().addTextChangedListener(this);
                 }
             }
 
         });
 
-        Button createPaymentButton= (Button) findViewById(R.id.create_payment_button);
+        Button createPaymentButton= findViewById(R.id.create_payment_button);
         createPaymentButton.setOnClickListener(v -> {
             progressBar.setVisibility(View.VISIBLE);
             String serviceName = Objects.requireNonNull(nameInput.getEditText()).getText().toString();
-            createGroupPayment(serviceName, "Eur");
-            //TODO (Create get currency)
+            Currency currency =  Currency.getInstance(locale);
+            createGroupPayment(serviceName, currency);
+
         });
 
         mUsers = new ArrayList<>();
@@ -127,7 +129,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         readUsers();
     }
 
-    private void createGroupPayment(String serviceName, String currency) {
+    private void createGroupPayment(String serviceName, Currency currency) {
         if (!validateNameForm(serviceName)) {
             return;
         }
@@ -141,7 +143,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             Map<String, Object> paymentDetails = new HashMap<>();
             paymentDetails.put("user_id", uid);
             paymentDetails.put("user_name", name);
-            paymentDetails.put("currency", currency);
+            paymentDetails.put("currency", currency.getCurrencyCode());
             paymentDetails.put("amount", amount);
             paymentDetails.put("service_name", serviceName);
             paymentDetails.put("active", true);
@@ -154,7 +156,6 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         }
         finish();
 
-        //TODO add all payment to payment collection
     }
 
     private void readUsers() {

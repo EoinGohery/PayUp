@@ -33,7 +33,6 @@ public class MenuActivity extends AppCompatActivity {
     private boolean isNightModeEnabled = false;
 
     private FirebaseFirestore db;
-    private FirebaseAuth mAuth;
     private FirebaseUser user;
 
     private TextView stripeAccount;
@@ -49,30 +48,30 @@ public class MenuActivity extends AppCompatActivity {
         isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
         setContentView(R.layout.activity_menu);
 
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
 
         // initiate Dark Mode Switch
-        SwitchCompat darkSwitch = (SwitchCompat) findViewById(R.id.darkModeSwitch);
+        SwitchCompat darkSwitch = findViewById(R.id.darkModeSwitch);
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             darkSwitch.setChecked(true);
         }
-        darkSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> setIsNightModeEnabled(isChecked));
+        darkSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> setIsNightModeEnabled(isChecked));
 
-        ImageButton backButton= (ImageButton) findViewById(R.id.backButton);
+        ImageButton backButton= findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
-        Button saveButton= (Button) findViewById(R.id.saveButton);
+        Button saveButton= findViewById(R.id.saveButton);
         saveButton.setOnClickListener(v -> finish());
 
-        Button logOutButton= (Button) findViewById(R.id.logOutButton);
+        Button logOutButton= findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(v -> logOut());
 
-        stripeAccount= (TextView) findViewById(R.id.stripeAccountButton);
+        stripeAccount= findViewById(R.id.stripeAccountButton);
         stripeAccount.setOnClickListener(v -> startActivity(new Intent(MenuActivity.this, SripeOnboardingView.class)));
 
-        Button accountButton= (Button) findViewById(R.id.accountsButton);
+        Button accountButton= findViewById(R.id.accountsButton);
         accountButton.setOnClickListener(v -> {
             if (stripeAccount.getVisibility() == View.GONE) {
                 stripeAccount.setVisibility(View.VISIBLE);
@@ -132,7 +131,7 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     public void setFields(String uid, String name, String customer_id, String account_id) {
-        User user = new User(uid, name, "default");
+        //User user = new User(uid, name, "default");
         this.name = name;
         this.account_id = account_id;
         this.customer_id = customer_id;

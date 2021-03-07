@@ -1,8 +1,6 @@
 package com.c17206413.payup.ui.Adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.c17206413.payup.R;
 import com.c17206413.payup.ui.Model.Payment;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHolder> {
@@ -41,7 +39,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Payment paymentDetails = mPayments.get(position);
-        holder.price.setText(paymentDetails.getAmount());
+        holder.price.setText(NumberFormat.getCurrencyInstance().format(paymentDetails.getAmount()));
         holder.userName.setText(paymentDetails.getUsername());
         holder.serviceName.setText(paymentDetails.getServiceName());
         if (paymentDetails.getType().equals("due")) {
@@ -84,7 +82,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
 
             itemView.setOnClickListener(this);
 
-            payButton = (Button) itemView.findViewById(R.id.pay_button);
+            payButton = itemView.findViewById(R.id.pay_button);
             payButton.setOnClickListener(v -> PaymentListener.payButtonOnClick(v, getAdapterPosition()));
 
         }

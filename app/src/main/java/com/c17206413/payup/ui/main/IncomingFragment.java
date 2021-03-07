@@ -23,8 +23,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,7 +51,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         mPayments = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
 
-        incomingRecycler = (RecyclerView) root.findViewById(R.id.incomingRecycler);
+        incomingRecycler = root.findViewById(R.id.incomingRecycler);
         incomingRecycler.setHasFixedSize(true);
         incomingRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -70,11 +70,10 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                         mPayments.clear();
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String serviceName = document.getString("service_name");
-                            String currency = document.getString("currency");
+                            Currency currency = Currency.getInstance(document.getString("currency"));
                             String name = document.getString("user_name");
                             String clientSecret = document.getString("clientSecret");
-                            //TODO (check currency of transaction and convert appropriately)
-                            String amount = NumberFormat.getCurrencyInstance().format((Double.parseDouble(document.getString("amount"))/100));
+                            Double amount = Double.parseDouble(document.getString("amount"))/100;
                             String id = document.getId();
                             Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true);
                             mPayments.add(paymentDetails);
@@ -96,6 +95,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         intent.putExtra("id", paymentDetail.getId());
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
+        intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
         paymentDetailScreenLauncher.launch(intent);
     }
 
@@ -103,13 +103,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    assert data != null;
-                    String returnedResult = data.getDataString();
                     readPayments();
-                    if (returnedResult.equals("result")) {
-                        //TODO (add result)
-                    }
                 }
             });
 

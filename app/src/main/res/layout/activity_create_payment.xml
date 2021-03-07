@@ -8,6 +8,48 @@
     android:background="@color/colorBackground"
     tools:context=".ui.accounts.SignIn">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/back_button"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="60dp"
+                app:iconTint="@color/colorOnPrimary"
+                app:srcCompat="@drawable/abc_vector_test" />
+
+            <TextView
+                android:id="@+id/create_title"
+                style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/create_expense"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <LinearLayout
         android:id="@+id/parentLinear"
         android:layout_width="350dp"
@@ -16,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/appbar">
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -62,8 +104,8 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_gravity="center_vertical"
-            android:gravity="center_vertical"
             android:background="@color/colorBackground"
+            android:gravity="center_vertical"
             android:paddingStart="13dp"
             android:paddingEnd="0dp"
             android:text="@string/price_pp"

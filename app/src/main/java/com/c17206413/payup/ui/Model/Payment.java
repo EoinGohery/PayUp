@@ -1,17 +1,19 @@
 package com.c17206413.payup.ui.Model;
 
+import java.util.Currency;
+
 public class Payment {
 
     private String serviceName;
-    private String currency;
+    private Currency currency;
     private String username;
     private String type;
-    private String amount;
+    private Double amount;
     private String clientSecret;
     private String id;
     private Boolean active;
 
-    public Payment(String id, String serviceName, String currency, String username, String amount, String clientSecret, String type, Boolean active) {
+    public Payment(String id, String serviceName, Currency currency, String username, Double amount, String clientSecret, String type, Boolean active) {
         this.serviceName = serviceName;
         this.currency = currency;
         this.username = username;
@@ -30,11 +32,11 @@ public class Payment {
         this.serviceName = serviceName;
     }
 
-    public String getCurrency() {
+    public Currency getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
+    public void setCurrency(Currency currency) {
         this.currency = currency;
     }
 
@@ -46,11 +48,11 @@ public class Payment {
         this.username = username;
     }
 
-    public String getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

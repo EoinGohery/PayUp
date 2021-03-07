@@ -18,14 +18,13 @@ import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
 import com.c17206413.payup.ui.Adapter.PaymentAdapter;
 import com.c17206413.payup.ui.Model.Payment;
-import com.c17206413.payup.ui.payment.CheckoutActivity;
 import com.c17206413.payup.ui.view.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,8 +35,6 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
     private List<Payment> mPayments;
     private RecyclerView historyRecycler;
     private View root;
-
-    private PaymentAdapter paymentAdapter;
 
     public static HistoryFragment newInstance() {
         return new HistoryFragment();
@@ -52,7 +49,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
         mPayments = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
 
-        historyRecycler = (RecyclerView) root.findViewById(R.id.historyRecycler);
+        historyRecycler = root.findViewById(R.id.historyRecycler);
         historyRecycler.setHasFixedSize(true);
         historyRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -71,11 +68,10 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String serviceName = document.getString("service_name");
-                            String currency = document.getString("currency");
+                            Currency currency = Currency.getInstance(document.getString("currency"));
                             String name = document.getString("user_name");
                             String clientSecret = document.getString("clientSecret");
-                            //TODO (check currency of transaction and convert appropriately)
-                            String amount = NumberFormat.getCurrencyInstance().format((Double.parseDouble(document.getString("amount"))/100));
+                            Double amount = Double.parseDouble(document.getString("amount"))/100;
                             String id = document.getId();
                             Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false);
                             addToRecycler(paymentDetails);
@@ -93,11 +89,10 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String serviceName = document.getString("service_name");
-                            String currency = document.getString("currency");
+                            Currency currency = Currency.getInstance(document.getString("currency"));
                             String name = document.getString("user_name");
                             String clientSecret = document.getString("clientSecret");
-                            //TODO (check currency of transaction and convert appropriately)
-                            String amount = NumberFormat.getCurrencyInstance().format((Double.parseDouble(document.getString("amount"))/100));
+                            Double amount = Double.parseDouble(document.getString("amount"))/100;
                             String id = document.getId();
                             Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false);
                             addToRecycler(paymentDetails);
@@ -112,7 +107,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
 
     private void addToRecycler(Payment payment) {
         mPayments.add(payment);
-        paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
+        PaymentAdapter paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
         historyRecycler.setAdapter(paymentAdapter);
     }
 
@@ -124,6 +119,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
         intent.putExtra("id", paymentDetail.getId());
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
+        intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
         paymentDetailScreenLauncher.launch(intent);
     }
 
@@ -131,13 +127,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
                     readPayments();
-                    assert data != null;
-                    String returnedResult = data.getDataString();
-                    if (returnedResult.equals("result")) {
-                        //TODO (add result)
-                    }
                 }
             });
 
@@ -149,8 +139,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
 
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
-        Payment paymentDetail = mPayments.get(adapterPosition);
-
+        //Pay button is disabled as payment has already been complete
     }
 
 
