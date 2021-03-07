@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
@@ -46,14 +47,20 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.fragment_incoming, container, false);
+        root = inflater.inflate(R.layout.fragment, container, false);
 
         mPayments = new ArrayList<>();
-        db = FirebaseFirestore.getInstance();
 
-        incomingRecycler = root.findViewById(R.id.incomingRecycler);
+        incomingRecycler = root.findViewById(R.id.paymentRecycler);
         incomingRecycler.setHasFixedSize(true);
         incomingRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        final SwipeRefreshLayout pullToRefresh = root.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(() -> {
+            pullToRefresh.setRefreshing(true);
+            readPayments();
+            pullToRefresh.setRefreshing(false);
+        });
 
         readPayments();
 
@@ -61,6 +68,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     }
 
     private void readPayments() {
+        db = FirebaseFirestore.getInstance();
         String uid = MainActivity.getUid();
         db.collection("users").document(uid).collection("incoming")
                 .whereEqualTo("active", true)
@@ -73,7 +81,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                             Currency currency = Currency.getInstance(document.getString("currency"));
                             String name = document.getString("user_name");
                             String clientSecret = document.getString("clientSecret");
-                            Double amount = Double.parseDouble(document.getString("amount"))/100;
+                            Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
                             Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true);
                             mPayments.add(paymentDetails);

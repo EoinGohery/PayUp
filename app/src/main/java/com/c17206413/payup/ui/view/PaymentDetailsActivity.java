@@ -1,25 +1,27 @@
 package com.c17206413.payup.ui.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
 import com.c17206413.payup.R;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.c17206413.payup.ui.payment.CheckoutActivity;
+import com.google.android.material.snackbar.Snackbar;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Currency;
-import java.util.Locale;
+
 
 public class PaymentDetailsActivity extends Activity {
+
+    private Button payButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,9 @@ public class PaymentDetailsActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         String currency = extras.getString("currency");
         Double amount =extras.getDouble("amount");
-        serviceName.setText(extras.getString("serviceName"));
+        String service = extras.getString("serviceName");
+        serviceName.setText(service);
+        String clientSecret = extras.getString("clientSecret");
 
         NumberFormat format = NumberFormat.getCurrencyInstance();
         format.setMaximumFractionDigits(2);
@@ -51,5 +55,36 @@ public class PaymentDetailsActivity extends Activity {
             isPaid.setTextColor(getResources().getColor(R.color.colorSuccess));
         }
         userIndicator.setText(extras.getString("user"));
+
+//        payButton= findViewById(R.id.pay_button);
+//        payButton.setOnClickListener(v -> launchPayment(currency, amount, service, clientSecret));
     }
+
+//    private void launchPayment(String currency, Double amount, String service, String clientSecret) {
+//        Intent intent = new Intent(this, CheckoutActivity.class);
+//        intent.putExtra("clientSecret", clientSecret);
+//        intent.putExtra("amount", amount);
+//        intent.putExtra("serviceName", service);
+//        intent.putExtra("currency", currency);
+//        paymentResultLauncher.launch(intent);
+//    }
+//
+//    ActivityResultLauncher<Intent> paymentResultLauncher = registerForActivityResult(
+//            new ActivityResultContracts.StartActivityForResult(),
+//            result -> {
+//                if (result.getResultCode() == Activity.RESULT_OK) {
+//                    Intent data = result.getData();
+//                    assert data != null;
+//                    String returnedResult = data.getDataString();
+//
+//                    if (returnedResult.equals("result")) {
+//                        Snackbar.make(findViewById(android.R.id.content), "Payment Succeeded.", Snackbar.LENGTH_LONG)
+//                                .setAction("Action", null).show();
+//                        payButton.setVisibility(View.INVISIBLE);
+//                    } else {
+//                        Snackbar.make(findViewById(android.R.id.content), "Payment Uncompleted.", Snackbar.LENGTH_LONG)
+//                                .setAction("Action", null).show();
+//                    }
+//                }
+//            });
 }

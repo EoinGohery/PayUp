@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
@@ -47,14 +48,22 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.fragment_due, container, false);
+        root = inflater.inflate(R.layout.fragment, container, false);
 
         mPayments = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
 
-        dueRecycler = root.findViewById(R.id.dueRecycler);
+        dueRecycler = root.findViewById(R.id.paymentRecycler);
         dueRecycler.setHasFixedSize(true);
         dueRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        final SwipeRefreshLayout pullToRefresh = root.findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(() -> {
+            pullToRefresh.setRefreshing(true);
+            readPayments();
+            pullToRefresh.setRefreshing(false);
+        });
+
 
         readPayments();
 
@@ -74,7 +83,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                             Currency currency = Currency.getInstance(document.getString("currency"));
                             String name = document.getString("user_name");
                             String clientSecret = document.getString("clientSecret");
-                            Double amount = Double.parseDouble(document.getString("amount"))/100;
+                            Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
                             Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true);
                             mPayments.add(paymentDetails);

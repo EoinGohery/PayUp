@@ -47,7 +47,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.ViewHold
             holder.indicator.setVisibility(View.INVISIBLE);
             holder.indicator.setImageResource(R.drawable.ic_arrow_down);
         } else if (paymentDetails.getType().equals("incoming")) {
-            holder.payButton.setText(R.string.cancel);
+            holder.payButton.setText(R.string.received);
             holder.indicator.setVisibility(View.INVISIBLE);
             holder.indicator.setImageResource(R.drawable.ic_arrow_up);
         }
