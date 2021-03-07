@@ -91,7 +91,6 @@ public class MenuActivity extends AppCompatActivity {
 
     public void updateUI() {
         if (account_id==null) {
-            //stripeCheck.setVisibility(View.INVISIBLE);
             stripeAccount.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.ic_delete, 0);
         } else {
             stripeAccount.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.com_facebook_button_like_icon_selected, 0);

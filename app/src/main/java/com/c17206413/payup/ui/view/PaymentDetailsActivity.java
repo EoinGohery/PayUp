@@ -3,6 +3,7 @@ package com.c17206413.payup.ui.view;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import com.c17206413.payup.R;
 import com.squareup.okhttp.Callback;
@@ -24,6 +25,9 @@ public class PaymentDetailsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payments_details);
+
+        ImageButton backButton= findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
 
         TextView serviceName = findViewById(R.id.service_name_details);
         TextView amountIndicator = findViewById(R.id.amount_indicator_details);

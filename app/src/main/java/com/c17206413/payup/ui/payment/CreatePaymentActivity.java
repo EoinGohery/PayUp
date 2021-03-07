@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -70,6 +71,9 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         locale = Locale.getDefault();
 
         setContentView(R.layout.activity_create_payment);
+
+        ImageButton backButton= findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
 
         db = FirebaseFirestore.getInstance();
 
