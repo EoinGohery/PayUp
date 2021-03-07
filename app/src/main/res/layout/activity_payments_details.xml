@@ -48,6 +48,10 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
     <TextView
         android:id="@+id/service_name_details"
         android:layout_width="match_parent"
@@ -69,16 +73,6 @@
         android:textSize="24sp" />
 
     <TextView
-        android:id="@+id/date_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="20dp"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textColor="@color/colorOnBackground"
-        android:textSize="20sp" />
-
-    <TextView
         android:id="@+id/user_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,6 +83,20 @@
         android:textSize="20sp" />
 
     <TextView
+        android:id="@+id/date_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textColor="@color/colorOnBackground"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
+    <TextView
         android:id="@+id/is_paid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -96,11 +104,12 @@
         android:text="@string/unpaid"
         android:textAlignment="center"
         android:textColor="@color/colorError"
-        android:textSize="20sp" />
+        android:textSize="30sp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
         <Button
             android:id="@+id/pay_button"

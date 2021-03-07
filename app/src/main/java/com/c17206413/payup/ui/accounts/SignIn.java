@@ -3,6 +3,7 @@ package com.c17206413.payup.ui.accounts;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -245,6 +246,10 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
+                        Intent data = new Intent();
+                        String text = "Register";
+                        data.setData(Uri.parse(text));
+                        setResult(RESULT_OK, data);
                         exitActivity();
                     } else {
                         // If sign in fails, display a message to the user.

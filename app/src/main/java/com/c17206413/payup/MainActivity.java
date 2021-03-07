@@ -147,7 +147,10 @@ public class MainActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
                     checkCurrentUser();
-                    askName();
+                    assert result.getData() != null;
+                    if (result.getData().equals("Register")) {
+                        askName();
+                    }
                 }
             });
 

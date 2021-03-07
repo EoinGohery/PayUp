@@ -1,19 +1,12 @@
 package com.c17206413.payup.ui.view;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-
 import com.c17206413.payup.R;
-import com.c17206413.payup.ui.payment.CheckoutActivity;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.text.NumberFormat;
 import java.util.Currency;
@@ -21,7 +14,7 @@ import java.util.Currency;
 
 public class PaymentDetailsActivity extends Activity {
 
-    private Button payButton;
+    //private Button payButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +35,7 @@ public class PaymentDetailsActivity extends Activity {
         Double amount =extras.getDouble("amount");
         String service = extras.getString("serviceName");
         serviceName.setText(service);
-        String clientSecret = extras.getString("clientSecret");
+        //String clientSecret = extras.getString("clientSecret");
 
         NumberFormat format = NumberFormat.getCurrencyInstance();
         format.setMaximumFractionDigits(2);
