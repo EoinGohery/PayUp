@@ -119,7 +119,7 @@ exports.createStripePayment = functions.firestore
         amount: amount,
         clientSecret: clientSecret,
         currency: currency,
-        user_id: userId,
+        user_id: context.params.userId,
         user_name: username,
         active: true
       });

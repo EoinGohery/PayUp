@@ -17,7 +17,7 @@ import androidx.core.widget.NestedScrollView;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.c17206413.payup.ui.Adapter.SectionsPagerAdapter;
+import com.c17206413.payup.ui.adapter.SectionsPagerAdapter;
 import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.SripeOnboardingView;
@@ -147,9 +147,12 @@ public class MainActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
                     checkCurrentUser();
-                    assert result.getData() != null;
-                    if (result.getData().equals("Register")) {
-                        askName();
+                    Intent data = result.getData();
+                    if (data != null) {
+                        String returnedResult = data.getDataString();
+                        if (returnedResult.equals("Register")) {
+                            askName();
+                        }
                     }
                 }
             });

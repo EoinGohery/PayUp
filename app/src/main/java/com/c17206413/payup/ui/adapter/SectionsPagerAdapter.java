@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.Adapter;
+package com.c17206413.payup.ui.adapter;
 
 import android.content.Context;
 

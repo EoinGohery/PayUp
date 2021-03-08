@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
-import com.c17206413.payup.ui.Adapter.UserAdapter;
-import com.c17206413.payup.ui.Model.User;
+import com.c17206413.payup.ui.adapter.UserAdapter;
+import com.c17206413.payup.ui.model.User;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;

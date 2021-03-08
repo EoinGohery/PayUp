@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.Model;
+package com.c17206413.payup.ui.model;
 
 import java.util.Currency;
 

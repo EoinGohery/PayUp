@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.Adapter;
+package com.c17206413.payup.ui.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.c17206413.payup.R;
-import com.c17206413.payup.ui.Model.User;
+import com.c17206413.payup.ui.model.User;
 
 import java.util.List;
 

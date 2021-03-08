@@ -1,4 +1,4 @@
-package com.c17206413.payup.ui.Adapter;
+package com.c17206413.payup.ui.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.c17206413.payup.R;
-import com.c17206413.payup.ui.Model.Payment;
+import com.c17206413.payup.ui.model.Payment;
 
 import java.text.NumberFormat;
 import java.util.List;

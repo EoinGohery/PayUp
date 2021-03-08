@@ -29,10 +29,10 @@ class CheckoutActivity : AppCompatActivity() {
         currentUser = FirebaseAuth.getInstance().currentUser
 
         val extras = intent.extras
-        val clientSecret = extras!!.getString("clientSecret")
-        val serviceName = extras.getString("serviceName")
-        val currency = extras.getString("currency")
-        val amount = extras.getDouble("amount")
+        val clientSecret = extras?.getString("clientSecret")
+        val serviceName = extras?.getString("serviceName")
+        val currency = extras?.getString("currency")
+        val amount = extras?.getDouble("amount")
 
         val format = NumberFormat.getCurrencyInstance()
         format.maximumFractionDigits = 2
@@ -114,6 +114,7 @@ class CheckoutActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         paymentSession.handlePaymentData(requestCode, resultCode, data ?: Intent())
+
     }
 }
 

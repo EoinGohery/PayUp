@@ -1,10 +1,11 @@
-package com.c17206413.payup.ui.view;
+package com.c17206413.payup.ui.payment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.c17206413.payup.R;
 
@@ -12,7 +13,7 @@ import java.text.NumberFormat;
 import java.util.Currency;
 
 
-public class PaymentDetailsActivity extends Activity {
+public class PaymentDetailsActivity extends AppCompatActivity {
 
     //private Button payButton;
 

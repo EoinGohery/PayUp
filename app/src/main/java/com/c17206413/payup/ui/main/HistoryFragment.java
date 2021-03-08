@@ -17,9 +17,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
-import com.c17206413.payup.ui.Adapter.PaymentAdapter;
-import com.c17206413.payup.ui.Model.Payment;
-import com.c17206413.payup.ui.view.PaymentDetailsActivity;
+import com.c17206413.payup.ui.adapter.PaymentAdapter;
+import com.c17206413.payup.ui.model.Payment;
+import com.c17206413.payup.ui.payment.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -60,6 +60,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
             readPayments();
             pullToRefresh.setRefreshing(false);
         });
+
 
         readPayments();
 

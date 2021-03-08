@@ -29,6 +29,7 @@
     <style name="Theme.PayUp.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:forceDarkAllowed">false</item>
     </style>
 
     <style name="Theme.PayUp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
