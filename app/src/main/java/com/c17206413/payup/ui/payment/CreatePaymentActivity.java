@@ -1,5 +1,6 @@
 package com.c17206413.payup.ui.payment;
 
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
@@ -172,7 +173,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             String name = user.getUsername();
             String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + includes))));
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
             String currentDateandTime = sdf.format(new Date());
 
             Map<String, Object> paymentDetails = new HashMap<>();

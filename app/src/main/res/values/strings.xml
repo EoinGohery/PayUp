@@ -47,5 +47,6 @@
     <string name="unpaid">Unpaid</string>
     <string name="received">Received</string>
     <string name="price_includes_youself">Price includes Youself</string>
+    <string name="no_internet_connection">No Internet Connection!</string>
 
 </resources>

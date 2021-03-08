@@ -1,13 +1,17 @@
 package com.c17206413.payup;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -56,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        checkInternetConnection();
 
         PaymentConfiguration.init(
                 getApplicationContext(),
@@ -66,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         checkCurrentUser();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        setContentView(R.layout.activity_main);
         setTheme();
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
@@ -81,6 +87,19 @@ public class MainActivity extends AppCompatActivity {
 
         Button newExpenseButton = findViewById(R.id.newExpenseButton);
         newExpenseButton.setOnClickListener(v -> createPayment());
+    }
+
+    private void checkInternetConnection() {
+        if (!isNetworkAvailable(this)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Internet");
+            builder.setMessage(R.string.no_internet_connection);
+
+            // Set up the buttons
+            builder.setPositiveButton("Close", (dialog, which) -> finish());
+
+            builder.show();
+        }
     }
 
     private void openUser() {
@@ -172,6 +191,29 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", (dialog, which) -> setName(input.getText().toString()));
 
         builder.show();
+    }
+
+    public static boolean isNetworkAvailable(Context context)
+    {
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+
+            if (info != null)
+            {
+                for (int i = 0; i < info.length; i++)
+                {
+                    Log.i("Class", info[i].getState().toString());
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void setName(String name) {
