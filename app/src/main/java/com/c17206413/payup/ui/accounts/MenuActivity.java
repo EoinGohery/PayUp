@@ -151,8 +151,7 @@ public class MenuActivity extends AppCompatActivity {
 
     private void logOut() {
         Intent data = new Intent();
-        String text = "LogOut";
-        data.setData(Uri.parse(text));
+        data.putExtra("result", "logOut");
         setResult(RESULT_OK, data);
         finish();
     }

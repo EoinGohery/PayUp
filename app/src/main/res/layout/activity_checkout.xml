@@ -70,8 +70,11 @@
             <com.stripe.android.view.CardInputWidget
                 android:id="@+id/cardInputWidget"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:visibility="gone" />
+                android:layout_height="70dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="50dp">
+
+            </com.stripe.android.view.CardInputWidget>
 
             <TextView
                 android:id="@+id/service_name_checkout"

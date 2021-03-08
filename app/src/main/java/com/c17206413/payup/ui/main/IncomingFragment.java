@@ -3,6 +3,7 @@ package com.c17206413.payup.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.c17206413.payup.ui.adapter.PaymentAdapter;
 import com.c17206413.payup.ui.model.Payment;
 import com.c17206413.payup.ui.payment.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -31,7 +33,7 @@ import java.util.Objects;
 
 public class IncomingFragment extends Fragment implements PaymentAdapter.PaymentListener{
 
-    private FirebaseFirestore db;
+    private static final String TAG = "Incoming:";
 
     private List<Payment> mPayments;
     private RecyclerView incomingRecycler;
@@ -74,7 +76,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     }
 
     private void readPayments() {
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         String uid = MainActivity.getUid();
         db.collection("users").document(uid).collection("incoming")
                 .whereEqualTo("active", true)
@@ -130,7 +132,12 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
         Payment paymentDetail = mPayments.get(adapterPosition);
-        //TODO (cancel a payment)
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userRef = db.collection("users").document(MainActivity.getUid()).collection("incoming").document(paymentDetail.getId());
+        userRef.update("active", false)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+        readPayments();
     }
 
 }

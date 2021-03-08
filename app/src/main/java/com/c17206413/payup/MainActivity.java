@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     checkCurrentUser();
                     Intent data = result.getData();
                     if (data != null) {
-                        String returnedResult = data.getDataString();
+                        String returnedResult = data.getStringExtra("result");
                         if (returnedResult.equals("Register")) {
                             askName();
                         }
@@ -202,8 +202,8 @@ public class MainActivity extends AppCompatActivity {
                 if (result.getResultCode() == RESULT_OK) {
                     Intent data = result.getData();
                     if (data != null) {
-                        String returnedResult = data.getDataString();
-                        if (returnedResult.equals("LogOut")) {
+                        String returnedResult = data.getStringExtra("result");
+                        if (returnedResult.equals("logOut")) {
                             signOut();
                         }
                     }

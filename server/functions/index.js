@@ -102,14 +102,14 @@ exports.createStripePayment = functions.firestore
       const idempotencyKey = context.params.pushId;
       const payment = await stripe.paymentIntents.create(
         {
-          payment_method_types: ['card'],
+          payment_method_types: ['card', ],
           amount: amount,
           currency: currency,
-          metadata: {'service_name': service_name, 'userID' : user_id}
-        }, {
-          stripeAccount: customer,
-          idempotencyKey: idempotencyKey, }
-      );
+          on_behalf_of: customer,
+          transfer_data: {
+            destination: customer,
+          },
+        });
       const clientSecret = payment.client_secret;
       // If the result is successful, write it back to the database.
       //await snap.ref.set(payment);
@@ -122,6 +122,55 @@ exports.createStripePayment = functions.firestore
         user_id: context.params.userId,
         user_name: username,
         active: true
+      });
+
+    } catch (error) {
+      // We want to capture errors and render them in a user-friendly way, while still logging an exception with StackDriver
+      console.log(error);
+      await snap.ref.set({ error: userFacingMessage(error) }, { merge: true });
+      await reportError(error, { user: context.params.userId });
+    }
+  });
+
+/**
+ * When a user pays an Expense, mark the expense as paid for the benefactor
+ */
+
+  exports.markAsPaid = functions.firestore
+    .document('users/{userId}/due/{pushId}')
+    .onUpdate(async (change, context) => {
+      const newValue = change.after.data();
+      const active = newValue.active;
+      const user_id = newValue.user_id;
+      try {
+        const idempotencyKey = context.params.pushId;
+
+        await admin.firestore().collection('users').doc(user_id).collection('incoming').doc(idempotencyKey).update({
+          active: active
+        });
+
+      } catch (error) {
+        // We want to capture errors and render them in a user-friendly way, while still logging an exception with StackDriver
+        console.log(error);
+        await snap.ref.set({ error: userFacingMessage(error) }, { merge: true });
+        await reportError(error, { user: context.params.userId });
+      }
+    });
+
+/**
+ * When a Benefactor marks an Expense as paid, mark the expense as paid for the benefactor
+ */
+  exports.markAsReceived = functions.firestore
+  .document('users/{userId}/incoming/{pushId}')
+  .onUpdate(async (change, context) => {
+    const newValue = change.after.data();
+    const active = newValue.active;
+    const user_id = newValue.user_id;
+    try {
+      const idempotencyKey = context.params.pushId;
+
+      await admin.firestore().collection('users').doc(user_id).collection('due').doc(idempotencyKey).update({
+        active: active
       });
 
     } catch (error) {
