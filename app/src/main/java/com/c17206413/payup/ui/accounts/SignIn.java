@@ -221,6 +221,7 @@ public class SignIn extends AppCompatActivity {
                         Log.w(TAG, "signInWithEmail:failure", task.getException());
                         Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
         // [END sign_in_with_email]
@@ -240,10 +241,9 @@ public class SignIn extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
                         Intent data = new Intent();
-                        String text = "Register";
-                        data.setData(Uri.parse(text));
+                        data.putExtra("result", "Register");
                         setResult(RESULT_OK, data);
-                        exitActivity();
+                        finish();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "createUserWithEmail:failure", task.getException());

@@ -1,12 +1,17 @@
 package com.c17206413.payup.ui.payment;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,8 +33,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.stripe.android.PaymentConfiguration;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Currency;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +66,8 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
 
     private Locale locale;
 
+    private int includes = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +83,29 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
 
         ImageButton backButton= findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
+
+        CheckBox included = findViewById(R.id.checkBox);
+        included.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                includes = 1;
+            } else {
+                includes = 0;
+            }
+            String s = Objects.requireNonNull(priceInput.getEditText()).getText().toString();
+
+            String cleanString = s.replaceAll("[$,£€.]", "");
+
+            double parsed = Double.parseDouble(cleanString);
+            perPerson = parsed;
+
+            pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
+
+            String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));
+
+            current = formatted;
+            priceInput.getEditText().setText(formatted);
+            priceInput.getEditText().setSelection(formatted.length());
+        });
 
         db = FirebaseFirestore.getInstance();
 
@@ -106,7 +138,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                     double parsed = Double.parseDouble(cleanString);
                     perPerson = parsed;
 
-                    pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + 1)))));
+                    pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
 
                     String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));
 
@@ -142,7 +174,10 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             User user = addedUsers.get(i);
             String uid = user.getId();
             String name = user.getUsername();
-            String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + 1))));
+            String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + includes))));
+
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
+            String currentDateandTime = sdf.format(new Date());
 
             Map<String, Object> paymentDetails = new HashMap<>();
             paymentDetails.put("user_id", uid);
@@ -151,6 +186,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             paymentDetails.put("amount", amount);
             paymentDetails.put("service_name", serviceName);
             paymentDetails.put("active", true);
+            paymentDetails.put("date_time", currentDateandTime);
 
             db.collection("users").document(MainActivity.getUid()).collection("incoming")
                     .document()
@@ -221,6 +257,6 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                 addedUsers.remove(user);
             }
         }
-        pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + 1)))));
+        pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
     }
 }

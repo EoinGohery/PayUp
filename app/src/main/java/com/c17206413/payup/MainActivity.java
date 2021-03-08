@@ -1,13 +1,17 @@
 package com.c17206413.payup;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -56,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        checkInternetConnection(this);
 
         PaymentConfiguration.init(
                 getApplicationContext(),
@@ -66,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         checkCurrentUser();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        setContentView(R.layout.activity_main);
         setTheme();
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
@@ -81,6 +87,20 @@ public class MainActivity extends AppCompatActivity {
 
         Button newExpenseButton = findViewById(R.id.newExpenseButton);
         newExpenseButton.setOnClickListener(v -> createPayment());
+    }
+
+    public static void checkInternetConnection(Context mContext) {
+        if (!isNetworkAvailable(mContext)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle("Internet");
+            builder.setMessage(R.string.no_internet_connection);
+
+            // Set up the buttons
+            int pid = android.os.Process.myPid();
+            builder.setPositiveButton("Close", (dialog, which) -> android.os.Process.killProcess(pid));
+
+            builder.show();
+        }
     }
 
     private void openUser() {
@@ -117,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         setTheme();
+        checkInternetConnection(this);
     }
 
     @Override
@@ -149,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                     checkCurrentUser();
                     Intent data = result.getData();
                     if (data != null) {
-                        String returnedResult = data.getDataString();
+                        String returnedResult = data.getStringExtra("result");
                         if (returnedResult.equals("Register")) {
                             askName();
                         }
@@ -172,6 +193,27 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", (dialog, which) -> setName(input.getText().toString()));
 
         builder.show();
+    }
+
+    public static boolean isNetworkAvailable(Context context)
+    {
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+
+            if (info != null)
+            {
+                for (NetworkInfo networkInfo : info) {
+                    Log.i("Class", networkInfo.getState().toString());
+                    if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void setName(String name) {
@@ -202,8 +244,8 @@ public class MainActivity extends AppCompatActivity {
                 if (result.getResultCode() == RESULT_OK) {
                     Intent data = result.getData();
                     if (data != null) {
-                        String returnedResult = data.getDataString();
-                        if (returnedResult.equals("LogOut")) {
+                        String returnedResult = data.getStringExtra("result");
+                        if (returnedResult.equals("logOut")) {
                             signOut();
                         }
                     }

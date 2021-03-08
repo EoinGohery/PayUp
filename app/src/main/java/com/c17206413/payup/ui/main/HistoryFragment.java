@@ -61,9 +61,6 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
             readPayments();
             pullToRefresh.setRefreshing(false);
         });
-
-        readPayments();
-
         return root;
     }
 
@@ -87,7 +84,8 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                             String clientSecret = document.getString("clientSecret");
                             Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false);
+                            String dateTime = document.getString("date_time");
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false, dateTime);
                             addToRecycler(paymentDetails);
                         }
 
@@ -108,7 +106,8 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                             String clientSecret = document.getString("clientSecret");
                             Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false);
+                            String dateTime = document.getString("date_time");
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false, dateTime);
                             addToRecycler(paymentDetails);
                         }
                     } else {
@@ -134,6 +133,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
+        intent.putExtra("dateTime", paymentDetail.getDateTime());
         paymentDetailScreenLauncher.launch(intent);
     }
 

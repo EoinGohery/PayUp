@@ -3,6 +3,7 @@ package com.c17206413.payup.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.c17206413.payup.ui.model.Payment;
 import com.c17206413.payup.ui.payment.CheckoutActivity;
 import com.c17206413.payup.ui.payment.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -32,6 +34,7 @@ import java.util.Objects;
 
 public class DueFragment extends Fragment implements PaymentAdapter.PaymentListener{
 
+    private static final String TAG = "DUE";
     private FirebaseFirestore db;
 
     private List<Payment> mPayments;
@@ -65,9 +68,6 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
             pullToRefresh.setRefreshing(false);
         });
 
-
-        readPayments();
-
         return root;
     }
 
@@ -91,7 +91,8 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                             String clientSecret = document.getString("clientSecret");
                             Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true);
+                            String dateTime = document.getString("date_time");
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true, dateTime);
                             mPayments.add(paymentDetails);
                         }
                         paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
@@ -109,6 +110,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         intent.putExtra("amount", paymentDetail.getAmount());
         intent.putExtra("serviceName", paymentDetail.getServiceName());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
+        intent.putExtra("id", paymentDetail.getId());
         paymentResultLauncher.launch(intent);
     }
 
@@ -118,15 +120,21 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     Intent data = result.getData();
                     assert data != null;
+                    Boolean successful = data.getBooleanExtra("paymentSuccess", true);
                     String returnedResult = data.getDataString();
-                    readPayments();
-                    if (returnedResult.equals("result")) {
+                    if (successful) {
                         Snackbar.make(root.findViewById(android.R.id.content), "Payment Succeeded.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        DocumentReference userRef = db.collection("users").document(MainActivity.getUid()).collection("due").document(returnedResult);
+                        userRef.update("active", false)
+                                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
                     } else {
                         Snackbar.make(root.findViewById(android.R.id.content), "Payment Uncompleted.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
+                    readPayments();
                 }
             });
 
@@ -139,6 +147,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
+        intent.putExtra("dateTime", paymentDetail.getDateTime());
 
         paymentDetailScreenLauncher.launch(intent);
     }

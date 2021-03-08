@@ -1,7 +1,11 @@
 package com.c17206413.payup.ui.payment;
 
 import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -14,8 +18,6 @@ import java.util.Currency;
 
 
 public class PaymentDetailsActivity extends AppCompatActivity {
-
-    //private Button payButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,42 +45,12 @@ public class PaymentDetailsActivity extends AppCompatActivity {
         format.setCurrency(Currency.getInstance(currency));
 
         amountIndicator.setText(format.format(amount));
-        dateIndicator.setText(extras.getString("date"));
+        dateIndicator.setText(extras.getString("dateTime"));
         if (!extras.getBoolean("active")) {
             isPaid.setText(R.string.paid);
             isPaid.setTextColor(getResources().getColor(R.color.colorSuccess));
         }
         userIndicator.setText(extras.getString("user"));
-
-//        payButton= findViewById(R.id.pay_button);
-//        payButton.setOnClickListener(v -> launchPayment(currency, amount, service, clientSecret));
     }
 
-//    private void launchPayment(String currency, Double amount, String service, String clientSecret) {
-//        Intent intent = new Intent(this, CheckoutActivity.class);
-//        intent.putExtra("clientSecret", clientSecret);
-//        intent.putExtra("amount", amount);
-//        intent.putExtra("serviceName", service);
-//        intent.putExtra("currency", currency);
-//        paymentResultLauncher.launch(intent);
-//    }
-//
-//    ActivityResultLauncher<Intent> paymentResultLauncher = registerForActivityResult(
-//            new ActivityResultContracts.StartActivityForResult(),
-//            result -> {
-//                if (result.getResultCode() == Activity.RESULT_OK) {
-//                    Intent data = result.getData();
-//                    assert data != null;
-//                    String returnedResult = data.getDataString();
-//
-//                    if (returnedResult.equals("result")) {
-//                        Snackbar.make(findViewById(android.R.id.content), "Payment Succeeded.", Snackbar.LENGTH_LONG)
-//                                .setAction("Action", null).show();
-//                        payButton.setVisibility(View.INVISIBLE);
-//                    } else {
-//                        Snackbar.make(findViewById(android.R.id.content), "Payment Uncompleted.", Snackbar.LENGTH_LONG)
-//                                .setAction("Action", null).show();
-//                    }
-//                }
-//            });
 }

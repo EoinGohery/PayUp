@@ -3,6 +3,7 @@ package com.c17206413.payup.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.c17206413.payup.ui.adapter.PaymentAdapter;
 import com.c17206413.payup.ui.model.Payment;
 import com.c17206413.payup.ui.payment.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -31,7 +33,7 @@ import java.util.Objects;
 
 public class IncomingFragment extends Fragment implements PaymentAdapter.PaymentListener{
 
-    private FirebaseFirestore db;
+    private static final String TAG = "Incoming:";
 
     private List<Payment> mPayments;
     private RecyclerView incomingRecycler;
@@ -62,9 +64,6 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
             readPayments();
             pullToRefresh.setRefreshing(false);
         });
-
-        readPayments();
-
         return root;
     }
 
@@ -74,7 +73,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     }
 
     private void readPayments() {
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         String uid = MainActivity.getUid();
         db.collection("users").document(uid).collection("incoming")
                 .whereEqualTo("active", true)
@@ -89,7 +88,8 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                             String clientSecret = document.getString("clientSecret");
                             Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true);
+                            String dateTime = document.getString("date_time");
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateTime);
                             mPayments.add(paymentDetails);
                         }
                         paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
@@ -110,6 +110,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
+        intent.putExtra("dateTime", paymentDetail.getDateTime());
         paymentDetailScreenLauncher.launch(intent);
     }
 
@@ -130,7 +131,12 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
         Payment paymentDetail = mPayments.get(adapterPosition);
-        //TODO (cancel a payment)
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userRef = db.collection("users").document(MainActivity.getUid()).collection("incoming").document(paymentDetail.getId());
+        userRef.update("active", false)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+        readPayments();
     }
 
 }
