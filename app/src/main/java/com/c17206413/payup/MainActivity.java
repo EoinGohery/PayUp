@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        checkInternetConnection();
+        checkInternetConnection(this);
 
         PaymentConfiguration.init(
                 getApplicationContext(),
@@ -89,14 +89,15 @@ public class MainActivity extends AppCompatActivity {
         newExpenseButton.setOnClickListener(v -> createPayment());
     }
 
-    private void checkInternetConnection() {
-        if (!isNetworkAvailable(this)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    public static void checkInternetConnection(Context mContext) {
+        if (!isNetworkAvailable(mContext)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
             builder.setTitle("Internet");
             builder.setMessage(R.string.no_internet_connection);
 
             // Set up the buttons
-            builder.setPositiveButton("Close", (dialog, which) -> finish());
+            int pid = android.os.Process.myPid();
+            builder.setPositiveButton("Close", (dialog, which) -> android.os.Process.killProcess(pid));
 
             builder.show();
         }
@@ -136,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         setTheme();
+        checkInternetConnection(this);
     }
 
     @Override
@@ -203,11 +205,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (info != null)
             {
-                for (int i = 0; i < info.length; i++)
-                {
-                    Log.i("Class", info[i].getState().toString());
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
-                    {
+                for (NetworkInfo networkInfo : info) {
+                    Log.i("Class", networkInfo.getState().toString());
+                    if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
                         return true;
                     }
                 }

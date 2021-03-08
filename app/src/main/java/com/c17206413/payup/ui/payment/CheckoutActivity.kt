@@ -2,15 +2,20 @@ package com.c17206413.payup.ui.payment
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.c17206413.payup.R
-import com.google.firebase.auth.*
-import com.google.gson.GsonBuilder
-import com.stripe.android.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.stripe.android.ApiResultCallback
+import com.stripe.android.PaymentIntentResult
+import com.stripe.android.Stripe
 import com.stripe.android.model.ConfirmPaymentIntentParams
-import com.stripe.android.model.PaymentMethod
 import com.stripe.android.model.StripeIntent
 import kotlinx.android.synthetic.main.activity_checkout.*
 import java.lang.ref.WeakReference
@@ -81,7 +86,8 @@ class CheckoutActivity : AppCompatActivity() {
                 if (status == StripeIntent.Status.Succeeded) {
                     displayAlert(weakActivity.get()!!, "Payment succeeded", "Returning", restartDemo = true)
                 } else {
-                    displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message ?: "")
+                    displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message
+                            ?: "")
                 }
             }
 

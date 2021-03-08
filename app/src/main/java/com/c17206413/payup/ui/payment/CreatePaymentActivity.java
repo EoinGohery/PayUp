@@ -1,7 +1,10 @@
 package com.c17206413.payup.ui.payment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
