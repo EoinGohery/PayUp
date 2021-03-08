@@ -183,14 +183,13 @@ public class MainActivity extends AppCompatActivity {
             if (user != null) {
                 user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
                     if (!task1.isSuccessful()) {
-                        Snackbar.make(findViewById(android.R.id.content), username, Snackbar.LENGTH_LONG)
+                        Snackbar.make(findViewById(android.R.id.content), "Name not Set", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
                 });
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 DocumentReference userRef = db.collection("users").document(user.getUid());
-                userRef
-                        .update("name", username)
+                userRef.update("name", username)
                         .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                         .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
             }
@@ -216,7 +215,8 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
-                    //TODO
+                    Snackbar.make(findViewById(android.R.id.content), "Expense created", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
             });
 

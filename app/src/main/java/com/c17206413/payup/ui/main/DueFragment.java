@@ -37,6 +37,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
     private List<Payment> mPayments;
     private RecyclerView dueRecycler;
     private View root;
+    private SwipeRefreshLayout pullToRefresh;
 
     private PaymentAdapter paymentAdapter;
 
@@ -57,7 +58,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         dueRecycler.setHasFixedSize(true);
         dueRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final SwipeRefreshLayout pullToRefresh = root.findViewById(R.id.pullToRefresh);
+        pullToRefresh = root.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> {
             pullToRefresh.setRefreshing(true);
             readPayments();
@@ -68,6 +69,11 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         readPayments();
 
         return root;
+    }
+
+    public void onResume() {
+        super.onResume();
+        readPayments();
     }
 
     private void readPayments() {

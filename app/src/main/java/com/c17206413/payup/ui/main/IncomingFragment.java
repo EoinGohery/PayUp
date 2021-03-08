@@ -36,6 +36,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     private List<Payment> mPayments;
     private RecyclerView incomingRecycler;
     private View root;
+    private SwipeRefreshLayout pullToRefresh;
 
     private PaymentAdapter paymentAdapter;
 
@@ -55,7 +56,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         incomingRecycler.setHasFixedSize(true);
         incomingRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final SwipeRefreshLayout pullToRefresh = root.findViewById(R.id.pullToRefresh);
+        pullToRefresh = root.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> {
             pullToRefresh.setRefreshing(true);
             readPayments();
@@ -65,6 +66,11 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         readPayments();
 
         return root;
+    }
+
+    public void onResume() {
+        super.onResume();
+        readPayments();
     }
 
     private void readPayments() {

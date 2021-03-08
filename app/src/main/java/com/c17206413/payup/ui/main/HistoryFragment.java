@@ -36,6 +36,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
     private List<Payment> mPayments;
     private RecyclerView historyRecycler;
     private View root;
+    private SwipeRefreshLayout pullToRefresh;
 
     public static HistoryFragment newInstance() {
         return new HistoryFragment();
@@ -54,17 +55,21 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
         historyRecycler.setHasFixedSize(true);
         historyRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final SwipeRefreshLayout pullToRefresh = root.findViewById(R.id.pullToRefresh);
+        pullToRefresh = root.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> {
             pullToRefresh.setRefreshing(true);
             readPayments();
             pullToRefresh.setRefreshing(false);
         });
 
-
         readPayments();
 
         return root;
+    }
+
+    public void onResume() {
+        super.onResume();
+        readPayments();
     }
 
     private void readPayments() {
