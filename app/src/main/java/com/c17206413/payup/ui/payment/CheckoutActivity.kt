@@ -12,6 +12,8 @@ import com.stripe.android.model.ConfirmPaymentIntentParams
 import com.stripe.android.model.PaymentMethod
 import com.stripe.android.view.BillingAddressFields
 import kotlinx.android.synthetic.main.activity_checkout.*
+import java.text.NumberFormat
+import java.util.*
 
 
 class CheckoutActivity : AppCompatActivity() {
@@ -27,12 +29,24 @@ class CheckoutActivity : AppCompatActivity() {
         currentUser = FirebaseAuth.getInstance().currentUser
 
         val extras = intent.extras
-        val paymentIntentClientSecret = extras!!.getString("paymentIntentClientSecret")
+        val clientSecret = extras?.getString("clientSecret")
+        val serviceName = extras?.getString("serviceName")
+        val currency = extras?.getString("currency")
+        val amount = extras?.getDouble("amount")
+
+        val format = NumberFormat.getCurrencyInstance()
+        format.maximumFractionDigits = 2
+        format.currency = Currency.getInstance(currency)
+
+        amount_indicator.text = format.format(amount)
+
+        service_name_checkout.text = serviceName
+        payButton.isEnabled = false
 
         setupPaymentSession()
 
         payButton.setOnClickListener {
-            confirmPayment(selectedPaymentMethod.id!!, paymentIntentClientSecret!!)
+            confirmPayment(selectedPaymentMethod.id!!, clientSecret!!)
         }
 
         paymentmethod.setOnClickListener {
@@ -100,6 +114,7 @@ class CheckoutActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         paymentSession.handlePaymentData(requestCode, resultCode, data ?: Intent())
+
     }
 }
 

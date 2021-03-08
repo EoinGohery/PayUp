@@ -29,19 +29,17 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
 
-public class IncomingFragment extends Fragment implements PaymentAdapter.PaymentListener{
+public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentListener{
 
     private FirebaseFirestore db;
 
     private List<Payment> mPayments;
-    private RecyclerView incomingRecycler;
+    private RecyclerView historyRecycler;
     private View root;
     private SwipeRefreshLayout pullToRefresh;
 
-    private PaymentAdapter paymentAdapter;
-
-    public static IncomingFragment newInstance() {
-        return new IncomingFragment();
+    public static HistoryFragment newInstance() {
+        return new HistoryFragment();
     }
 
     @Override
@@ -51,10 +49,11 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         root = inflater.inflate(R.layout.fragment, container, false);
 
         mPayments = new ArrayList<>();
+        db = FirebaseFirestore.getInstance();
 
-        incomingRecycler = root.findViewById(R.id.paymentRecycler);
-        incomingRecycler.setHasFixedSize(true);
-        incomingRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        historyRecycler = root.findViewById(R.id.paymentRecycler);
+        historyRecycler.setHasFixedSize(true);
+        historyRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         pullToRefresh = root.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> {
@@ -74,14 +73,13 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     }
 
     private void readPayments() {
-        db = FirebaseFirestore.getInstance();
+        mPayments.clear();
         String uid = MainActivity.getUid();
-        db.collection("users").document(uid).collection("incoming")
-                .whereEqualTo("active", true)
+        db.collection("users").document(uid).collection("due")
+                .whereEqualTo("active", false)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        mPayments.clear();
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String serviceName = document.getString("service_name");
                             Currency currency = Currency.getInstance(document.getString("currency"));
@@ -89,16 +87,42 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                             String clientSecret = document.getString("clientSecret");
                             Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true);
-                            mPayments.add(paymentDetails);
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false);
+                            addToRecycler(paymentDetails);
                         }
-                        paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
-                        incomingRecycler.setAdapter(paymentAdapter);
+
+                    } else {
+                        Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+                });
+        db.collection("users").document(uid).collection("incoming")
+                .whereEqualTo("active", false)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                            String serviceName = document.getString("service_name");
+                            Currency currency = Currency.getInstance(document.getString("currency"));
+                            String name = document.getString("user_name");
+                            String clientSecret = document.getString("clientSecret");
+                            Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
+                            String id = document.getId();
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false);
+                            addToRecycler(paymentDetails);
+                        }
                     } else {
                         Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments incoming.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
                 });
+
+    }
+
+    private void addToRecycler(Payment payment) {
+        mPayments.add(payment);
+        PaymentAdapter paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
+        historyRecycler.setAdapter(paymentAdapter);
     }
 
     private void viewPayment(Payment paymentDetail) {
@@ -129,8 +153,8 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
 
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
-        Payment paymentDetail = mPayments.get(adapterPosition);
-        //TODO (cancel a payment)
+        //Pay button is disabled as payment has already been complete
     }
+
 
 }

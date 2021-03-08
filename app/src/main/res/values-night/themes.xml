@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.PayUp" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.PayUp" parent="Theme.MaterialComponents.NoActionBar">
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
@@ -29,6 +29,7 @@
     <style name="Theme.PayUp.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:forceDarkAllowed">false</item>
     </style>
 
     <style name="Theme.PayUp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

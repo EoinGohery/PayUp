@@ -1,10 +1,13 @@
 package com.c17206413.payup;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -14,18 +17,25 @@ import androidx.core.widget.NestedScrollView;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.c17206413.payup.ui.Adapter.SectionsPagerAdapter;
-import com.c17206413.payup.ui.accounts.SignIn;
+import com.c17206413.payup.ui.adapter.SectionsPagerAdapter;
 import com.c17206413.payup.ui.accounts.MenuActivity;
+import com.c17206413.payup.ui.accounts.SignIn;
+import com.c17206413.payup.ui.accounts.SripeOnboardingView;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.stripe.android.PaymentConfiguration;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "Main";
 
     //Firestore Initialisation
     private FirebaseAuth mAuth;
@@ -33,10 +43,11 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     // user details
-    private static String providerId, providerUid, uid, name, email, language;
+    private static String providerId, uid, name, email, language, customer_id, account_id, username;;
+
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
-    private SharedPreferences mPrefs;
+    private static SharedPreferences mPrefs;
 
     public static String getUid() {
         return uid;
@@ -51,14 +62,13 @@ public class MainActivity extends AppCompatActivity {
                 "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
         );
 
-
-        mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         checkCurrentUser();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
         setTheme();
-        NestedScrollView scrollView = (NestedScrollView) findViewById(R.id.nestedScroll);
+        NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -66,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        Button userButton = (Button) findViewById(R.id.userButton);
+        Button userButton = findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
 
-        Button newExpenseButton = (Button) findViewById(R.id.newExpenseButton);
+        Button newExpenseButton = findViewById(R.id.newExpenseButton);
         newExpenseButton.setOnClickListener(v -> createPayment());
     }
 
@@ -79,8 +89,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createPayment() {
-        Intent intent = new Intent(this, CreatePaymentActivity.class);
-        createPaymentResultLauncher.launch(intent);
+        if (account_id==null) {
+            startActivity(new Intent(MainActivity.this, SripeOnboardingView.class));
+        } else {
+            Intent intent = new Intent(this, CreatePaymentActivity.class);
+            createPaymentResultLauncher.launch(intent);
+        }
     }
 
 
@@ -90,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         signInUser();
     }
 
-    private void setTheme() {
+    public static void setTheme() {
         boolean isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
         if (isNightModeEnabled) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -131,22 +145,66 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> loginResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
+                if (result.getResultCode() == RESULT_OK) {
                     checkCurrentUser();
+                    Intent data = result.getData();
+                    if (data != null) {
+                        String returnedResult = data.getDataString();
+                        if (returnedResult.equals("Register")) {
+                            askName();
+                        }
+                    }
                 }
             });
 
+    private void askName() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Name:");
+
+        // Set up the input
+        final EditText input = new EditText(MainActivity.this);
+        input.setHint("Username");
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", (dialog, which) -> setName(input.getText().toString()));
+
+        builder.show();
+    }
+
+    private void setName(String name) {
+        username = name;
+        if (username!=null) {
+            FirebaseUser user = mAuth.getCurrentUser();
+            UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
+            builder.setDisplayName(username);
+            if (user != null) {
+                user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
+                    if (!task1.isSuccessful()) {
+                        Snackbar.make(findViewById(android.R.id.content), "Name not Set", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+                });
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                DocumentReference userRef = db.collection("users").document(user.getUid());
+                userRef.update("name", username)
+                        .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                        .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+            }
+        }
+    }
 
     ActivityResultLauncher<Intent> userResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
+                if (result.getResultCode() == RESULT_OK) {
                     Intent data = result.getData();
                     if (data != null) {
                         String returnedResult = data.getDataString();
                         if (returnedResult.equals("LogOut")) {
                             signOut();
-                            signInUser();
                         }
                     }
 
@@ -156,24 +214,46 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> createPaymentResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    //TODO
+                if (result.getResultCode() == RESULT_OK) {
+                    Snackbar.make(findViewById(android.R.id.content), "Expense created", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
             });
 
-
     public void getUserProfile() {
         // [START get_user_profile]
-        user = mAuth.getCurrentUser();
         if (user != null) {
-            name = user.getDisplayName();
             email = user.getEmail();
             uid = user.getUid();
             for (UserInfo profile : user.getProviderData()) {
                 providerId = profile.getProviderId();
-                name = profile.getDisplayName();
-                email = profile.getEmail();
             }
+            DocumentReference docRef = db.collection("users").document(uid);
+            docRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    assert document != null;
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        String account = document.getString("connected_account_id");
+                        String customer = document.getString("customer_id");
+                        String docName = document.getString("name");
+                        setFields(uid, docName, customer, account);
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                    finish();
+                }
+            });
         }
+    }
+
+    public void setFields(String uid, String name, String customer_id, String account_id) {
+        MainActivity.name = name;
+        MainActivity.account_id = account_id;
+        MainActivity.customer_id = customer_id;
+        MainActivity.uid = uid;
     }
 }

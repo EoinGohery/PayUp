@@ -11,24 +11,24 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PayUp">
+        android:theme="@style/Theme.PayUp"
+        android:windowSoftInputMode="adjustPan">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.PayUp.NoActionBar">
+            android:theme="@style/Theme.PayUp.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.accounts.SignIn"
-            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.accounts.SignIn"/>
         <activity android:name=".ui.accounts.MenuActivity" />
-        <activity android:name=".ui.payment.CheckoutActivity" />
-        <activity android:name=".ui.payment.CreatePaymentActivity"
-            android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ui.accounts.SripeOnboardingView" />
+        <activity android:name=".ui.payment.CheckoutActivity"/>
+        <activity android:name=".ui.payment.CreatePaymentActivity"/>
+        <activity android:name=".ui.accounts.SripeOnboardingView"/>
+        <activity android:name=".ui.payment.PaymentDetailsActivity" />
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             tools:replace="android:value"

@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name" translatable="false">Pay Up</string>
-    <string name="tab_due">Payments Due</string>
+    <string name="tab_due">Due</string>
+    <string name="tab_history">History</string>
     <string name="back_button">Return to main activity</string>
     <string name="user_button">Go to user activity</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="profile_picture">Profile picture</string>
     <string name="accounts">Accounts</string>
+    <string name="checkout">Checkout</string>
     <string name="create_expense">Create Expense</string>
     <string name="new_expense">New Expense</string>
     <string name="stripe_account">Stripe Account</string>
@@ -25,11 +27,12 @@
     <string name="password">Password</string>
     <string name="login_with_password">Log in</string>
     <string name="register">Register</string>
+    <string name="menu">Menu</string>
     <string name="no_account">No account yet? Create one</string>
     <string name="login_with_facebook">Sign in with Facebook</string>
     <string name="login_with_google">Sign in with Google</string>
-    <string name="facebook_application_id" translatable="false">YOUR_APP_ID</string>
-    <string name="facebook_login_protocol_scheme" translatable="false">fbYOUR_APP_ID</string>
+    <string name="facebook_application_id" translatable="false">440518313790406</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">440518313790406</string>
     <string name="twitter_consumer_key" translatable="false">YOUR_CONSUMER_KEY</string>
     <string name="twitter_consumer_secret" translatable="false">YOUR_CONSUMER_SECRET</string>
     <string name="backToSignIn">Back To Sign In</string>
@@ -39,5 +42,9 @@
     <string name="total_price">Total Price</string>
     <string name="price_pp">Price per Person: </string>
     <string name="username">Username</string>
+    <string name="cancel">Cancel</string>
+    <string name="paid">Paid</string>
+    <string name="unpaid">Unpaid</string>
+    <string name="received">Received</string>
 
 </resources>
