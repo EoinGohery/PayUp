@@ -88,7 +88,8 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                             String clientSecret = document.getString("clientSecret");
                             Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
                             String id = document.getId();
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true);
+                            String dateTime = document.getString("date_time");
+                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateTime);
                             mPayments.add(paymentDetails);
                         }
                         paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
@@ -109,6 +110,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
+        intent.putExtra("dateTime", paymentDetail.getDateTime());
         paymentDetailScreenLauncher.launch(intent);
     }
 

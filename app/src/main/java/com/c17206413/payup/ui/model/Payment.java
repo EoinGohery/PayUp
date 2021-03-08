@@ -11,9 +11,10 @@ public class Payment {
     private Double amount;
     private String clientSecret;
     private String id;
+    private final String dateTime;
     private Boolean active;
 
-    public Payment(String id, String serviceName, Currency currency, String username, Double amount, String clientSecret, String type, Boolean active) {
+    public Payment(String id, String serviceName, Currency currency, String username, Double amount, String clientSecret, String type, Boolean active, String dateTime) {
         this.serviceName = serviceName;
         this.currency = currency;
         this.username = username;
@@ -22,6 +23,7 @@ public class Payment {
         this.clientSecret = clientSecret;
         this.id = id;
         this.active = active;
+        this.dateTime = dateTime;
     }
 
     public String getServiceName() {
@@ -86,5 +88,9 @@ public class Payment {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getDateTime() {
+        return dateTime;
     }
 }

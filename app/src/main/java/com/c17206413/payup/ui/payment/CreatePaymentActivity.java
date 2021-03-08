@@ -29,8 +29,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.stripe.android.PaymentConfiguration;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Currency;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -170,6 +172,9 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             String name = user.getUsername();
             String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + includes))));
 
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
+            String currentDateandTime = sdf.format(new Date());
+
             Map<String, Object> paymentDetails = new HashMap<>();
             paymentDetails.put("user_id", uid);
             paymentDetails.put("user_name", name);
@@ -177,6 +182,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             paymentDetails.put("amount", amount);
             paymentDetails.put("service_name", serviceName);
             paymentDetails.put("active", true);
+            paymentDetails.put("date_time", currentDateandTime);
 
             db.collection("users").document(MainActivity.getUid()).collection("incoming")
                     .document()

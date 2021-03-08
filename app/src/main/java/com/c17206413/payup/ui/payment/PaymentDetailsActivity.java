@@ -43,7 +43,7 @@ public class PaymentDetailsActivity extends AppCompatActivity {
         format.setCurrency(Currency.getInstance(currency));
 
         amountIndicator.setText(format.format(amount));
-        dateIndicator.setText(extras.getString("date"));
+        dateIndicator.setText(extras.getString("dateTime"));
         if (!extras.getBoolean("active")) {
             isPaid.setText(R.string.paid);
             isPaid.setTextColor(getResources().getColor(R.color.colorSuccess));
