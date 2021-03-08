@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -59,6 +60,8 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
 
     private Locale locale;
 
+    private int includes = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +77,29 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
 
         ImageButton backButton= findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
+
+        CheckBox included = findViewById(R.id.checkBox);
+        included.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                includes = 1;
+            } else {
+                includes = 0;
+            }
+            String s = Objects.requireNonNull(priceInput.getEditText()).getText().toString();
+
+            String cleanString = s.replaceAll("[$,£€.]", "");
+
+            double parsed = Double.parseDouble(cleanString);
+            perPerson = parsed;
+
+            pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
+
+            String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));
+
+            current = formatted;
+            priceInput.getEditText().setText(formatted);
+            priceInput.getEditText().setSelection(formatted.length());
+        });
 
         db = FirebaseFirestore.getInstance();
 
@@ -106,7 +132,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                     double parsed = Double.parseDouble(cleanString);
                     perPerson = parsed;
 
-                    pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + 1)))));
+                    pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
 
                     String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));
 
@@ -142,7 +168,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             User user = addedUsers.get(i);
             String uid = user.getId();
             String name = user.getUsername();
-            String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + 1))));
+            String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + includes))));
 
             Map<String, Object> paymentDetails = new HashMap<>();
             paymentDetails.put("user_id", uid);
@@ -221,6 +247,6 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                 addedUsers.remove(user);
             }
         }
-        pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + 1)))));
+        pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
     }
 }

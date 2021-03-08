@@ -61,9 +61,6 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
             readPayments();
             pullToRefresh.setRefreshing(false);
         });
-
-        readPayments();
-
         return root;
     }
 

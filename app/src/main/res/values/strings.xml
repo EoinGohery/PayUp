@@ -46,5 +46,6 @@
     <string name="paid">Paid</string>
     <string name="unpaid">Unpaid</string>
     <string name="received">Received</string>
+    <string name="price_includes_youself">Price includes Youself</string>
 
 </resources>

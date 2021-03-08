@@ -68,9 +68,6 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
             pullToRefresh.setRefreshing(false);
         });
 
-
-        readPayments();
-
         return root;
     }
 

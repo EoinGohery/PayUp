@@ -64,9 +64,6 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
             readPayments();
             pullToRefresh.setRefreshing(false);
         });
-
-        readPayments();
-
         return root;
     }
 
