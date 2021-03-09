@@ -266,6 +266,7 @@ public class SignIn extends AppCompatActivity {
             valid = false;
         } else {
             emailInput.setError(null);
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
@@ -274,6 +275,7 @@ public class SignIn extends AppCompatActivity {
             valid = false;
         } else {
             passwordInput.setError(null);
+            progressBar.setVisibility(View.VISIBLE);
         }
         return valid;
     }
