@@ -163,6 +163,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         mUsers = new ArrayList<>();
         addedUsers = new ArrayList<>();
         readUsers();
+        MainActivity.checkInternetConnection(this);
     }
 
     private void createGroupPayment(String serviceName, Currency currency) {

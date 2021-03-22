@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -141,6 +142,8 @@ public class SignIn extends AppCompatActivity {
             registerLayout.setVisibility(View.GONE);
             signIn.setVisibility(View.VISIBLE);
         });
+
+        MainActivity.checkInternetConnection(this);
     }
 
     //for facebook activity result
@@ -266,6 +269,7 @@ public class SignIn extends AppCompatActivity {
             valid = false;
         } else {
             emailInput.setError(null);
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
@@ -274,6 +278,7 @@ public class SignIn extends AppCompatActivity {
             valid = false;
         } else {
             passwordInput.setError(null);
+            progressBar.setVisibility(View.VISIBLE);
         }
         return valid;
     }

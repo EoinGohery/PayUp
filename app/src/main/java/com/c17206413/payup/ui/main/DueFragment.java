@@ -120,11 +120,9 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     Intent data = result.getData();
                     assert data != null;
-                    Boolean successful = data.getBooleanExtra("paymentSuccess", true);
-                    String returnedResult = data.getDataString();
+                    Boolean successful = data.getBooleanExtra("paymentSuccess", false);
+                    String returnedResult = data.getStringExtra("docId");
                     if (successful) {
-                        Snackbar.make(root.findViewById(android.R.id.content), "Payment Succeeded.", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                         DocumentReference userRef = db.collection("users").document(MainActivity.getUid()).collection("due").document(returnedResult);
                         userRef.update("active", false)

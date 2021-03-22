@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
@@ -26,6 +27,11 @@ import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.SripeOnboardingView;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -71,8 +77,20 @@ public class MainActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        checkCurrentUser();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
+            if (mAuth.getCurrentUser() == null){
+                signInUser();
+            }
+            else {
+                getUserProfile();
+            }
+        };
+
+        mAuth.addAuthStateListener(authStateListener);
+
+        checkCurrentUser();
         setTheme();
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
@@ -95,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
             builder.setTitle("Internet");
             builder.setMessage(R.string.no_internet_connection);
 
-            // Set up the buttons
             int pid = android.os.Process.myPid();
             builder.setPositiveButton("Close", (dialog, which) -> android.os.Process.killProcess(pid));
 
@@ -121,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
     private void signOut() {
         // Firebase sign out
         mAuth.signOut();
-        signInUser();
     }
 
     public static void setTheme() {
@@ -148,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void checkCurrentUser() {
         // [START check_current_user]
-        user = mAuth.getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             getUserProfile();
         } else {
@@ -219,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
     private void setName(String name) {
         username = name;
         if (username!=null) {
-            FirebaseUser user = mAuth.getCurrentUser();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
             builder.setDisplayName(username);
             if (user != null) {
