@@ -75,19 +75,18 @@ public class MainActivity extends AppCompatActivity {
                 "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
         );
 
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
             if (mAuth.getCurrentUser() == null){
-                //Do anything here which needs to be done after signout is complete
                 signInUser();
             }
             else {
                 getUserProfile();
             }
         };
-
-        db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         mAuth.addAuthStateListener(authStateListener);
 
@@ -114,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
             builder.setTitle("Internet");
             builder.setMessage(R.string.no_internet_connection);
 
-            // Set up the buttons
             int pid = android.os.Process.myPid();
             builder.setPositiveButton("Close", (dialog, which) -> android.os.Process.killProcess(pid));
 

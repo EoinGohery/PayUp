@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.c17206413.payup.MainActivity
 import com.c17206413.payup.R
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.wallet.*
@@ -79,6 +80,8 @@ class CheckoutActivity : AppCompatActivity() {
         paymentmethod.setOnClickListener {
             // Create the customer session and kick start the payment flow
         }
+
+        MainActivity.checkInternetConnection(this)
     }
 
     private fun isReadyToPay() {

@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 
+import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -78,6 +79,7 @@ public class MenuActivity extends AppCompatActivity {
             }
         });
 
+        MainActivity.checkInternetConnection(this);
         getUserProfile();
     }
 
