@@ -28,6 +28,7 @@
     <string name="login_with_password">Log in</string>
     <string name="register">Register</string>
     <string name="menu">Menu</string>
+    <string name="publish_key">pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF</string>
     <string name="no_account">No account yet? Create one</string>
     <string name="login_with_facebook">Sign in with Facebook</string>
     <string name="login_with_google">Sign in with Google</string>

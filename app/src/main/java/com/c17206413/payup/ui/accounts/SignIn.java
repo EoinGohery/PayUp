@@ -2,7 +2,6 @@ package com.c17206413.payup.ui.accounts;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -53,8 +52,6 @@ public class SignIn extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private CallbackManager mCallbackManager;
 
-    private String username;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +65,15 @@ public class SignIn extends AppCompatActivity {
 
         emailInput = findViewById(R.id.emailLayout);
         passwordInput = findViewById(R.id.passwordLayout);
+
+        FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
+            if (mAuth.getCurrentUser() != null){
+                setResult(RESULT_OK);
+                finish();
+            }
+        };
+
+        mAuth.addAuthStateListener(authStateListener);
 
         //email sign in
         Button emailLogin= findViewById(R.id.login_with_password);
@@ -188,7 +194,7 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
-                        exitActivity();
+
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -218,7 +224,6 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
-                        exitActivity();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -260,13 +265,12 @@ public class SignIn extends AppCompatActivity {
 
 
     //validate login strings correctness
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean validateLoginInForm() {
-        boolean valid = true;
-
         String emailString = Objects.requireNonNull(emailInput.getEditText()).getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             emailInput.setError("Required.");
-            valid = false;
+            return false;
         } else {
             emailInput.setError(null);
             progressBar.setVisibility(View.VISIBLE);
@@ -275,24 +279,18 @@ public class SignIn extends AppCompatActivity {
         String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
         if (passwordString.isEmpty()) {
             passwordInput.setError("Required.");
-            valid = false;
+            return false;
         } else {
             passwordInput.setError(null);
             progressBar.setVisibility(View.VISIBLE);
         }
-        return valid;
+        return true;
     }
 
     public void onBackPressed() {
         // disable going back to the MainActivity
         moveTaskToBack(true);
     }
-
-    private void exitActivity() {
-        setResult(RESULT_OK);
-        finish();
-    }
-
 
 //    public void privacyAndTerms() {
 //        List<AuthUI.IdpConfig> providers = Collections.emptyList();
