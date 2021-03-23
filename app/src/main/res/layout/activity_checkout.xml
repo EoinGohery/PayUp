@@ -55,8 +55,10 @@
             android:id="@+id/parentLinear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -77,7 +79,7 @@
             </com.stripe.android.view.CardInputWidget>
 
             <TextView
-                android:id="@+id/service_name_checkout"
+                android:id="@+id/serviceNameCheckout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="20dp"
@@ -87,7 +89,7 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/amount_indicator"
+                android:id="@+id/amountIndicator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="20dp"
