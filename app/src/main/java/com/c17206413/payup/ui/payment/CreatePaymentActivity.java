@@ -72,10 +72,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        PaymentConfiguration.init(
-                getApplicationContext(),
-                "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
-        );
+        PaymentConfiguration.init(getApplicationContext(), getString(R.string.publish_key));
 
         locale = Locale.getDefault();
 
@@ -221,6 +218,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                         userAdapter = new UserAdapter(this, mUsers, this);
                         searchRecycler.setAdapter(userAdapter);
                     } else {
+                        Log.w(TAG, "Error recieving document");
                         Snackbar.make(findViewById(android.R.id.content), "Receive Document Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
