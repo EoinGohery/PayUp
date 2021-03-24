@@ -266,16 +266,15 @@ public class SignIn extends AppCompatActivity {
         if (!validateLoginInForm()) {
             return;
         }
-
+        Intent data = new Intent();
+        data.putExtra("result", "Register");
+        setResult(RESULT_OK, data);
         // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success");
-                        Intent data = new Intent();
-                        data.putExtra("result", "Register");
-                        setResult(RESULT_OK, data);
                         finish();
                     } else {
                         // If sign in fails, display a message to the user.
