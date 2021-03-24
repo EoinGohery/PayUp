@@ -1,13 +1,8 @@
 package com.c17206413.payup.ui.accounts;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -40,8 +35,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -62,8 +55,6 @@ public class SignIn extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        showHashKey(this);
 
         setContentView(com.c17206413.payup.R.layout.activity_signin);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -204,6 +195,7 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
+                        setResult(RESULT_OK);
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -224,9 +216,10 @@ public class SignIn extends AppCompatActivity {
     //email login method
     private void loginSignIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
-        if (!validateLoginInForm()) {
+        if (validateLoginInForm()) {
             return;
         }
+
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -247,12 +240,9 @@ public class SignIn extends AppCompatActivity {
     //email registration method
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
-        if (!validateLoginInForm()) {
+        if (validateLoginInForm()) {
             return;
         }
-        Intent data = new Intent();
-        data.putExtra("result", "Register");
-        setResult(RESULT_OK, data);
         // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -273,12 +263,11 @@ public class SignIn extends AppCompatActivity {
 
 
     //validate login strings correctness
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean validateLoginInForm() {
         String emailString = Objects.requireNonNull(emailInput.getEditText()).getText().toString();
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             emailInput.setError("Required.");
-            return false;
+            return true;
         } else {
             emailInput.setError(null);
             progressBar.setVisibility(View.VISIBLE);
@@ -287,12 +276,12 @@ public class SignIn extends AppCompatActivity {
         String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
         if (passwordString.isEmpty()) {
             passwordInput.setError("Required.");
-            return false;
+            return true;
         } else {
             passwordInput.setError(null);
             progressBar.setVisibility(View.VISIBLE);
         }
-        return true;
+        return false;
     }
 
     public void onBackPressed() {

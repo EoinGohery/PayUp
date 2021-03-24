@@ -69,14 +69,10 @@ public class MainActivity extends AppCompatActivity {
             if (mAuth.getCurrentUser() == null){
                 signInUser();
             }
-            else {
-                getUserProfile();
-            }
         };
 
         mAuth.addAuthStateListener(authStateListener);
 
-        checkCurrentUser();
         setTheme();
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
@@ -149,16 +145,6 @@ public class MainActivity extends AppCompatActivity {
         setTheme();
     }
 
-    public void checkCurrentUser() {
-        // [START check_current_user]
-        if ( mAuth.getCurrentUser() != null) {
-            getUserProfile();
-        } else {
-            signInUser();
-        }
-        // [END check_current_user]
-    }
-
     public void signInUser() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
@@ -169,13 +155,7 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null) {
-                        String returnedResult = data.getStringExtra("result");
-                        if (returnedResult.equals("Register")) {
-                            askName();
-                        }
-                    }
+                    getUserProfile();
                 }
             });
 
@@ -243,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
                     Intent data = result.getData();
+                    getUserProfile();
                     if (data != null) {
                         String returnedResult = data.getStringExtra("result");
                         if (returnedResult.equals("logOut")) {
@@ -276,6 +257,10 @@ public class MainActivity extends AppCompatActivity {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         String account = document.getString("connected_account_id");
+                        String name = document.getString("name");
+                        if (name == null || name.matches("")) {
+                            askName();
+                        }
                         setFields(uid, account);
                     } else {
                         Log.d(TAG, "No such document");
