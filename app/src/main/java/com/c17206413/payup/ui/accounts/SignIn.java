@@ -1,8 +1,13 @@
 package com.c17206413.payup.ui.accounts;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +40,8 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -55,6 +62,9 @@ public class SignIn extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        showHashKey(this);
+
         setContentView(com.c17206413.payup.R.layout.activity_signin);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         mAuth = FirebaseAuth.getInstance();
@@ -100,7 +110,7 @@ public class SignIn extends AppCompatActivity {
         Button facebookButton = findViewById(R.id.login_facebook);
         facebookButton.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
-            LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("email","name"));
+            LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("public_profile", "email"));
         });
 
         mCallbackManager = CallbackManager.Factory.create();
@@ -152,6 +162,22 @@ public class SignIn extends AppCompatActivity {
         MainActivity.checkInternetConnection(this);
     }
 
+    public void showHashKey(Context context) {
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(
+                    "com.example.tryitonjewelry", PackageManager.GET_SIGNATURES); //Your            package name here
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Snackbar.make(findViewById(android.R.id.content), Base64.encodeToString(md.digest(), Base64.DEFAULT), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                Log.i("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+        } catch (NoSuchAlgorithmException e) {
+        }
+    }
+
     //for facebook activity result
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -194,7 +220,6 @@ public class SignIn extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
-
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());

@@ -71,7 +71,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx:22.1.1'
 
     //facebook
-    implementation 'com.facebook.android:facebook-android-sdk:7.1.0'
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
 
     //google pay
     implementation 'com.google.android.gms:play-services-wallet:18.1.2'

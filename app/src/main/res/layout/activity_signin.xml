@@ -149,7 +149,7 @@
                 android:text="@string/login_with_twitter"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:icon="@drawable/fui_ic_twitter_bird_white_24dp"
                 app:iconGravity="start"
                 app:iconPadding="-20dp"
