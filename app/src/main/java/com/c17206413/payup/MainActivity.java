@@ -11,49 +11,40 @@ import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.c17206413.payup.ui.adapter.SectionsPagerAdapter;
 import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.SripeOnboardingView;
+import com.c17206413.payup.ui.adapter.SectionsPagerAdapter;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
-import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.stripe.android.PaymentConfiguration;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main";
 
-    //Firestore Initialisation
+    // Firestore Initialisation
     private FirebaseAuth mAuth;
-    private FirebaseUser user;
     private FirebaseFirestore db;
 
     // user details
-    private static String providerId, uid, name, email, language, customer_id, account_id, username;;
+    private static String uid;
+    private static String account_id;
 
 
     public static final String NIGHT_MODE = "NIGHT_MODE";
@@ -70,11 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         checkInternetConnection(this);
 
-        PaymentConfiguration.init(
-                getApplicationContext(),
-                "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF"
-        );
-
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -83,14 +69,10 @@ public class MainActivity extends AppCompatActivity {
             if (mAuth.getCurrentUser() == null){
                 signInUser();
             }
-            else {
-                getUserProfile();
-            }
         };
 
         mAuth.addAuthStateListener(authStateListener);
 
-        checkCurrentUser();
         setTheme();
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
@@ -99,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+
 
         Button userButton = findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
@@ -162,17 +145,6 @@ public class MainActivity extends AppCompatActivity {
         setTheme();
     }
 
-    public void checkCurrentUser() {
-        // [START check_current_user]
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            getUserProfile();
-        } else {
-            signInUser();
-        }
-        // [END check_current_user]
-    }
-
     public void signInUser() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
@@ -183,14 +155,7 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
-                    checkCurrentUser();
-                    Intent data = result.getData();
-                    if (data != null) {
-                        String returnedResult = data.getStringExtra("result");
-                        if (returnedResult.equals("Register")) {
-                            askName();
-                        }
-                    }
+                    getUserProfile();
                 }
             });
 
@@ -233,11 +198,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setName(String name) {
-        username = name;
-        if (username!=null) {
+        if (name !=null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
-            builder.setDisplayName(username);
+            builder.setDisplayName(name);
             if (user != null) {
                 user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
                     if (!task1.isSuccessful()) {
@@ -247,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 DocumentReference userRef = db.collection("users").document(user.getUid());
-                userRef.update("name", username)
+                userRef.update("name", name)
                         .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                         .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
             }
@@ -259,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
                     Intent data = result.getData();
+                    getUserProfile();
                     if (data != null) {
                         String returnedResult = data.getStringExtra("result");
                         if (returnedResult.equals("logOut")) {
@@ -273,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
+                    getUserProfile();
                     Snackbar.make(findViewById(android.R.id.content), "Expense created", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -280,12 +246,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void getUserProfile() {
         // [START get_user_profile]
+        FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            email = user.getEmail();
             uid = user.getUid();
-            for (UserInfo profile : user.getProviderData()) {
-                providerId = profile.getProviderId();
-            }
             DocumentReference docRef = db.collection("users").document(uid);
             docRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -294,9 +257,11 @@ public class MainActivity extends AppCompatActivity {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         String account = document.getString("connected_account_id");
-                        String customer = document.getString("customer_id");
-                        String docName = document.getString("name");
-                        setFields(uid, docName, customer, account);
+                        String name = document.getString("name");
+                        if (name == null || name.matches("")) {
+                            askName();
+                        }
+                        setFields(uid, account);
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -305,13 +270,13 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
             });
+        } else {
+            signInUser();
         }
     }
 
-    public void setFields(String uid, String name, String customer_id, String account_id) {
-        MainActivity.name = name;
+    public void setFields(String uid, String account_id) {
         MainActivity.account_id = account_id;
-        MainActivity.customer_id = customer_id;
         MainActivity.uid = uid;
     }
 }

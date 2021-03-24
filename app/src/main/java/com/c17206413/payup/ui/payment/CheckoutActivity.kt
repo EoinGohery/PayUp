@@ -4,9 +4,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.c17206413.payup.MainActivity
 import com.c17206413.payup.R
+import com.c17206413.payup.databinding.ActivityCheckoutBinding
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.wallet.*
 import com.google.firebase.auth.FirebaseAuth
@@ -16,7 +18,6 @@ import com.stripe.android.model.ConfirmPaymentIntentParams
 import com.stripe.android.model.PaymentMethod
 import com.stripe.android.model.PaymentMethodCreateParams
 import com.stripe.android.model.StripeIntent
-import kotlinx.android.synthetic.main.activity_checkout.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -29,8 +30,11 @@ class CheckoutActivity : AppCompatActivity() {
     private var currentUser: FirebaseUser? = null
     private var docId = ""
     private var clientSecret = ""
+    private var tag = "Checkout: "
 
-    private val stripe: Stripe by lazy { Stripe(applicationContext, "pk_test_51HnPJaAXocUznruHqwf1wdNuZeIEEkX9ODwT0yuhtsv9nFPoghcpWbRLDcq3GU0k7g3RlPwCQGhCHVcMPe9nmoqB00JWK66tDF") }
+    private lateinit var binding: ActivityCheckoutBinding
+
+    private val stripe: Stripe by lazy { Stripe(applicationContext,  getString(R.string.publish_key)) }
     private val paymentsClient: PaymentsClient by lazy {
         Wallet.getPaymentsClient(
                 this,
@@ -42,7 +46,9 @@ class CheckoutActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_checkout)
+        binding = ActivityCheckoutBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         currentUser = FirebaseAuth.getInstance().currentUser
 
@@ -59,25 +65,25 @@ class CheckoutActivity : AppCompatActivity() {
         format.maximumFractionDigits = 2
         format.currency = Currency.getInstance(currency)
 
-        amount_indicator.text = format.format(amount)
+        binding.amountIndicator.text = format.format(amount)
 
-        service_name_checkout.text = serviceName
+        binding.serviceNameCheckout.text = serviceName
 
-        backButton.setOnClickListener {
+        binding.backButton.setOnClickListener {
             finish()
         }
 
-        cardInputWidget.postalCodeEnabled=false
+        binding.cardInputWidget.postalCodeEnabled=false
 
-        payButton.setOnClickListener {
+        binding.payButton.setOnClickListener {
             confirmPayment()
         }
 
-        payGoogleButton.setOnClickListener {
+        binding.payGoogleButton.setOnClickListener {
             payWithGoogle()
         }
 
-        paymentmethod.setOnClickListener {
+        binding.paymentmethod.setOnClickListener {
             // Create the customer session and kick start the payment flow
         }
 
@@ -89,11 +95,11 @@ class CheckoutActivity : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     try {
                         if (task.isSuccessful) {
-                            payGoogleButton.isEnabled = true
-                            payGoogleButton.isClickable = true
+                            binding.payGoogleButton.isEnabled = true
+                            binding.payGoogleButton.isClickable = true
                         } else {
-                            payGoogleButton.isEnabled = false
-                            payGoogleButton.isClickable = false
+                            binding.payGoogleButton.isEnabled = false
+                            binding.payGoogleButton.isClickable = false
                         }
                     } catch (exception: ApiException) {
                     }
@@ -201,7 +207,7 @@ class CheckoutActivity : AppCompatActivity() {
     }
 
     private fun confirmPayment() {
-        val params = cardInputWidget.paymentMethodCreateParams
+        val params = binding.cardInputWidget.paymentMethodCreateParams
         if (params != null) {
             val confirmParams = ConfirmPaymentIntentParams
                     .createWithPaymentMethodCreateParams(params, clientSecret)
@@ -209,6 +215,9 @@ class CheckoutActivity : AppCompatActivity() {
         }
     }
 
+    //This method cannot be replaced with the new activity result method
+    //At the time of development google pay api has not been updated
+    //to the new activity result method
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val weakActivity = WeakReference<Activity>(this)
@@ -222,16 +231,15 @@ class CheckoutActivity : AppCompatActivity() {
                         }
                     }
                     Activity.RESULT_CANCELED -> {
-                        // Cancelled
+                        displayAlert(weakActivity.get()!!, "Payment cancelled", "Please try again.", restartDemo = true)
                     }
                     AutoResolveHelper.RESULT_ERROR -> {
                         // Log the status for debugging
-                        // Generally there is no need to show an error to
-                        // the user as the Google Payment API will do that
                         val status = AutoResolveHelper.getStatusFromIntent(data)
+                        Log.w(tag, status.toString())
                     }
                     else -> {
-                        // Do nothing.
+                        Log.w(tag, "Unidentified issue")
                     }
                 }
             }
@@ -244,8 +252,7 @@ class CheckoutActivity : AppCompatActivity() {
                         if (status == StripeIntent.Status.Succeeded) {
                             displayAlert(weakActivity.get()!!, "Payment succeeded", "Returning", restartDemo = true)
                         } else {
-                            displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message
-                                    ?: "")
+                            displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message ?: "")
                         }
                     }
 
@@ -265,7 +272,7 @@ class CheckoutActivity : AppCompatActivity() {
                 )
 
         // now use the `paymentMethodCreateParams` object to create a PaymentMethod
-        val params = stripe.createPaymentMethod(
+        stripe.createPaymentMethod(
                 paymentMethodCreateParams,
                 callback = object : ApiResultCallback<PaymentMethod> {
                     override fun onSuccess(result: PaymentMethod) {

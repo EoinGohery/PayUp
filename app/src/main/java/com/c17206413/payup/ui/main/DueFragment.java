@@ -23,6 +23,7 @@ import com.c17206413.payup.ui.model.Payment;
 import com.c17206413.payup.ui.payment.CheckoutActivity;
 import com.c17206413.payup.ui.payment.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -36,6 +37,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
 
     private static final String TAG = "DUE";
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     private List<Payment> mPayments;
     private RecyclerView dueRecycler;
@@ -57,6 +59,8 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         mPayments = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
 
+        mAuth = FirebaseAuth.getInstance();
+
         dueRecycler = root.findViewById(R.id.paymentRecycler);
         dueRecycler.setHasFixedSize(true);
         dueRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -77,31 +81,33 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
     }
 
     private void readPayments() {
-        String uid = MainActivity.getUid();
-        db.collection("users").document(uid).collection("due")
-                .whereEqualTo("active", true)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        mPayments.clear();
-                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                            String serviceName = document.getString("service_name");
-                            Currency currency = Currency.getInstance(document.getString("currency"));
-                            String name = document.getString("user_name");
-                            String clientSecret = document.getString("clientSecret");
-                            Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
-                            String id = document.getId();
-                            String dateTime = document.getString("date_time");
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true, dateTime);
-                            mPayments.add(paymentDetails);
+        if ( mAuth.getCurrentUser() != null) {
+            String uid = MainActivity.getUid();
+            db.collection("users").document(uid).collection("due")
+                    .whereEqualTo("active", true)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            mPayments.clear();
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                String serviceName = document.getString("service_name");
+                                Currency currency = Currency.getInstance(document.getString("currency"));
+                                String name = document.getString("user_name");
+                                String clientSecret = document.getString("clientSecret");
+                                Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
+                                String id = document.getId();
+                                String dateTime = document.getString("date_time");
+                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true, dateTime);
+                                mPayments.add(paymentDetails);
+                            }
+                            paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
+                            dueRecycler.setAdapter(paymentAdapter);
+                        } else {
+                            Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
                         }
-                        paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
-                        dueRecycler.setAdapter(paymentAdapter);
-                    } else {
-                        Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-                });
+                    });
+        }
     }
 
     private void launchPayment(Payment paymentDetail) {

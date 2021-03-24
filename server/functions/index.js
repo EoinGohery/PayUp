@@ -25,6 +25,7 @@ exports.createUserDocument = functions.auth.user().onCreate(async (user) => {
     customer_id: customer.id,
     name: user.displayName,
   });
+
   return;
 });
 
@@ -194,13 +195,74 @@ exports.cleanupUser = functions.auth.user().onDelete(async (user) => {
     .collection('payment_methods')
     .get();
   snapshot.forEach((snap) => snap.ref.delete());
+
+  //delete any paymetns incoming
+  try {
+    const incomingSnapshot = await dbRef
+      .doc(user.uid)
+      .collection('incoming')
+      .get();
+    incomingSnapshot.forEach((snap) => {
+      snap.ref.delete();
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  //delete any paymetns due
+  try {
+    const dueSnapshot = await dbRef
+      .doc(user.uid)
+      .collection('due')
+      .get();
+    dueSnapshot.forEach((snap) => {
+      snap.ref.delete();
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  //delete user document
   await dbRef.doc(user.uid).delete();
+
   //delete the connected account attached to this user
   const connected_account_id = customer.connected_account_id
   await stripe.oauth.deauthorize({
     client_id: 'ca_IOBii6j7E2TGUDjLMBChG5j65L8sq8GN',
     stripe_user_id: connected_account_id,
   });
+});
+
+/**
+* When a incoming payment is deleted it is removed from the corrisponding due 
+*/
+exports.incomingDeleted = functions.firestore
+.document('users/{userId}/incoming/{pushId}')
+.onDelete(async (snap, context) => {
+  try {
+    const push_id = context.params.pushId;
+    const user_id = snap.data().user_id;
+    await admin.firestore().collection('users').doc(user_id).collection('due').doc(push_id).delete();
+  } catch (error) {
+    console.log(error);
+    await reportError(error, { user: context.params.userId });
+  }
+});
+
+/**
+* When a due payment is deleted it is removed from the corrisponding incoming 
+*/
+exports.dueDeleted = functions.firestore
+.document('users/{userId}/due/{pushId}')
+.onDelete(async (snap, context) => {
+  try {
+    const push_id = context.params.pushId;
+    const user_id = snap.data().user_id;
+    await admin.firestore().collection('users').doc(user_id).collection('incoming').doc(push_id).delete();
+  } catch (error) {
+    console.log(error);
+    await reportError(error, { user: context.params.userId });
+  }
 });
 
 function reportError(err, context = {}) {

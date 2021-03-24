@@ -22,6 +22,7 @@ import com.c17206413.payup.ui.adapter.PaymentAdapter;
 import com.c17206413.payup.ui.model.Payment;
 import com.c17206413.payup.ui.payment.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -38,6 +39,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     private List<Payment> mPayments;
     private RecyclerView incomingRecycler;
     private View root;
+    private FirebaseAuth mAuth;
     private SwipeRefreshLayout pullToRefresh;
 
     private PaymentAdapter paymentAdapter;
@@ -58,6 +60,8 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         incomingRecycler.setHasFixedSize(true);
         incomingRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        mAuth = FirebaseAuth.getInstance();
+
         pullToRefresh = root.findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> {
             pullToRefresh.setRefreshing(true);
@@ -73,32 +77,34 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     }
 
     private void readPayments() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = MainActivity.getUid();
-        db.collection("users").document(uid).collection("incoming")
-                .whereEqualTo("active", true)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        mPayments.clear();
-                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                            String serviceName = document.getString("service_name");
-                            Currency currency = Currency.getInstance(document.getString("currency"));
-                            String name = document.getString("user_name");
-                            String clientSecret = document.getString("clientSecret");
-                            Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount")))/100;
-                            String id = document.getId();
-                            String dateTime = document.getString("date_time");
-                            Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateTime);
-                            mPayments.add(paymentDetails);
+        if ( mAuth.getCurrentUser() != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            String uid = MainActivity.getUid();
+            db.collection("users").document(uid).collection("incoming")
+                    .whereEqualTo("active", true)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            mPayments.clear();
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                String serviceName = document.getString("service_name");
+                                Currency currency = Currency.getInstance(document.getString("currency"));
+                                String name = document.getString("user_name");
+                                String clientSecret = document.getString("clientSecret");
+                                Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
+                                String id = document.getId();
+                                String dateTime = document.getString("date_time");
+                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateTime);
+                                mPayments.add(paymentDetails);
+                            }
+                            paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
+                            incomingRecycler.setAdapter(paymentAdapter);
+                        } else {
+                            Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments incoming.", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
                         }
-                        paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
-                        incomingRecycler.setAdapter(paymentAdapter);
-                    } else {
-                        Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments incoming.", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-                });
+                    });
+        }
     }
 
     private void viewPayment(Payment paymentDetail) {
