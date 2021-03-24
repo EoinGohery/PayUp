@@ -162,22 +162,6 @@ public class SignIn extends AppCompatActivity {
         MainActivity.checkInternetConnection(this);
     }
 
-    public void showHashKey(Context context) {
-        try {
-            PackageInfo info = context.getPackageManager().getPackageInfo(
-                    "com.example.tryitonjewelry", PackageManager.GET_SIGNATURES); //Your            package name here
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Snackbar.make(findViewById(android.R.id.content), Base64.encodeToString(md.digest(), Base64.DEFAULT), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                Log.i("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-        } catch (NoSuchAlgorithmException e) {
-        }
-    }
-
     //for facebook activity result
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
