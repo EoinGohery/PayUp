@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
+        getUserProfile();
 
         Button userButton = findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());

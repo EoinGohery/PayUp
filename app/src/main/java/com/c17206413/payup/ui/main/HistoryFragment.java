@@ -77,49 +77,51 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
         if ( mAuth.getCurrentUser() != null) {
             mPayments.clear();
             String uid = MainActivity.getUid();
-            db.collection("users").document(uid).collection("due")
-                    .whereEqualTo("active", false)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                String serviceName = document.getString("service_name");
-                                Currency currency = Currency.getInstance(document.getString("currency"));
-                                String name = document.getString("user_name");
-                                String clientSecret = document.getString("clientSecret");
-                                Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
-                                String id = document.getId();
-                                String dateTime = document.getString("date_time");
-                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false, dateTime);
-                                addToRecycler(paymentDetails);
-                            }
+            if (uid != null) {
+                db.collection("users").document(uid).collection("due")
+                        .whereEqualTo("active", false)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                    String serviceName = document.getString("service_name");
+                                    Currency currency = Currency.getInstance(document.getString("currency"));
+                                    String name = document.getString("user_name");
+                                    String clientSecret = document.getString("clientSecret");
+                                    Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
+                                    String id = document.getId();
+                                    String dateTime = document.getString("date_time");
+                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false, dateTime);
+                                    addToRecycler(paymentDetails);
+                                }
 
-                        } else {
-                            Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        }
-                    });
-            db.collection("users").document(uid).collection("incoming")
-                    .whereEqualTo("active", false)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                String serviceName = document.getString("service_name");
-                                Currency currency = Currency.getInstance(document.getString("currency"));
-                                String name = document.getString("user_name");
-                                String clientSecret = document.getString("clientSecret");
-                                Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
-                                String id = document.getId();
-                                String dateTime = document.getString("date_time");
-                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false, dateTime);
-                                addToRecycler(paymentDetails);
+                            } else {
+                                Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                                        .setAction("Action", null).show();
                             }
-                        } else {
-                            Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments incoming.", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        }
-                    });
+                        });
+                db.collection("users").document(uid).collection("incoming")
+                        .whereEqualTo("active", false)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                    String serviceName = document.getString("service_name");
+                                    Currency currency = Currency.getInstance(document.getString("currency"));
+                                    String name = document.getString("user_name");
+                                    String clientSecret = document.getString("clientSecret");
+                                    Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
+                                    String id = document.getId();
+                                    String dateTime = document.getString("date_time");
+                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false, dateTime);
+                                    addToRecycler(paymentDetails);
+                                }
+                            } else {
+                                Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments incoming.", Snackbar.LENGTH_LONG)
+                                        .setAction("Action", null).show();
+                            }
+                        });
+            }
         }
     }
 

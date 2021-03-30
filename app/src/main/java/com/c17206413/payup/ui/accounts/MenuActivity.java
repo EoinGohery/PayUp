@@ -5,11 +5,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.preference.PreferenceManager;
+
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,12 +24,17 @@ import androidx.appcompat.widget.SwitchCompat;
 
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Objects;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -35,6 +46,8 @@ public class MenuActivity extends AppCompatActivity {
     private FirebaseUser user;
 
     private TextView stripeAccount;
+    private TextView emailText;
+    private EditText nameEdit;
 
     // user details
     private String providerId, uid, name, email, language, customer_id, account_id;
@@ -46,6 +59,8 @@ public class MenuActivity extends AppCompatActivity {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
         setContentView(R.layout.activity_menu);
+
+        nameEdit = findViewById(R.id.nameEdit);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -62,13 +77,18 @@ public class MenuActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         Button saveButton= findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(v -> finish());
+        saveButton.setOnClickListener(v -> setName(nameEdit.getText().toString()));
 
         Button logOutButton= findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(v -> logOut());
 
         stripeAccount= findViewById(R.id.stripeAccountButton);
         stripeAccount.setOnClickListener(v -> startActivity(new Intent(MenuActivity.this, SripeOnboardingView.class)));
+
+        emailText= findViewById(R.id.emailText);
+        LinearLayout emailLayout= findViewById(R.id.emailLayout);
+        LinearLayout nameLayout= findViewById(R.id.nameLayout);
+
 
         Button accountButton= findViewById(R.id.accountsButton);
         accountButton.setOnClickListener(v -> {
@@ -78,6 +98,22 @@ public class MenuActivity extends AppCompatActivity {
                 stripeAccount.setVisibility(View.GONE);
             }
         });
+
+        Button userButton= findViewById(R.id.userDetails);
+        userButton.setOnClickListener(v -> {
+            if (nameLayout.getVisibility() == View.GONE) {
+                nameLayout.setVisibility(View.VISIBLE);
+            } else if(nameLayout.getVisibility()==View.VISIBLE) {
+                nameLayout.setVisibility(View.GONE);
+            }
+            if (emailLayout.getVisibility() == View.GONE) {
+                emailLayout.setVisibility(View.VISIBLE);
+            } else if(emailLayout.getVisibility()==View.VISIBLE) {
+                emailLayout.setVisibility(View.GONE);
+            }
+        });
+
+
 
         MainActivity.checkInternetConnection(this);
         getUserProfile();
@@ -117,7 +153,7 @@ public class MenuActivity extends AppCompatActivity {
                         String account = document.getString("connected_account_id");
                         String customer = document.getString("customer_id");
                         String docName = document.getString("name");
-                        setFields(uid, docName, customer, account);
+                        setFields(uid, docName, customer, account, email);
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -129,9 +165,11 @@ public class MenuActivity extends AppCompatActivity {
         }
     }
 
-    public void setFields(String uid, String name, String customer_id, String account_id) {
+    public void setFields(String uid, String name, String customer_id, String account_id, String email) {
         //User user = new User(uid, name, "default");
         this.name = name;
+        nameEdit.setText(name);
+        emailText.setText(email);
         this.account_id = account_id;
         this.customer_id = customer_id;
         updateUI();
@@ -148,6 +186,27 @@ public class MenuActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
+    private void setName(String name) {
+        if (name !=null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
+            builder.setDisplayName(name);
+            if (user != null) {
+                user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
+                    if (!task1.isSuccessful()) {
+                        Snackbar.make(findViewById(android.R.id.content), "Name not Set", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+                });
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                DocumentReference userRef = db.collection("users").document(user.getUid());
+                userRef.update("name", name)
+                        .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                        .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+            }
         }
     }
 
