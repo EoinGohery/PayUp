@@ -6,15 +6,20 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.preference.PreferenceManager;
 
+import android.provider.MediaStore;
 import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,8 +27,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 
+import com.bumptech.glide.Glide;
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,8 +41,14 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.Objects;
+
+import io.grpc.Context;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -49,6 +63,10 @@ public class MenuActivity extends AppCompatActivity {
     private TextView emailText;
     private EditText nameEdit;
 
+    private ImageView profile_image;
+
+    private StorageReference mStorageRef;
+
     // user details
     private String providerId, uid, name, email, language, customer_id, account_id;
 
@@ -61,6 +79,11 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         nameEdit = findViewById(R.id.nameEdit);
+
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+        profile_image = findViewById(R.id.profileImage);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -77,7 +100,7 @@ public class MenuActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         Button saveButton= findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(v -> setName(nameEdit.getText().toString()));
+        saveButton.setOnClickListener(v -> updateName());
 
         Button logOutButton= findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(v -> logOut());
@@ -113,7 +136,14 @@ public class MenuActivity extends AppCompatActivity {
             }
         });
 
-
+        profile_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //open gallery
+                Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                galleryResultLauncher.launch(openGalleryIntent);
+            }
+        });
 
         MainActivity.checkInternetConnection(this);
         getUserProfile();
@@ -153,7 +183,12 @@ public class MenuActivity extends AppCompatActivity {
                         String account = document.getString("connected_account_id");
                         String customer = document.getString("customer_id");
                         String docName = document.getString("name");
-                        setFields(uid, docName, customer, account, email);
+                        String profile = document.getString("profileUrl");
+                        Uri profileUri = null;
+                        if (profile != null) {
+                            profileUri = Uri.parse(profile);
+                        }
+                        setFields(uid, docName, customer, account, email, profileUri);
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -165,13 +200,20 @@ public class MenuActivity extends AppCompatActivity {
         }
     }
 
-    public void setFields(String uid, String name, String customer_id, String account_id, String email) {
+    public void setFields(String uid, String name, String customer_id, String account_id, String email, Uri photoUri) {
         //User user = new User(uid, name, "default");
         this.name = name;
         nameEdit.setText(name);
         emailText.setText(email);
         this.account_id = account_id;
         this.customer_id = customer_id;
+
+        if (photoUri == null) {
+            profile_image.setImageResource(R.mipmap.ic_launcher);
+        } else {
+            Glide.with(MenuActivity.this).load(photoUri).into(profile_image);
+        }
+
         updateUI();
     }
 
@@ -189,8 +231,9 @@ public class MenuActivity extends AppCompatActivity {
         }
     }
 
-    private void setName(String name) {
-        if (name !=null) {
+    private void updateName() {
+        String name = nameEdit.getText().toString();
+        if (!name.matches("")) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
             builder.setDisplayName(name);
@@ -206,6 +249,7 @@ public class MenuActivity extends AppCompatActivity {
                 userRef.update("name", name)
                         .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                         .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+
             }
         }
     }
@@ -215,5 +259,58 @@ public class MenuActivity extends AppCompatActivity {
         data.putExtra("result", "logOut");
         setResult(RESULT_OK, data);
         finish();
+    }
+
+    ActivityResultLauncher<Intent> galleryResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                       Uri image = data.getData();
+                       uploadImage(image);
+                    }
+                }
+            });
+
+    private void uploadImage(Uri image) {
+        StorageReference fileRef = mStorageRef.child(uid + "/profile.jpg");
+        fileRef.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Snackbar.make(findViewById(android.R.id.content), "Image Uploaded", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        Glide.with(MenuActivity.this).load(uri).into(profile_image);
+                        UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
+                        builder.setPhotoUri(uri);
+                        user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
+                            if (!task1.isSuccessful()) {
+                                Log.d(TAG, "Profile image successfully updated");
+                            }
+                        });
+                        DocumentReference userRef = db.collection("users").document(user.getUid());
+                        userRef.update("profileUrl", uri.toString())
+                                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated"))
+                                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Profile image failed to update ", e);
+                Snackbar.make(findViewById(android.R.id.content), "Image not Uploaded", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                Snackbar.make(findViewById(android.R.id.content), "Uploading", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 }

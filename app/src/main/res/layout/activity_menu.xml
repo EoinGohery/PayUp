@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -56,6 +57,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:src="@mipmap/ic_launcher_round"
+                tools:ignore="InefficientWeight" />
 
             <Button
                 android:id="@+id/accountsButton"
@@ -191,8 +202,8 @@
                 android:layout_gravity="end"
                 android:gravity="start|center_vertical"
                 android:insetLeft="-2dp"
-                android:insetRight="-2dp"
                 android:insetTop="0dp"
+                android:insetRight="-2dp"
                 android:insetBottom="0dp"
                 android:text="@string/fui_button_text_save"
                 android:textColor="@color/textColor"

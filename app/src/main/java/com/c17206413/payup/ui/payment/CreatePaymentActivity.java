@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -205,9 +206,10 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String id = document.getId();
                             String username = document.getString("name");
-                            String profileUrl = document.getString("ProfileUrl");
-                            if (profileUrl == null) {
-                                profileUrl="default";
+                            String profile = document.getString("profileUrl");
+                            Uri profileUrl = null;
+                            if (profile != null) {
+                                profileUrl = Uri.parse(profile);
                             }
                             User user = new User(id, username, profileUrl);
                             assert firebaseUser != null;
