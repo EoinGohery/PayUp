@@ -39,7 +39,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User user = mUsers.get(position);
         holder.username.setText(user.getUsername());
-        if (user.getImageUrl().equals("default")) {
+        if (user.getImageUrl() == null) {
             holder.profile_image.setImageResource(R.mipmap.ic_launcher);
         } else {
             Glide.with(mContext).load(user.getImageUrl()).into(holder.profile_image);

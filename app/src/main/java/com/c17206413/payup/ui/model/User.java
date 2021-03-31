@@ -1,13 +1,15 @@
 package com.c17206413.payup.ui.model;
 
+import android.net.Uri;
+
 public class User {
 
     private String id;
     private String username;
-    private String imageUrl;
+    private Uri imageUrl;
     private Boolean isSelected;
 
-    public User(String id, String username, String imageUrl) {
+    public User(String id, String username, Uri imageUrl) {
         this.id = id;
         this.username = username;
         this.imageUrl = imageUrl;
@@ -30,17 +32,15 @@ public class User {
         this.username = username;
     }
 
-    public String getImageUrl() {
+    public Uri getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
+    public void setImageUrl(Uri imageUrl) {
         this.imageUrl = imageUrl;
     }
 
     public Boolean getSelected() { return isSelected; }
-
-    public void setSelected(Boolean selected) { isSelected = selected; }
 
     public void swapSelected() { isSelected = !isSelected; }
 }

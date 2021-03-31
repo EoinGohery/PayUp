@@ -5,6 +5,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.c17206413.payup.MainActivity
 import com.c17206413.payup.R
@@ -30,11 +33,11 @@ class CheckoutActivity : AppCompatActivity() {
     private var currentUser: FirebaseUser? = null
     private var docId = ""
     private var clientSecret = ""
-    private var tag = "Checkout: "
+    private var tag = "Checkout"
 
     private lateinit var binding: ActivityCheckoutBinding
 
-    private val stripe: Stripe by lazy { Stripe(applicationContext,  getString(R.string.publish_key)) }
+    private val stripe: Stripe by lazy { Stripe(applicationContext, getString(R.string.publish_key)) }
     private val paymentsClient: PaymentsClient by lazy {
         Wallet.getPaymentsClient(
                 this,
@@ -76,10 +79,12 @@ class CheckoutActivity : AppCompatActivity() {
         binding.cardInputWidget.postalCodeEnabled=false
 
         binding.payButton.setOnClickListener {
+            binding.progressBar.visibility = VISIBLE
             confirmPayment()
         }
 
         binding.payGoogleButton.setOnClickListener {
+            binding.progressBar.visibility = VISIBLE
             payWithGoogle()
         }
 
@@ -231,7 +236,8 @@ class CheckoutActivity : AppCompatActivity() {
                         }
                     }
                     Activity.RESULT_CANCELED -> {
-                        displayAlert(weakActivity.get()!!, "Payment cancelled", "Please try again.", restartDemo = true)
+                        displayAlert(weakActivity.get()!!, "Payment cancelled", "Please try again.", restartDemo = false)
+                        binding.progressBar.visibility = INVISIBLE
                     }
                     AutoResolveHelper.RESULT_ERROR -> {
                         // Log the status for debugging
@@ -240,6 +246,7 @@ class CheckoutActivity : AppCompatActivity() {
                     }
                     else -> {
                         Log.w(tag, "Unidentified issue")
+                        binding.progressBar.visibility = INVISIBLE
                     }
                 }
             }
@@ -253,11 +260,13 @@ class CheckoutActivity : AppCompatActivity() {
                             displayAlert(weakActivity.get()!!, "Payment succeeded", "Returning", restartDemo = true)
                         } else {
                             displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message ?: "")
+                            binding.progressBar.visibility = INVISIBLE
                         }
                     }
 
                     override fun onError(e: Exception) {
                         displayAlert(weakActivity.get()!!, "Payment failed", e.toString())
+                        binding.progressBar.visibility = INVISIBLE
                     }
                 })
             }

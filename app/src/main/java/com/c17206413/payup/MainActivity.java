@@ -3,9 +3,9 @@ package com.c17206413.payup;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -17,13 +17,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.widget.NestedScrollView;
-import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.SripeOnboardingView;
 import com.c17206413.payup.ui.adapter.SectionsPagerAdapter;
+import com.c17206413.payup.ui.model.CurrentUser;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -42,16 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    // user details
-    private static String uid;
-    private static String account_id;
+    private static final CurrentUser currentUser = new CurrentUser();
 
-
-    public static final String NIGHT_MODE = "NIGHT_MODE";
-    private static SharedPreferences mPrefs;
-
-    public static String getUid() {
-        return uid;
+    public static CurrentUser getCurrentUser() {
+        return currentUser;
     }
 
     @Override
@@ -63,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
             if (mAuth.getCurrentUser() == null){
@@ -73,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth.addAuthStateListener(authStateListener);
 
-        setTheme();
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
@@ -82,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
+        getUserProfile();
 
         Button userButton = findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
@@ -109,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createPayment() {
-        if (account_id==null) {
+        if (currentUser.getAccount_id()==null) {
             startActivity(new Intent(MainActivity.this, SripeOnboardingView.class));
         } else {
             Intent intent = new Intent(this, CreatePaymentActivity.class);
@@ -123,30 +116,20 @@ public class MainActivity extends AppCompatActivity {
         mAuth.signOut();
     }
 
-    public static void setTheme() {
-        boolean isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
-        if (isNightModeEnabled) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        setTheme();
+        getUserProfile();
         checkInternetConnection(this);
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
-        setTheme();
+        getUserProfile();
     }
 
     public void signInUser() {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
         loginResultLauncher.launch(intent);
     }
@@ -227,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
                     if (data != null) {
                         String returnedResult = data.getStringExtra("result");
                         if (returnedResult.equals("logOut")) {
+                            currentUser.reset();
                             signOut();
                         }
                     }
@@ -238,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
-                    getUserProfile();
                     Snackbar.make(findViewById(android.R.id.content), "Expense created", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -247,8 +230,9 @@ public class MainActivity extends AppCompatActivity {
     public void getUserProfile() {
         // [START get_user_profile]
         FirebaseUser user = mAuth.getCurrentUser();
+        currentUser.reset();
         if (user != null) {
-            uid = user.getUid();
+            String uid = user.getUid();
             DocumentReference docRef = db.collection("users").document(uid);
             docRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -256,12 +240,25 @@ public class MainActivity extends AppCompatActivity {
                     assert document != null;
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        String account = document.getString("connected_account_id");
+                        currentUser.setAccount_id(document.getString("connected_account_id"));
+                        currentUser.setEmail(user.getEmail());
+                        currentUser.setId(uid);
+                        currentUser.setDarkMode(document.getBoolean("darkMode"));
                         String name = document.getString("name");
+                        String profile = document.getString("profileUrl");
+                        if (profile != null) {
+                            currentUser.setImageUrl(Uri.parse(profile));
+                        }
                         if (name == null || name.matches("")) {
                             askName();
+                        } else {
+                            currentUser.setUsername(name);
                         }
-                        setFields(uid, account);
+                        if (currentUser.getDarkMode()==null || !currentUser.getDarkMode()) {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        } else {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        }
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -273,10 +270,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             signInUser();
         }
-    }
-
-    public void setFields(String uid, String account_id) {
-        MainActivity.account_id = account_id;
-        MainActivity.uid = uid;
     }
 }

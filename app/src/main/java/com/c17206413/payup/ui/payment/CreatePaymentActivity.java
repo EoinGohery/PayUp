@@ -1,10 +1,8 @@
 package com.c17206413.payup.ui.payment;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -186,7 +184,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             paymentDetails.put("active", true);
             paymentDetails.put("date_time", currentDateandTime);
 
-            db.collection("users").document(MainActivity.getUid()).collection("incoming")
+            db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("incoming")
                     .document()
                     .set(paymentDetails)
                     .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
@@ -205,9 +203,10 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String id = document.getId();
                             String username = document.getString("name");
-                            String profileUrl = document.getString("ProfileUrl");
-                            if (profileUrl == null) {
-                                profileUrl="default";
+                            String profile = document.getString("profileUrl");
+                            Uri profileUrl = null;
+                            if (profile != null) {
+                                profileUrl = Uri.parse(profile);
                             }
                             User user = new User(id, username, profileUrl);
                             assert firebaseUser != null;

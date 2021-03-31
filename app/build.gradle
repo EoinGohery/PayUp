@@ -53,6 +53,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
 
     //jUnit testing
     testImplementation 'junit:junit:4.13.1'

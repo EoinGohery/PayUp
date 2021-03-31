@@ -82,31 +82,33 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
 
     private void readPayments() {
         if ( mAuth.getCurrentUser() != null) {
-            String uid = MainActivity.getUid();
-            db.collection("users").document(uid).collection("due")
-                    .whereEqualTo("active", true)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            mPayments.clear();
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                String serviceName = document.getString("service_name");
-                                Currency currency = Currency.getInstance(document.getString("currency"));
-                                String name = document.getString("user_name");
-                                String clientSecret = document.getString("clientSecret");
-                                Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
-                                String id = document.getId();
-                                String dateTime = document.getString("date_time");
-                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true, dateTime);
-                                mPayments.add(paymentDetails);
+            String uid = MainActivity.getCurrentUser().getId();
+            if (uid != null) {
+                db.collection("users").document(uid).collection("due")
+                        .whereEqualTo("active", true)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                mPayments.clear();
+                                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                    String serviceName = document.getString("service_name");
+                                    Currency currency = Currency.getInstance(document.getString("currency"));
+                                    String name = document.getString("user_name");
+                                    String clientSecret = document.getString("clientSecret");
+                                    Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
+                                    String id = document.getId();
+                                    String dateTime = document.getString("date_time");
+                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true, dateTime);
+                                    mPayments.add(paymentDetails);
+                                }
+                                paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
+                                dueRecycler.setAdapter(paymentAdapter);
+                            } else {
+                                Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                                        .setAction("Action", null).show();
                             }
-                            paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
-                            dueRecycler.setAdapter(paymentAdapter);
-                        } else {
-                            Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                        }
-                    });
+                        });
+            }
         }
     }
 
@@ -130,7 +132,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                     String returnedResult = data.getStringExtra("docId");
                     if (successful) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userRef = db.collection("users").document(MainActivity.getUid()).collection("due").document(returnedResult);
+                        DocumentReference userRef = db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("due").document(returnedResult);
                         userRef.update("active", false)
                                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                                 .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
