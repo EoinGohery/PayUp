@@ -1,11 +1,7 @@
 package com.c17206413.payup.ui.payment;
 
-import android.app.Activity;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -27,28 +23,34 @@ public class PaymentDetailsActivity extends AppCompatActivity {
         ImageButton backButton= findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
-        TextView serviceName = findViewById(R.id.service_name_details);
-        TextView amountIndicator = findViewById(R.id.amount_indicator_details);
-        TextView dateIndicator = findViewById(R.id.date_details);
+        TextView serviceName = findViewById(R.id.serviceNameDetails);
+        TextView amountIndicator = findViewById(R.id.amountIndicatorDetails);
+        TextView dateCreated = findViewById(R.id.dateCreatedDetail);
+        TextView datePaid = findViewById(R.id.datePaidDetail);
         TextView isPaid = findViewById(R.id.is_paid);
-        TextView userIndicator = findViewById(R.id.user_details);
+        TextView userIndicator = findViewById(R.id.userDetail);
+        TextView paymentMethod = findViewById(R.id.methodDetail);
 
         Bundle extras = getIntent().getExtras();
         String currency = extras.getString("currency");
         Double amount =extras.getDouble("amount");
         String service = extras.getString("serviceName");
         serviceName.setText(service);
-        //String clientSecret = extras.getString("clientSecret");
+        //String clientSecret = extras.getString("clientSecret")
 
         NumberFormat format = NumberFormat.getCurrencyInstance();
         format.setMaximumFractionDigits(2);
         format.setCurrency(Currency.getInstance(currency));
 
         amountIndicator.setText(format.format(amount));
-        dateIndicator.setText(extras.getString("dateTime"));
+        dateCreated.setText(extras.getString("dateCreated"));
+        datePaid.setText(extras.getString("datePaid"));
+        paymentMethod.setText(extras.getString("paymentMethod"));
         if (!extras.getBoolean("active")) {
             isPaid.setText(R.string.paid);
             isPaid.setTextColor(getResources().getColor(R.color.colorSuccess));
+            datePaid.setVisibility(View.INVISIBLE);
+            paymentMethod.setVisibility(View.INVISIBLE);
         }
         userIndicator.setText(extras.getString("user"));
     }

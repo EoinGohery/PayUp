@@ -74,8 +74,8 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
     }
 
     private void readPayments() {
+        mPayments.clear();
         if ( mAuth.getCurrentUser() != null) {
-            mPayments.clear();
             String uid = MainActivity.getCurrentUser().getId();
             if (uid != null) {
                 db.collection("users").document(uid).collection("due")
@@ -90,8 +90,10 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                                     String clientSecret = document.getString("clientSecret");
                                     Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
                                     String id = document.getId();
-                                    String dateTime = document.getString("date_time");
-                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false, dateTime);
+                                    String dateCreated = document.getString("date_created");
+                                    String datePaid = document.getString("date_paid");
+                                    String paymentMethod = document.getString("payment_method");
+                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
                                     addToRecycler(paymentDetails);
                                 }
 
@@ -112,8 +114,10 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                                     String clientSecret = document.getString("clientSecret");
                                     Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
                                     String id = document.getId();
-                                    String dateTime = document.getString("date_time");
-                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false, dateTime);
+                                    String dateCreated = document.getString("date_created");
+                                    String datePaid = document.getString("date_paid");
+                                    String paymentMethod = document.getString("payment_method");
+                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
                                     addToRecycler(paymentDetails);
                                 }
                             } else {
@@ -140,7 +144,9 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
-        intent.putExtra("dateTime", paymentDetail.getDateTime());
+        intent.putExtra("dateCreated", paymentDetail.getDateCreated());
+        intent.putExtra("datePaid", paymentDetail.getDatePaid());
+        intent.putExtra("paymentMethod", paymentDetail.getPaymentMethod());
         paymentDetailScreenLauncher.launch(intent);
     }
 

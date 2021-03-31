@@ -1,5 +1,6 @@
 package com.c17206413.payup.ui.main;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,8 +28,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Currency;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -77,6 +80,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     }
 
     private void readPayments() {
+        mPayments.clear();
         if ( mAuth.getCurrentUser() != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             String uid = MainActivity.getCurrentUser().getId();
@@ -86,7 +90,6 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                         .get()
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                mPayments.clear();
                                 for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                     String serviceName = document.getString("service_name");
                                     Currency currency = Currency.getInstance(document.getString("currency"));
@@ -94,8 +97,10 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                                     String clientSecret = document.getString("clientSecret");
                                     Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
                                     String id = document.getId();
-                                    String dateTime = document.getString("date_time");
-                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateTime);
+                                    String dateCreated = document.getString("date_created");
+                                    String datePaid = document.getString("date_paid");
+                                    String paymentMethod = document.getString("payment_method");
+                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
                                     mPayments.add(paymentDetails);
                                 }
                                 paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
@@ -118,7 +123,9 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
-        intent.putExtra("dateTime", paymentDetail.getDateTime());
+        intent.putExtra("dateCreated", paymentDetail.getDateCreated());
+        intent.putExtra("datePaid", paymentDetail.getDatePaid());
+        intent.putExtra("paymentMethod", paymentDetail.getPaymentMethod());
         paymentDetailScreenLauncher.launch(intent);
     }
 
@@ -139,9 +146,20 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
         Payment paymentDetail = mPayments.get(adapterPosition);
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference userRef = db.collection("users").document( MainActivity.getCurrentUser().getId()).collection("incoming").document(paymentDetail.getId());
         userRef.update("active", false)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
+        String currentDateAndTime = sdf.format(new Date());
+        userRef.update("date_paid", currentDateAndTime)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+
+        userRef.update("payment_method", "Outside App")
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                 .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
         readPayments();

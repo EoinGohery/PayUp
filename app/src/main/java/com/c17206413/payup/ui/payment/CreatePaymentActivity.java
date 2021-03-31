@@ -165,32 +165,39 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         if (!validateNameForm(serviceName)) {
             return;
         }
+        long price = Math.round((perPerson / (addedUsers.size() + includes)));
 
-        for (int i=0; i < addedUsers.size(); i++) {
-            User user = addedUsers.get(i);
-            String uid = user.getId();
-            String name = user.getUsername();
-            String amount = String.valueOf(Math.round((perPerson / (addedUsers.size() + includes))));
+        if (price >= 50 && addedUsers.size() != 0) {
+            for (int i = 0; i < addedUsers.size(); i++) {
+                User user = addedUsers.get(i);
+                String uid = user.getId();
+                String name = user.getUsername();
+                String amount = String.valueOf(price);
 
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
-            String currentDateandTime = sdf.format(new Date());
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
+                String currentDateAndTime = sdf.format(new Date());
 
-            Map<String, Object> paymentDetails = new HashMap<>();
-            paymentDetails.put("user_id", uid);
-            paymentDetails.put("user_name", name);
-            paymentDetails.put("currency", currency.getCurrencyCode());
-            paymentDetails.put("amount", amount);
-            paymentDetails.put("service_name", serviceName);
-            paymentDetails.put("active", true);
-            paymentDetails.put("date_time", currentDateandTime);
+                Map<String, Object> paymentDetails = new HashMap<>();
+                paymentDetails.put("user_id", uid);
+                paymentDetails.put("user_name", name);
+                paymentDetails.put("currency", currency.getCurrencyCode());
+                paymentDetails.put("amount", amount);
+                paymentDetails.put("service_name", serviceName);
+                paymentDetails.put("active", true);
+                paymentDetails.put("date_created", currentDateAndTime);
 
-            db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("incoming")
-                    .document()
-                    .set(paymentDetails)
-                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
-                    .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
+                db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("incoming")
+                        .document()
+                        .set(paymentDetails)
+                        .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
+                        .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
+            }
+            finish();
+        } else {
+            Snackbar.make(findViewById(android.R.id.content), "Price per person must be at least 0.50 and at least one user must be selected.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            progressBar.setVisibility(View.INVISIBLE);
         }
-        finish();
 
     }
 
@@ -231,6 +238,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
         if (serviceName.isEmpty()) {
             nameInput.setError("Required.");
             valid = false;
+            progressBar.setVisibility(View.INVISIBLE);
         } else {
             nameInput.setError(null);
         }

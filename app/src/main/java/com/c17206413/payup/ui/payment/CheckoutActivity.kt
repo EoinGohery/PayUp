@@ -1,5 +1,6 @@
 package com.c17206413.payup.ui.payment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -7,15 +8,17 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.c17206413.payup.MainActivity
 import com.c17206413.payup.R
 import com.c17206413.payup.databinding.ActivityCheckoutBinding
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.wallet.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import com.stripe.android.*
 import com.stripe.android.model.ConfirmPaymentIntentParams
 import com.stripe.android.model.PaymentMethod
@@ -25,6 +28,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -34,6 +38,7 @@ class CheckoutActivity : AppCompatActivity() {
     private var docId = ""
     private var clientSecret = ""
     private var tag = "Checkout"
+    private var paymentMethod = "Card"
 
     private lateinit var binding: ActivityCheckoutBinding
 
@@ -80,6 +85,7 @@ class CheckoutActivity : AppCompatActivity() {
 
         binding.payButton.setOnClickListener {
             binding.progressBar.visibility = VISIBLE
+            paymentMethod = "Card"
             confirmPayment()
         }
 
@@ -232,6 +238,7 @@ class CheckoutActivity : AppCompatActivity() {
                 when (resultCode) {
                     Activity.RESULT_OK -> {
                         if (data != null) {
+                            paymentMethod = "GooglePay"
                             onGooglePayResult(data)
                         }
                     }
@@ -258,6 +265,22 @@ class CheckoutActivity : AppCompatActivity() {
                         val status = paymentIntent.status
                         if (status == StripeIntent.Status.Succeeded) {
                             displayAlert(weakActivity.get()!!, "Payment succeeded", "Returning", restartDemo = true)
+                            @SuppressLint("SimpleDateFormat") val sdf = SimpleDateFormat("dd/MM/yyyy\nHH:mm z")
+                            val currentDateAndTime = sdf.format(Date())
+
+                            val db = FirebaseFirestore.getInstance()
+                            val userRef = db.collection("users").document(MainActivity.getCurrentUser().id).collection("due").document(docId)
+                            userRef.update("date_paid", currentDateAndTime)
+                                    .addOnSuccessListener { Log.d(tag, "DocumentSnapshot successfully updated!") }
+                                    .addOnFailureListener { e: java.lang.Exception? -> Log.w(tag, "Error updating document", e) }
+
+                            userRef.update("active", false)
+                                    .addOnSuccessListener { Log.d(tag, "DocumentSnapshot successfully updated!") }
+                                    .addOnFailureListener { e: java.lang.Exception? -> Log.w(tag, "Error updating document", e) }
+
+                            userRef.update("payment_method", paymentMethod)
+                                    .addOnSuccessListener { Log.d(tag, "DocumentSnapshot successfully updated!") }
+                                    .addOnFailureListener { e: java.lang.Exception? -> Log.w(tag, "Error updating document", e) }
                         } else {
                             displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message ?: "")
                             binding.progressBar.visibility = INVISIBLE
@@ -311,7 +334,6 @@ class CheckoutActivity : AppCompatActivity() {
             if (restartDemo) {
                 val intent = Intent()
                 intent.putExtra("paymentSuccess", true)
-                intent.putExtra("docId", docId)
                 setResult(RESULT_OK, intent)
                 builder.setPositiveButton("Ok") { _, _ -> finish() }
             } else {

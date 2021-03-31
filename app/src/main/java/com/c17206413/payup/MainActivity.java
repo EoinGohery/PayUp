@@ -230,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
     public void getUserProfile() {
         // [START get_user_profile]
         FirebaseUser user = mAuth.getCurrentUser();
-        currentUser.reset();
         if (user != null) {
             String uid = user.getUid();
             DocumentReference docRef = db.collection("users").document(uid);

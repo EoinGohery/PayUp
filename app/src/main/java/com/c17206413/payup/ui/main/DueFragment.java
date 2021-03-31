@@ -3,7 +3,6 @@ package com.c17206413.payup.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import com.c17206413.payup.ui.payment.CheckoutActivity;
 import com.c17206413.payup.ui.payment.PaymentDetailsActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -41,7 +39,6 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
 
     private List<Payment> mPayments;
     private RecyclerView dueRecycler;
-    private View root;
     private SwipeRefreshLayout pullToRefresh;
 
     private PaymentAdapter paymentAdapter;
@@ -54,7 +51,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.fragment, container, false);
+        View root = inflater.inflate(R.layout.fragment, container, false);
 
         mPayments = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
@@ -81,6 +78,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
     }
 
     private void readPayments() {
+        mPayments.clear();
         if ( mAuth.getCurrentUser() != null) {
             String uid = MainActivity.getCurrentUser().getId();
             if (uid != null) {
@@ -89,7 +87,6 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                         .get()
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                mPayments.clear();
                                 for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                     String serviceName = document.getString("service_name");
                                     Currency currency = Currency.getInstance(document.getString("currency"));
@@ -97,14 +94,16 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                                     String clientSecret = document.getString("clientSecret");
                                     Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
                                     String id = document.getId();
-                                    String dateTime = document.getString("date_time");
-                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true, dateTime);
+                                    String dateCreated = document.getString("date_created");
+                                    String datePaid = document.getString("date_paid");
+                                    String paymentMethod = document.getString("payment_method");
+                                    Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
                                     mPayments.add(paymentDetails);
                                 }
                                 paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
                                 dueRecycler.setAdapter(paymentAdapter);
                             } else {
-                                Snackbar.make(root.findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                                Snackbar.make(getActivity().findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
                                         .setAction("Action", null).show();
                             }
                         });
@@ -117,8 +116,11 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         intent.putExtra("clientSecret", paymentDetail.getClientSecret());
         intent.putExtra("amount", paymentDetail.getAmount());
         intent.putExtra("serviceName", paymentDetail.getServiceName());
-        intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
         intent.putExtra("id", paymentDetail.getId());
+        intent.putExtra("active", paymentDetail.getActive());
+        intent.putExtra("user", paymentDetail.getUsername());
+        intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
+        intent.putExtra("dateCreated", paymentDetail.getDateCreated());
         paymentResultLauncher.launch(intent);
     }
 
@@ -129,15 +131,11 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                     Intent data = result.getData();
                     assert data != null;
                     Boolean successful = data.getBooleanExtra("paymentSuccess", false);
-                    String returnedResult = data.getStringExtra("docId");
                     if (successful) {
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userRef = db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("due").document(returnedResult);
-                        userRef.update("active", false)
-                                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
-                                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+                        Snackbar.make(getActivity().findViewById(android.R.id.content), "Payment Successful.", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
                     } else {
-                        Snackbar.make(root.findViewById(android.R.id.content), "Payment Uncompleted.", Snackbar.LENGTH_LONG)
+                        Snackbar.make(getActivity().findViewById(android.R.id.content), "Payment Uncompleted.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
                     readPayments();
@@ -153,7 +151,9 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());
-        intent.putExtra("dateTime", paymentDetail.getDateTime());
+        intent.putExtra("dateCreated", paymentDetail.getDateCreated());
+        intent.putExtra("datePaid", paymentDetail.getDatePaid());
+        intent.putExtra("paymentMethod", paymentDetail.getPaymentMethod());
 
         paymentDetailScreenLauncher.launch(intent);
     }

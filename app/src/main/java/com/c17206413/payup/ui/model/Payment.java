@@ -11,10 +11,12 @@ public class Payment {
     private Double amount;
     private String clientSecret;
     private String id;
-    private final String dateTime;
+    private String dateCreated;
+    private String paymentMethod;
+    private String datePaid;
     private Boolean active;
 
-    public Payment(String id, String serviceName, Currency currency, String username, Double amount, String clientSecret, String type, Boolean active, String dateTime) {
+    public Payment(String id, String serviceName, Currency currency, String username, Double amount, String clientSecret, String type, Boolean active, String dateCreated, String datePaid, String paymentMethod) {
         this.serviceName = serviceName;
         this.currency = currency;
         this.username = username;
@@ -23,7 +25,9 @@ public class Payment {
         this.clientSecret = clientSecret;
         this.id = id;
         this.active = active;
-        this.dateTime = dateTime;
+        this.dateCreated = dateCreated;
+        this.paymentMethod = paymentMethod;
+        this.datePaid = datePaid;
     }
 
     public String getServiceName() {
@@ -90,7 +94,27 @@ public class Payment {
         this.active = active;
     }
 
-    public String getDateTime() {
-        return dateTime;
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getDatePaid() {
+        return datePaid;
+    }
+
+    public void setDatePaid(String datePaid) {
+        this.datePaid = datePaid;
     }
 }

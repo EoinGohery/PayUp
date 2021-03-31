@@ -38,7 +38,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="@string/checkout"
+                android:text="@string/details"
                 android:textColor="@color/colorOnPrimary"
                 android:textSize="24sp" />
 
@@ -50,58 +50,228 @@
         android:layout_width="match_parent"
         android:layout_height="50dp" />
 
-    <TextView
-        android:id="@+id/service_name_details"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="20dp"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textColor="@color/colorOnBackground"
-        android:textSize="26sp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/amount_indicator_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="20dp"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textColor="@color/colorOnBackground"
-        android:textSize="24sp" />
+        <TextView
+            android:id="@+id/serviceNameDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="20dp"
+            android:text="@string/app_name"
+            android:textAlignment="center"
+            android:textColor="@color/colorOnBackground"
+            android:textSize="30sp" />
 
-    <TextView
-        android:id="@+id/user_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="20dp"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textColor="@color/colorOnBackground"
-        android:textSize="20sp" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
-    <TextView
-        android:id="@+id/date_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="20dp"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textColor="@color/colorOnBackground"
-        android:textSize="20sp" />
+        <LinearLayout
+            android:id="@+id/userLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
+            <Button
+                android:id="@+id/userLabel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|end"
+                android:insetLeft="15dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/user"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="0dp" />
 
-    <TextView
-        android:id="@+id/is_paid"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="20dp"
-        android:text="@string/unpaid"
-        android:textAlignment="center"
-        android:textColor="@color/colorError"
-        android:textSize="30sp" />
+            <TextView
+                android:id="@+id/userDetail"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:gravity="start|center_vertical"
+                android:text="@string/user"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:drawableTint="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/amountLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/amountLabel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|end"
+                android:insetLeft="15dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/price"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="0dp" />
+
+            <TextView
+                android:id="@+id/amountIndicatorDetails"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:gravity="start|center_vertical"
+                android:text="@string/total_price"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:drawableTint="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dateCreatedLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/dateCreatedLabel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|end"
+                android:insetLeft="15dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/date"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="0dp" />
+
+            <TextView
+                android:id="@+id/dateCreatedDetail"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:gravity="start|center_vertical"
+                android:text="@string/date"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:drawableTint="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/datePaidLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/datePaidLabel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|end"
+                android:insetLeft="15dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/paid"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="0dp" />
+
+            <TextView
+                android:id="@+id/datePaidDetail"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:gravity="start|center_vertical"
+                android:text="@string/paid"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:drawableTint="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/methodLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/methodLabel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|end"
+                android:insetLeft="15dp"
+                android:insetTop="0dp"
+                android:insetRight="-2dp"
+                android:insetBottom="0dp"
+                android:text="@string/method"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:rippleColor="@color/colorRipple"
+                app:strokeColor="@color/colorSecondaryVariant"
+                app:strokeWidth="0dp" />
+
+            <TextView
+                android:id="@+id/methodDetail"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:gravity="start|center_vertical"
+                android:text="@string/method"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                app:drawableTint="@color/colorPrimary" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <TextView
+            android:id="@+id/is_paid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="20dp"
+            android:text="@string/unpaid"
+            android:textAlignment="center"
+            android:textColor="@color/colorError"
+            android:textSize="40sp" />
+    </LinearLayout>
 
 </LinearLayout>

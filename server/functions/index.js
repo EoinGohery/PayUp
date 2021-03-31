@@ -94,7 +94,7 @@ exports.authorizeStripeAccount = functions.https.onCall(async (data, context) =>
 exports.createStripePayment = functions.firestore
   .document('users/{userId}/incoming/{pushId}')
   .onCreate(async (snap, context) => {
-    const { amount, currency, user_id, service_name} = snap.data();
+    const { amount, currency, user_id, service_name, date_created} = snap.data();
     try {
       // Look up the Stripe customer id.
       const customer = (await snap.ref.parent.parent.get()).data().connected_account_id;
@@ -120,6 +120,7 @@ exports.createStripePayment = functions.firestore
         amount: amount,
         clientSecret: clientSecret,
         currency: currency,
+        date_created: date_created,
         user_id: context.params.userId,
         user_name: username,
         active: true
@@ -142,12 +143,16 @@ exports.createStripePayment = functions.firestore
     .onUpdate(async (change, context) => {
       const newValue = change.after.data();
       const active = newValue.active;
+      const date_paid = newValue.date_paid;
+      const payment_method = newValue.payment_method;
       const user_id = newValue.user_id;
       try {
         const idempotencyKey = context.params.pushId;
 
         await admin.firestore().collection('users').doc(user_id).collection('incoming').doc(idempotencyKey).update({
-          active: active
+          active: active,
+          date_paid: date_paid,
+          payment_method: payment_method
         });
 
       } catch (error) {
@@ -166,12 +171,16 @@ exports.createStripePayment = functions.firestore
   .onUpdate(async (change, context) => {
     const newValue = change.after.data();
     const active = newValue.active;
+    const date_paid = newValue.date_paid;
+    const payment_method = newValue.payment_method;
     const user_id = newValue.user_id;
     try {
       const idempotencyKey = context.params.pushId;
 
       await admin.firestore().collection('users').doc(user_id).collection('due').doc(idempotencyKey).update({
-        active: active
+        active: active,
+        date_paid: date_paid,
+        payment_method: payment_method
       });
 
     } catch (error) {

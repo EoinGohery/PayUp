@@ -53,14 +53,17 @@
     <LinearLayout
         android:id="@+id/parentLinear"
         android:layout_width="350dp"
-        android:layout_height="700dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appbar">
 
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/serviceNameLayout"
@@ -104,7 +107,7 @@
             android:id="@+id/checkBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/price_includes_youself"
+            android:text="@string/price_includes_yourself"
             android:textSize="16sp" />
 
         <TextView
