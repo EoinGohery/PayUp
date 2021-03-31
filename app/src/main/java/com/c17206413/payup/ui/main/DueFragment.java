@@ -82,7 +82,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
 
     private void readPayments() {
         if ( mAuth.getCurrentUser() != null) {
-            String uid = MainActivity.getUid();
+            String uid = MainActivity.getCurrentUser().getId();
             if (uid != null) {
                 db.collection("users").document(uid).collection("due")
                         .whereEqualTo("active", true)
@@ -132,7 +132,7 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                     String returnedResult = data.getStringExtra("docId");
                     if (successful) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userRef = db.collection("users").document(MainActivity.getUid()).collection("due").document(returnedResult);
+                        DocumentReference userRef = db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("due").document(returnedResult);
                         userRef.update("active", false)
                                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                                 .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));

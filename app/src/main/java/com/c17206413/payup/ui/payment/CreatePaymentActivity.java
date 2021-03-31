@@ -1,10 +1,7 @@
 package com.c17206413.payup.ui.payment;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -187,7 +184,7 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
             paymentDetails.put("active", true);
             paymentDetails.put("date_time", currentDateandTime);
 
-            db.collection("users").document(MainActivity.getUid()).collection("incoming")
+            db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("incoming")
                     .document()
                     .set(paymentDetails)
                     .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))

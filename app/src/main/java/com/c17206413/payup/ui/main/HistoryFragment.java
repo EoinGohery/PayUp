@@ -76,7 +76,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
     private void readPayments() {
         if ( mAuth.getCurrentUser() != null) {
             mPayments.clear();
-            String uid = MainActivity.getUid();
+            String uid = MainActivity.getCurrentUser().getId();
             if (uid != null) {
                 db.collection("users").document(uid).collection("due")
                         .whereEqualTo("active", false)

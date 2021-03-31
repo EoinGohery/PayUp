@@ -79,7 +79,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     private void readPayments() {
         if ( mAuth.getCurrentUser() != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            String uid = MainActivity.getUid();
+            String uid = MainActivity.getCurrentUser().getId();
             if (uid != null) {
                 db.collection("users").document(uid).collection("incoming")
                         .whereEqualTo("active", true)
@@ -140,7 +140,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     public void payButtonOnClick(View v, int adapterPosition) {
         Payment paymentDetail = mPayments.get(adapterPosition);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference userRef = db.collection("users").document(MainActivity.getUid()).collection("incoming").document(paymentDetail.getId());
+        DocumentReference userRef = db.collection("users").document( MainActivity.getCurrentUser().getId()).collection("incoming").document(paymentDetail.getId());
         userRef.update("active", false)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                 .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));

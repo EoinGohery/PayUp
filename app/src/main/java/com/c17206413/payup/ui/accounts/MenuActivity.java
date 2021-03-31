@@ -23,13 +23,12 @@ import androidx.appcompat.widget.SwitchCompat;
 import com.bumptech.glide.Glide;
 import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
+import com.c17206413.payup.ui.model.CurrentUser;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -51,9 +50,7 @@ public class MenuActivity extends AppCompatActivity {
 
     private StorageReference mStorageRef;
 
-    // user details
-    private String providerId, email, language, account_id;
-
+    private final CurrentUser currentUser = MainActivity.getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,82 +118,43 @@ public class MenuActivity extends AppCompatActivity {
         });
 
         MainActivity.checkInternetConnection(this);
-        getUserProfile();
+        updateUI();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        getUserProfile();
+        updateUI();
     }
 
     public void updateUI() {
-        if (account_id==null) {
+
+        nameEdit.setText(currentUser.getUsername());
+        emailText.setText(currentUser.getEmail());
+        if (currentUser.getDarkMode() == null) {
+            setIsNightModeEnabled(false);
+            darkSwitch.setChecked(false);
+        } else {
+            setIsNightModeEnabled(currentUser.getDarkMode());
+            darkSwitch.setChecked(currentUser.getDarkMode());
+        }
+
+
+        if (currentUser.getImageUrl() == null) {
+            profile_image.setImageResource(R.mipmap.ic_launcher);
+        } else {
+            Glide.with(MenuActivity.this).load(currentUser.getImageUrl()).into(profile_image);
+        }
+        if (currentUser.getAccount_id()==null) {
             stripeAccount.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.ic_delete, 0);
         } else {
             stripeAccount.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.com_facebook_button_like_icon_selected, 0);
         }
     }
 
-    public void getUserProfile() {
-        // [START get_user_profile]
-        if (user != null) {
-            email = user.getEmail();
-            for (UserInfo profile : user.getProviderData()) {
-                providerId = profile.getProviderId();
-            }
-            DocumentReference docRef = db.collection("users").document(MainActivity.getUid());
-            docRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    assert document != null;
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        String account = document.getString("connected_account_id");
-                        String docName = document.getString("name");
-                        String profile = document.getString("profileUrl");
-                        Boolean darkMode = document.getBoolean("darkMode");
-                        Uri profileUri = null;
-                        if (profile != null) {
-                            profileUri = Uri.parse(profile);
-                        }
-                        setFields(docName, account, email, profileUri, darkMode);
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                    finish();
-                }
-            });
-        }
-    }
-
-    public void setFields(String name, String account_id, String email, Uri photoUri, Boolean darkMode) {
-        //User user = new User(uid, name, "default");
-        nameEdit.setText(name);
-        emailText.setText(email);
-        this.account_id = account_id;
-        if (darkMode == null) {
-            setIsNightModeEnabled(false);
-            darkSwitch.setChecked(false);
-        } else {
-            setIsNightModeEnabled(darkMode);
-            darkSwitch.setChecked(darkMode);
-        }
-
-
-        if (photoUri == null) {
-            profile_image.setImageResource(R.mipmap.ic_launcher);
-        } else {
-            Glide.with(MenuActivity.this).load(photoUri).into(profile_image);
-        }
-
-        updateUI();
-    }
-
     @SuppressLint("ApplySharedPref")
     public void setIsNightModeEnabled(boolean NightModeEnabled) {
+        currentUser.setDarkMode(NightModeEnabled);
         if (NightModeEnabled) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
@@ -204,7 +162,7 @@ public class MenuActivity extends AppCompatActivity {
         }
         if (user != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference userRef = db.collection("users").document(MainActivity.getUid());
+            DocumentReference userRef = db.collection("users").document(currentUser.getId());
             userRef.update("darkMode", NightModeEnabled)
                     .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                     .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
@@ -237,6 +195,7 @@ public class MenuActivity extends AppCompatActivity {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
             builder.setDisplayName(name);
+            currentUser.setUsername(name);
             if (user != null) {
                 user.updateProfile(builder.build()).addOnCompleteListener(task1 -> {
                     if (!task1.isSuccessful()) {
@@ -255,8 +214,9 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void uploadImage(Uri image) {
-        StorageReference fileRef = mStorageRef.child(MainActivity.getUid() + "/profile.jpg");
+        StorageReference fileRef = mStorageRef.child(currentUser.getId() + "/profile.jpg");
         fileRef.putFile(image).addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            currentUser.setImageUrl(uri);
             Snackbar.make(findViewById(android.R.id.content), "Image Uploaded", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             Glide.with(MenuActivity.this).load(uri).into(profile_image);

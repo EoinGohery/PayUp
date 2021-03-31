@@ -53,193 +53,200 @@
         android:fitsSystemWindows="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profileImage"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                android:layout_margin="20dp"
-                android:layout_weight="1"
-                android:src="@mipmap/ic_launcher_round"
-                tools:ignore="InefficientWeight" />
-
-            <Button
-                android:id="@+id/accountsButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:gravity="start|center_vertical"
-                android:insetLeft="-2dp"
-                android:insetTop="0dp"
-                android:insetRight="-2dp"
-                android:insetBottom="-2dp"
-                android:text="@string/accounts"
-                android:textColor="@color/textColor"
-                app:rippleColor="@color/colorRipple"
-                app:strokeColor="@color/colorSecondaryVariant"
-                app:strokeWidth="1dp" />
-
-            <TextView
-                android:id="@+id/stripeAccountButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="395dp"
-                android:layout_height="45dp"
-                android:layout_gravity="end"
-                android:gravity="start|center_vertical"
-                android:insetLeft="0dp"
-                android:insetTop="-3dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/stripe_account"
-                android:textAlignment="textStart"
-                android:textAllCaps="true"
-                android:textColor="@color/textColor"
-                android:visibility="gone"
-                app:drawableTint="@color/colorPrimary" />
-
-            <Button
-                android:id="@+id/userDetails"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:gravity="start|center_vertical"
-                android:insetLeft="-2dp"
-                android:insetTop="0dp"
-                android:insetRight="-2dp"
-                android:insetBottom="-2dp"
-                android:text="@string/user"
-                android:textColor="@color/textColor"
-                app:rippleColor="@color/colorRipple"
-                app:strokeColor="@color/colorSecondaryVariant"
-                app:strokeWidth="1dp" />
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/emailLayout"
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:layout_editor_absoluteY="56dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="20dp"
+                    android:layout_weight="1"
+                    android:src="@mipmap/ic_launcher_round"
+                    tools:ignore="InefficientWeight" />
 
                 <Button
-                    android:id="@+id/emailLabel"
+                    android:id="@+id/accountsButton"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:gravity="start|center_vertical"
-                    android:insetLeft="15dp"
+                    android:insetLeft="-2dp"
                     android:insetTop="0dp"
                     android:insetRight="-2dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/email"
+                    android:insetBottom="-2dp"
+                    android:text="@string/accounts"
                     android:textColor="@color/textColor"
                     app:rippleColor="@color/colorRipple"
                     app:strokeColor="@color/colorSecondaryVariant"
-                    app:strokeWidth="0dp" />
+                    app:strokeWidth="1dp" />
 
                 <TextView
-                    android:id="@+id/emailText"
+                    android:id="@+id/stripeAccountButton"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent"
+                    android:layout_width="395dp"
                     android:layout_height="45dp"
                     android:layout_gravity="end"
                     android:gravity="start|center_vertical"
-                    android:text="@string/email"
+                    android:insetLeft="0dp"
+                    android:insetTop="-3dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/stripe_account"
                     android:textAlignment="textStart"
-                    android:textAllCaps="false"
+                    android:textAllCaps="true"
                     android:textColor="@color/textColor"
+                    android:visibility="gone"
                     app:drawableTint="@color/colorPrimary" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/nameLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:visibility="gone">
 
                 <Button
-                    android:id="@+id/nameLabel"
+                    android:id="@+id/userDetails"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:gravity="start|center_vertical"
-                    android:insetLeft="15dp"
+                    android:insetLeft="-2dp"
                     android:insetTop="0dp"
                     android:insetRight="-2dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/name"
+                    android:insetBottom="-2dp"
+                    android:text="@string/user"
                     android:textColor="@color/textColor"
                     app:rippleColor="@color/colorRipple"
                     app:strokeColor="@color/colorSecondaryVariant"
-                    app:strokeWidth="0dp" />
+                    app:strokeWidth="1dp" />
 
-                <EditText
-                    android:id="@+id/nameEdit"
+                <LinearLayout
+                    android:id="@+id/emailLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <Button
+                        android:id="@+id/emailLabel"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        android:gravity="start|center_vertical"
+                        android:insetLeft="15dp"
+                        android:insetTop="0dp"
+                        android:insetRight="-2dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/email"
+                        android:textColor="@color/textColor"
+                        app:rippleColor="@color/colorRipple"
+                        app:strokeColor="@color/colorSecondaryVariant"
+                        app:strokeWidth="0dp" />
+
+                    <TextView
+                        android:id="@+id/emailText"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:layout_gravity="end"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/email"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/textColor"
+                        app:drawableTint="@color/colorPrimary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/nameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <Button
+                        android:id="@+id/nameLabel"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        android:gravity="start|center_vertical"
+                        android:insetLeft="15dp"
+                        android:insetTop="0dp"
+                        android:insetRight="-2dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/name"
+                        android:textColor="@color/textColor"
+                        app:rippleColor="@color/colorRipple"
+                        app:strokeColor="@color/colorSecondaryVariant"
+                        app:strokeWidth="0dp" />
+
+                    <EditText
+                        android:id="@+id/nameEdit"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_gravity="end"
+                        android:autofillHints=""
+                        android:gravity="start|center_vertical"
+                        android:inputType="textPersonName"
+                        android:text="@string/name"
+                        android:textAlignment="inherit"
+                        android:textColor="@color/textColor"
+                        app:drawableTint="@color/colorPrimary"
+                        tools:ignore="LabelFor" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/saveButton"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="46dp"
+                    android:layout_height="45dp"
                     android:layout_gravity="end"
-                    android:autofillHints=""
                     android:gravity="start|center_vertical"
-                    android:inputType="textPersonName"
-                    android:text="@string/name"
-                    android:textAlignment="inherit"
+                    android:insetLeft="-2dp"
+                    android:insetTop="0dp"
+                    android:insetRight="-2dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/fui_button_text_save"
                     android:textColor="@color/textColor"
-                    app:drawableTint="@color/colorPrimary"
-                    tools:ignore="LabelFor" />
+                    app:rippleColor="@color/colorRipple"
+                    app:strokeColor="@color/colorSecondaryVariant"
+                    app:strokeWidth="1dp" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/darkModeSwitch"
+                    android:layout_width="380dp"
+                    android:layout_height="45dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/dark_mode"
+                    android:textAlignment="inherit"
+                    android:textAllCaps="true"
+                    android:textColor="@color/textColor"
+                    android:translationX="13dp" />
+
+                <Button
+                    android:id="@+id/logOutButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:gravity="start|center_vertical"
+                    android:insetLeft="-2dp"
+                    android:insetTop="0dp"
+                    android:insetRight="-2dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/com_facebook_loginview_log_out_button"
+                    android:textColor="@color/textColor"
+                    app:rippleColor="@color/colorRipple"
+                    app:strokeColor="@color/colorSecondaryVariant"
+                    app:strokeWidth="1dp" />
 
             </LinearLayout>
-
-            <Button
-                android:id="@+id/saveButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_gravity="end"
-                android:gravity="start|center_vertical"
-                android:insetLeft="-2dp"
-                android:insetTop="0dp"
-                android:insetRight="-2dp"
-                android:insetBottom="0dp"
-                android:text="@string/fui_button_text_save"
-                android:textColor="@color/textColor"
-                app:rippleColor="@color/colorRipple"
-                app:strokeColor="@color/colorSecondaryVariant"
-                app:strokeWidth="1dp" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/darkModeSwitch"
-                android:layout_width="380dp"
-                android:layout_height="45dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/dark_mode"
-                android:textAlignment="inherit"
-                android:textAllCaps="true"
-                android:textColor="@color/textColor"
-                android:translationX="13dp" />
-
-            <Button
-                android:id="@+id/logOutButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:gravity="start|center_vertical"
-                android:insetLeft="-2dp"
-                android:insetTop="0dp"
-                android:insetRight="-2dp"
-                android:insetBottom="0dp"
-                android:text="@string/com_facebook_loginview_log_out_button"
-                android:textColor="@color/textColor"
-                app:rippleColor="@color/colorRipple"
-                app:strokeColor="@color/colorSecondaryVariant"
-                app:strokeWidth="1dp" />
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
