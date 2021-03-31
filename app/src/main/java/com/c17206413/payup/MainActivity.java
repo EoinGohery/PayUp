@@ -47,11 +47,13 @@ public class MainActivity extends AppCompatActivity {
     private static String account_id;
 
 
-    public static final String NIGHT_MODE = "NIGHT_MODE";
-    private static SharedPreferences mPrefs;
 
     public static String getUid() {
         return uid;
+    }
+
+    public static String getAccount() {
+        return account_id;
     }
 
     @Override
@@ -63,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
             if (mAuth.getCurrentUser() == null){
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth.addAuthStateListener(authStateListener);
 
-        setTheme();
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
@@ -124,30 +124,20 @@ public class MainActivity extends AppCompatActivity {
         mAuth.signOut();
     }
 
-    public static void setTheme() {
-        boolean isNightModeEnabled = mPrefs.getBoolean(NIGHT_MODE, false);
-        if (isNightModeEnabled) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        setTheme();
+        getUserProfile();
         checkInternetConnection(this);
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
-        setTheme();
+        getUserProfile();
     }
 
     public void signInUser() {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Intent intent = new Intent(this, SignIn.class);
         loginResultLauncher.launch(intent);
     }
@@ -258,9 +248,15 @@ public class MainActivity extends AppCompatActivity {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         String account = document.getString("connected_account_id");
+                        Boolean darkMode = document.getBoolean("darkMode");
                         String name = document.getString("name");
                         if (name == null || name.matches("")) {
                             askName();
+                        }
+                        if (darkMode==null || !darkMode) {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        } else {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                         }
                         setFields(uid, account);
                     } else {

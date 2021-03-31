@@ -60,10 +60,10 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profileImage"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_gravity="center"
-                android:layout_margin="10dp"
+                android:layout_margin="20dp"
                 android:layout_weight="1"
                 android:src="@mipmap/ic_launcher_round"
                 tools:ignore="InefficientWeight" />
@@ -77,12 +77,12 @@
                 android:insetLeft="-2dp"
                 android:insetTop="0dp"
                 android:insetRight="-2dp"
-                android:insetBottom="0dp"
+                android:insetBottom="-2dp"
                 android:text="@string/accounts"
                 android:textColor="@color/textColor"
                 app:rippleColor="@color/colorRipple"
                 app:strokeColor="@color/colorSecondaryVariant"
-                app:strokeWidth="0dp" />
+                app:strokeWidth="1dp" />
 
             <TextView
                 android:id="@+id/stripeAccountButton"
@@ -190,7 +190,8 @@
                     android:text="@string/name"
                     android:textAlignment="inherit"
                     android:textColor="@color/textColor"
-                    app:drawableTint="@color/colorPrimary" />
+                    app:drawableTint="@color/colorPrimary"
+                    tools:ignore="LabelFor" />
 
             </LinearLayout>
 

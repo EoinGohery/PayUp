@@ -74,6 +74,8 @@ public class SignIn extends AppCompatActivity {
             }
         };
 
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
         mAuth.addAuthStateListener(authStateListener);
 
         //email sign in
