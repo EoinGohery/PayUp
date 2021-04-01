@@ -13,11 +13,7 @@ import com.c17206413.payup.MainActivity
 import com.c17206413.payup.R
 import com.c17206413.payup.databinding.ActivityCheckoutBinding
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.wallet.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.stripe.android.*
 import com.stripe.android.model.ConfirmPaymentIntentParams
@@ -30,19 +26,23 @@ import java.lang.ref.WeakReference
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
-
+import com.c17206413.payup.MainActivity.currentUser
 
 class CheckoutActivity : AppCompatActivity() {
 
-    private var currentUser: FirebaseUser? = null
+    //String values
     private var docId = ""
     private var clientSecret = ""
-    private var tag = "Checkout"
+    private var tag = "CHECKOUT"
     private var paymentMethod = "Card"
 
+    //binding to allow for more fluid layout object referencing
     private lateinit var binding: ActivityCheckoutBinding
 
+    //initialise stripe application
     private val stripe: Stripe by lazy { Stripe(applicationContext, getString(R.string.publish_key)) }
+
+    //initialise payments client
     private val paymentsClient: PaymentsClient by lazy {
         Wallet.getPaymentsClient(
                 this,
@@ -58,10 +58,10 @@ class CheckoutActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        currentUser = FirebaseAuth.getInstance().currentUser
-
+        //check if google pay is possible
         isReadyToPay()
 
+        //get intent extras
         val extras = intent.extras
         clientSecret = extras?.getString("clientSecret")!!
         val serviceName = extras.getString("serviceName")
@@ -69,31 +69,41 @@ class CheckoutActivity : AppCompatActivity() {
         val amount = extras.getDouble("amount")
         docId = extras.getString("id")!!
 
+        //format currency
         val format = NumberFormat.getCurrencyInstance()
         format.maximumFractionDigits = 2
         format.currency = Currency.getInstance(currency)
 
+        //set layout UI variables
         binding.amountIndicator.text = format.format(amount)
-
         binding.serviceNameCheckout.text = serviceName
 
+        //set back button on click
         binding.backButton.setOnClickListener {
             finish()
         }
 
+        //remove postal code form card input
         binding.cardInputWidget.postalCodeEnabled=false
 
+        //set card pay button click listener
         binding.payButton.setOnClickListener {
+            binding.payGoogleButton.isClickable = false
+            binding.payButton.isClickable = false
             binding.progressBar.visibility = VISIBLE
             paymentMethod = "Card"
             confirmPayment()
         }
 
+        //set GooglePay button click listener
         binding.payGoogleButton.setOnClickListener {
+            binding.payGoogleButton.isClickable = false
+            binding.payButton.isClickable = false
             binding.progressBar.visibility = VISIBLE
             payWithGoogle()
         }
 
+        //This can be used for card payments in future. (See further development of report)
         binding.paymentmethod.setOnClickListener {
             // Create the customer session and kick start the payment flow
         }
@@ -101,6 +111,7 @@ class CheckoutActivity : AppCompatActivity() {
         MainActivity.checkInternetConnection(this)
     }
 
+    //checks if google pay is possible
     private fun isReadyToPay() {
         paymentsClient.isReadyToPay(createIsReadyToPayRequest())
                 .addOnCompleteListener { task ->
@@ -117,10 +128,7 @@ class CheckoutActivity : AppCompatActivity() {
                 }
     }
 
-    /**
-     * See https://developers.google.com/pay/api/android/reference/request-objects#example
-     * for an example of the generated JSON.
-     */
+    //creates the is IsReadyToPayRequest JSON object for confirming card payment
     private fun createIsReadyToPayRequest(): IsReadyToPayRequest {
         return IsReadyToPayRequest.fromJson(
                 JSONObject()
@@ -146,11 +154,11 @@ class CheckoutActivity : AppCompatActivity() {
                                                                 )
                                                 )
                                 )
-                        )
-                        .toString()
+                        ).toString()
         )
     }
 
+    //creates the is IsReadyToPayRequest JSON object for confirming GooglePay payment
     private fun createPaymentDataRequest(): PaymentDataRequest {
         val cardPaymentMethod = JSONObject()
                 .put("type", "CARD")
@@ -205,16 +213,11 @@ class CheckoutActivity : AppCompatActivity() {
         return PaymentDataRequest.fromJson(paymentDataRequest)
     }
 
+    //create the google payment method and activate the onActivityResult
     private fun payWithGoogle() {
         AutoResolveHelper.resolveTask(
-                paymentsClient.loadPaymentData(createPaymentDataRequest()),
-                this@CheckoutActivity,
-                LOAD_PAYMENT_DATA_REQUEST_CODE
-        )
-    }
-
-    companion object {
-        private const val LOAD_PAYMENT_DATA_REQUEST_CODE = 53
+                // 1 used to indicate GooglePay
+                paymentsClient.loadPaymentData(createPaymentDataRequest()), this@CheckoutActivity, 1)
     }
 
     private fun confirmPayment() {
@@ -234,16 +237,21 @@ class CheckoutActivity : AppCompatActivity() {
         val weakActivity = WeakReference<Activity>(this)
 
         when (requestCode) {
-            LOAD_PAYMENT_DATA_REQUEST_CODE -> {
+            //if GooglePay
+            1 -> {
                 when (resultCode) {
                     Activity.RESULT_OK -> {
                         if (data != null) {
+                            //launch GooglePay handle payment
                             paymentMethod = "GooglePay"
                             onGooglePayResult(data)
                         }
                     }
                     Activity.RESULT_CANCELED -> {
+                        //display payment failed popup
                         displayAlert(weakActivity.get()!!, "Payment cancelled", "Please try again.", restartDemo = false)
+                        binding.payGoogleButton.isClickable = false
+                        binding.payButton.isClickable = false
                         binding.progressBar.visibility = INVISIBLE
                     }
                     AutoResolveHelper.RESULT_ERROR -> {
@@ -252,11 +260,15 @@ class CheckoutActivity : AppCompatActivity() {
                         Log.w(tag, status.toString())
                     }
                     else -> {
+                        //log unidentified issue
                         Log.w(tag, "Unidentified issue")
+                        binding.payGoogleButton.isClickable = false
+                        binding.payButton.isClickable = false
                         binding.progressBar.visibility = INVISIBLE
                     }
                 }
             }
+            //if card payment or if Google payment has already been formatted with onGooglePayResult()
             else -> {
                 // Handle the result of stripe.confirmPayment
                 stripe.onPaymentResult(requestCode, data, object : ApiResultCallback<PaymentIntentResult> {
@@ -264,31 +276,40 @@ class CheckoutActivity : AppCompatActivity() {
                         val paymentIntent = result.intent
                         val status = paymentIntent.status
                         if (status == StripeIntent.Status.Succeeded) {
+                            //display payment succeeded popup
                             displayAlert(weakActivity.get()!!, "Payment succeeded", "Returning", restartDemo = true)
+                            //get current datetime
                             @SuppressLint("SimpleDateFormat") val sdf = SimpleDateFormat("dd/MM/yyyy\nHH:mm z")
                             val currentDateAndTime = sdf.format(Date())
 
+                            //initialise db
                             val db = FirebaseFirestore.getInstance()
-                            val userRef = db.collection("users").document(MainActivity.getCurrentUser().id).collection("due").document(docId)
+                            //get user ref
+                            val userRef = db.collection("users").document(currentUser.id).collection("due").document(docId)
+                            //update date paid
                             userRef.update("date_paid", currentDateAndTime)
                                     .addOnSuccessListener { Log.d(tag, "DocumentSnapshot successfully updated!") }
                                     .addOnFailureListener { e: java.lang.Exception? -> Log.w(tag, "Error updating document", e) }
-
+                            //update paid status
                             userRef.update("active", false)
                                     .addOnSuccessListener { Log.d(tag, "DocumentSnapshot successfully updated!") }
                                     .addOnFailureListener { e: java.lang.Exception? -> Log.w(tag, "Error updating document", e) }
-
+                            //update payment method used
                             userRef.update("payment_method", paymentMethod)
                                     .addOnSuccessListener { Log.d(tag, "DocumentSnapshot successfully updated!") }
                                     .addOnFailureListener { e: java.lang.Exception? -> Log.w(tag, "Error updating document", e) }
                         } else {
-                            displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message ?: "")
+                            //display payment failed popup
+                            displayAlert(weakActivity.get()!!, "Payment failed", paymentIntent.lastPaymentError?.message
+                                    ?: "")
                             binding.progressBar.visibility = INVISIBLE
                         }
                     }
 
                     override fun onError(e: Exception) {
+                        //display payment failed popup
                         displayAlert(weakActivity.get()!!, "Payment failed", e.toString())
+                        Log.w(tag, e.toString())
                         binding.progressBar.visibility = INVISIBLE
                     }
                 })

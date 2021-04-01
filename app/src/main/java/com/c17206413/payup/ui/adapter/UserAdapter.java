@@ -16,12 +16,16 @@ import com.c17206413.payup.ui.model.User;
 
 import java.util.List;
 
+//recycler adapter for displaying user informatiion
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private final Context mContext;
+    //list of user objects
     private final List<User> mUsers;
+    //click listener for recycler adapter
     private final UserListener userListener;
 
+    //adapter constructor
     public UserAdapter(Context mContext, List<User> mUsers, UserListener userListener) {
         this.mUsers = mUsers;
         this.mContext = mContext;
@@ -37,13 +41,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        //set specific user information to each adapter object on view holder
         User user = mUsers.get(position);
         holder.username.setText(user.getUsername());
+        //set user profile picture
         if (user.getImageUrl() == null) {
             holder.profile_image.setImageResource(R.mipmap.ic_launcher);
         } else {
             Glide.with(mContext).load(user.getImageUrl()).into(holder.profile_image);
         }
+        //set whether the user has been selected or not using highlighted star image
         if (user.getSelected()) {
             holder.selected_image.setImageResource(android.R.drawable.btn_star_big_on);
         } else {
@@ -52,6 +59,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     @Override
+    //gert the total number of items in list
     public int getItemCount() {
         return mUsers.size();
     }
@@ -65,12 +73,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         public ViewHolder(View itemView, UserListener userListener) {
             super(itemView);
 
+            //user listener
             this.userListener = userListener;
 
+            //UI elements
             username = itemView.findViewById(R.id.username);
             profile_image = itemView.findViewById(R.id.profile_image);
             selected_image = itemView.findViewById(R.id.selected_star);
 
+            //On click listener for entire object
             itemView.setOnClickListener(this);
         }
 
@@ -80,6 +91,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }
     }
 
+    //payment listener interface (methods to be overwritten in create payemnt class)
     public interface UserListener {
         void onUserClick(int position);
     }

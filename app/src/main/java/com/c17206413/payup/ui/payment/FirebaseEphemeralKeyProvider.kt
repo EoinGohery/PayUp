@@ -7,6 +7,7 @@ import com.google.firebase.ktx.Firebase
 import com.stripe.android.EphemeralKeyProvider
 import com.stripe.android.EphemeralKeyUpdateListener
 
+//This can be used for card payments in future. (See further development of report)
 class FirebaseEphemeralKeyProvider: EphemeralKeyProvider {
 
     override fun createEphemeralKey(

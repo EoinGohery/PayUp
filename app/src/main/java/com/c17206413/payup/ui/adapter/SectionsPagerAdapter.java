@@ -13,6 +13,7 @@ import com.c17206413.payup.ui.main.DueFragment;
 import com.c17206413.payup.ui.main.HistoryFragment;
 import com.c17206413.payup.ui.main.IncomingFragment;
 
+//
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
@@ -25,6 +26,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
+    //Set teh fragments for each tab
     public Fragment getItem(int pos) {
         switch (pos) {
             case 0:
@@ -39,11 +41,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
     @Nullable
     @Override
+    //title for each tab
     public CharSequence getPageTitle(int position) {
         return mContext.getResources().getString(TAB_TITLES[position]);
     }
 
     @Override
+    //total tabs
     public int getCount() {
         return 3;
     }

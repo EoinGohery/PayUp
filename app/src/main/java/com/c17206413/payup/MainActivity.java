@@ -23,6 +23,7 @@ import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.SripeOnboardingView;
 import com.c17206413.payup.ui.adapter.SectionsPagerAdapter;
+import com.c17206413.payup.ui.main.DueFragment;
 import com.c17206413.payup.ui.model.CurrentUser;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
 import com.google.android.material.snackbar.Snackbar;
@@ -33,56 +34,69 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.stripe.android.PaymentConfiguration;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "Main";
+    private static final String TAG = "MAIN";
 
     // Firestore Initialisation
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    private static final CurrentUser currentUser = new CurrentUser();
-
-    public static CurrentUser getCurrentUser() {
-        return currentUser;
-    }
+    //publicly available current User object
+    public static final CurrentUser currentUser = new CurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //check the internet connection
         checkInternetConnection(this);
 
+        //initialise firebase db
         db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
 
+        //initialise firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        //set auth change listener
         FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
             if (mAuth.getCurrentUser() == null){
                 signInUser();
             }
         };
-
         mAuth.addAuthStateListener(authStateListener);
 
+        //initialise payment configuration with stripe
+        PaymentConfiguration.init(getApplicationContext(), getString(R.string.publish_key));
+
+        //get currently logged in user
+        getUserProfile();
+
+        //nested scroll view to contain the fragment adapter
         NestedScrollView scrollView = findViewById(R.id.nestedScroll);
         scrollView.setFillViewport(true);
+
+        //sections adapter to contain the fragments
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+
+        //View pager to display fragments
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        getUserProfile();
-
+        //user menu button
         Button userButton = findViewById(R.id.userButton);
         userButton.setOnClickListener(v -> openUser());
 
+        //create expense launch activity button
         Button newExpenseButton = findViewById(R.id.newExpenseButton);
         newExpenseButton.setOnClickListener(v -> createPayment());
     }
 
+    //check the current internet connection (Application must have internet)
     public static void checkInternetConnection(Context mContext) {
         if (!isNetworkAvailable(mContext)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -92,23 +106,62 @@ public class MainActivity extends AppCompatActivity {
             int pid = android.os.Process.myPid();
             builder.setPositiveButton("Close", (dialog, which) -> android.os.Process.killProcess(pid));
 
+            //show popup indicating no internet
             builder.show();
         }
     }
 
+    //open the user activity
     private void openUser() {
         Intent intent = new Intent(this, MenuActivity.class);
         userResultLauncher.launch(intent);
     }
 
+    //open the create payment activity or onboarding activity
     private void createPayment() {
         if (currentUser.getAccount_id()==null) {
-            startActivity(new Intent(MainActivity.this, SripeOnboardingView.class));
+            //no account, launch onboarding
+            openStripeOnbarding();
         } else {
+            //if account exists, launch create payment
             Intent intent = new Intent(this, CreatePaymentActivity.class);
             createPaymentResultLauncher.launch(intent);
         }
     }
+
+    //open stripe Onboarding activity
+    private void openStripeOnbarding() {
+        Intent openStripeIntent = new Intent(this, SripeOnboardingView.class);
+        OnboardingResultLauncher.launch(openStripeIntent);
+    }
+
+    //activity handler for Stripe Onboarding
+    ActivityResultLauncher<Intent> OnboardingResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        //get the new connected account status
+                        DocumentReference docRef = db.collection("users").document(currentUser.getId());
+                        docRef.get().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                assert document != null;
+                                if (document.exists()) {
+                                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                    //set the current users connected account id
+                                    currentUser.setAccount_id(document.getString("connected_account_id"));
+                                } else {
+                                    Log.d(TAG, "No such document");
+                                }
+                            } else {
+                                Log.d(TAG, "get failed with ", task.getException());
+                            }
+                        });
+                    }
+                }
+            });
 
 
     private void signOut() {
@@ -117,31 +170,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    //onResume check internet and get profile data
     public void onResume() {
         super.onResume();
         getUserProfile();
         checkInternetConnection(this);
     }
 
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        getUserProfile();
-    }
-
+    //launch sign in activity
     public void signInUser() {
         Intent intent = new Intent(this, SignIn.class);
         loginResultLauncher.launch(intent);
     }
 
+    //handle sign in result
     ActivityResultLauncher<Intent> loginResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
+                    //get current user data
                     getUserProfile();
                 }
             });
 
+    //Alert box to ask for username on registration
     private void askName() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter Name:");
@@ -149,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
         // Set up the input
         final EditText input = new EditText(MainActivity.this);
         input.setHint("Username");
+
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
@@ -159,16 +212,16 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    //check network availability
     public static boolean isNetworkAvailable(Context context)
     {
         ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
         if (connectivity != null)
         {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
-
             if (info != null)
             {
+                //search for an internet conection status
                 for (NetworkInfo networkInfo : info) {
                     Log.i("Class", networkInfo.getState().toString());
                     if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
@@ -180,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    //set the naem once the user has set one
     private void setName(String name) {
         if (name !=null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -228,16 +282,17 @@ public class MainActivity extends AppCompatActivity {
             });
 
     public void getUserProfile() {
-        // [START get_user_profile]
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
+            //get the documetn of the user data
             DocumentReference docRef = db.collection("users").document(uid);
             docRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     assert document != null;
                     if (document.exists()) {
+                        //get the user info and set to currentUser object
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         currentUser.setAccount_id(document.getString("connected_account_id"));
                         currentUser.setEmail(user.getEmail());
@@ -245,28 +300,34 @@ public class MainActivity extends AppCompatActivity {
                         currentUser.setDarkMode(document.getBoolean("darkMode"));
                         String name = document.getString("name");
                         String profile = document.getString("profileUrl");
+                        //only parse profile picture if one exists
                         if (profile != null) {
                             currentUser.setImageUrl(Uri.parse(profile));
                         }
+                        //if name is black or null create askNmae popup
                         if (name == null || name.matches("")) {
                             askName();
                         } else {
                             currentUser.setUsername(name);
                         }
+                        //set the correct darmode settings
                         if (currentUser.getDarkMode()==null || !currentUser.getDarkMode()) {
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                         } else {
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                         }
                     } else {
+                        //log error
                         Log.d(TAG, "No such document");
                     }
                 } else {
+                    //log error
                     Log.d(TAG, "get failed with ", task.getException());
                     finish();
                 }
             });
         } else {
+            //if user is not found
             signInUser();
         }
     }

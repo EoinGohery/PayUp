@@ -4,6 +4,7 @@ import java.util.Currency;
 
 public class Payment {
 
+    //payment information required
     private String serviceName;
     private Currency currency;
     private String username;
@@ -16,6 +17,7 @@ public class Payment {
     private String datePaid;
     private Boolean active;
 
+    //constructor
     public Payment(String id, String serviceName, Currency currency, String username, Double amount, String clientSecret, String type, Boolean active, String dateCreated, String datePaid, String paymentMethod) {
         this.serviceName = serviceName;
         this.currency = currency;
@@ -30,36 +32,21 @@ public class Payment {
         this.datePaid = datePaid;
     }
 
+    //setters adn getters
     public String getServiceName() {
         return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
     }
 
     public Currency getCurrency() {
         return currency;
     }
 
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public Double getAmount() {
         return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
     }
 
     public String getId() {
@@ -74,16 +61,8 @@ public class Payment {
         return clientSecret;
     }
 
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
-
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Boolean getActive() {

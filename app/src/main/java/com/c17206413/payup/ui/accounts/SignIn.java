@@ -40,43 +40,47 @@ import java.util.Objects;
 
 public class SignIn extends AppCompatActivity {
 
-    private static final String TAG = "Sign In";
+    private static final String TAG = "SIGN_IN";
 
+    //Firebase elements
+    private FirebaseAuth mAuth;
+
+    //UI elements
     private ProgressBar progressBar;
     private TextInputLayout emailInput;
     private TextInputLayout passwordInput;
-    private LinearLayout signIn;
+    private LinearLayout signInLayout;
     private LinearLayout registerLayout;
 
-    private FirebaseAuth mAuth;
+    //social signin clients
     private GoogleSignInClient mGoogleSignInClient;
     private CallbackManager mCallbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(com.c17206413.payup.R.layout.activity_signin);
+
+        //set dark mode off
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        //FireAuth initialise
         mAuth = FirebaseAuth.getInstance();
-        progressBar = findViewById(R.id.progressBar1);
-
-        signIn = findViewById(R.id.signIn_Layout);
-        registerLayout = findViewById(R.id.registerLayout);
-
-        emailInput = findViewById(R.id.emailLayout);
-        passwordInput = findViewById(R.id.passwordLayout);
-
+        //Auth listener to check for successful login
         FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
             if (mAuth.getCurrentUser() != null){
                 setResult(RESULT_OK);
                 finish();
             }
         };
-
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
         mAuth.addAuthStateListener(authStateListener);
+
+        //UI elements
+        progressBar = findViewById(R.id.progressBar1);
+        signInLayout = findViewById(R.id.signIn_Layout);
+        registerLayout = findViewById(R.id.registerLayout);
+        emailInput = findViewById(R.id.emailLayout);
+        passwordInput = findViewById(R.id.passwordLayout);
 
         //email sign in
         Button emailLogin= findViewById(R.id.login_with_password);
@@ -132,7 +136,7 @@ public class SignIn extends AppCompatActivity {
         //enable registration form
         Button showRegisterButton = findViewById(R.id.link_signup);
         showRegisterButton.setOnClickListener(v -> {
-            signIn.setVisibility(View.GONE);
+            signInLayout.setVisibility(View.GONE);
             registerLayout.setVisibility(View.VISIBLE);
         });
 
@@ -149,7 +153,7 @@ public class SignIn extends AppCompatActivity {
         Button backToSingInButton= findViewById(R.id.create_payment_button);
         backToSingInButton.setOnClickListener(v -> {
             registerLayout.setVisibility(View.GONE);
-            signIn.setVisibility(View.VISIBLE);
+            signInLayout.setVisibility(View.VISIBLE);
         });
 
         MainActivity.checkInternetConnection(this);
@@ -180,7 +184,6 @@ public class SignIn extends AppCompatActivity {
                         Log.w(TAG, "Google sign in failed", e);
                         Snackbar.make(findViewById(android.R.id.content), "Authentication Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
-                        // ...
                     }
                 }
             });
@@ -191,6 +194,14 @@ public class SignIn extends AppCompatActivity {
         socialAuthentication(credential);
     }
 
+    //handle facebook authentication
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d(TAG, "handleFacebookAccessToken:" + token);
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        socialAuthentication(credential);
+    }
+
+    //authenticate social accesstoken
     private void socialAuthentication(AuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
@@ -208,21 +219,12 @@ public class SignIn extends AppCompatActivity {
                 });
     }
 
-    private void handleFacebookAccessToken(AccessToken token) {
-        Log.d(TAG, "handleFacebookAccessToken:" + token);
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        socialAuthentication(credential);
-    }
-
-
     //email login method
     private void loginSignIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
-        if (validateLoginInForm()) {
+        if (validateLoginInForm(email, password)) {
             return;
         }
-
-        // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -236,16 +238,14 @@ public class SignIn extends AppCompatActivity {
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
-        // [END sign_in_with_email]
     }
 
     //email registration method
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
-        if (validateLoginInForm()) {
+        if (validateLoginInForm(email, password)) {
             return;
         }
-        // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -260,13 +260,12 @@ public class SignIn extends AppCompatActivity {
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
-        // [END create_user_with_email]
     }
 
 
     //validate login strings correctness
-    private boolean validateLoginInForm() {
-        String emailString = Objects.requireNonNull(emailInput.getEditText()).getText().toString();
+    private boolean validateLoginInForm(String emailString, String passwordString) {
+        //check email correctness
         if (emailString.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             emailInput.setError("Required.");
             return true;
@@ -275,7 +274,7 @@ public class SignIn extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
         }
 
-        String passwordString = Objects.requireNonNull(passwordInput.getEditText()).getText().toString();
+        //check password correctness
         if (passwordString.isEmpty()) {
             passwordInput.setError("Required.");
             return true;
@@ -290,20 +289,4 @@ public class SignIn extends AppCompatActivity {
         // disable going back to the MainActivity
         moveTaskToBack(true);
     }
-
-//    public void privacyAndTerms() {
-//        List<AuthUI.IdpConfig> providers = Collections.emptyList();
-//        // [START auth_fui_pp_tos]
-//        startActivityForResult(
-//                AuthUI.getInstance()
-//                        .createSignInIntentBuilder()
-//                        .setAvailableProviders(providers)
-//                        .setTosAndPrivacyPolicyUrls(
-//                                "https://example.com/terms.html",
-//                                "https://example.com/privacy.html")
-//                        .build(),
-//                RC_SIGN_IN);
-//        // [END auth_fui_pp_tos]
-//    }
-
 }

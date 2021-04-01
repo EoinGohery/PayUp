@@ -41,111 +41,109 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.c17206413.payup.MainActivity.currentUser;
+
 public class CreatePaymentActivity extends AppCompatActivity implements UserAdapter.UserListener {
 
+    private static final String TAG = "PAYMENT_CREATION";
+
+    //firebase db
     private FirebaseFirestore db;
 
-    private static final String TAG = "Payment Creation";
+    //user recycler
     private RecyclerView searchRecycler;
 
-    private ProgressBar progressBar;
-
+    //user adapter for recycler
     private UserAdapter userAdapter;
+
+    //list of all user
     private List<User> mUsers;
+
+    //list of users added to payment
     private List<User> addedUsers;
 
+    //UI elements
+    private ProgressBar progressBar;
     private TextInputLayout nameInput;
     private TextInputLayout priceInput;
-
     private TextView pricePP;
 
+    //variables
     private String current = "";
     private double perPerson;
 
+    //locale for currency
     private Locale locale;
 
+    //this indicates wether the user is included in the indicated price
     private int includes = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        PaymentConfiguration.init(getApplicationContext(), getString(R.string.publish_key));
-
-        locale = Locale.getDefault();
-
         setContentView(R.layout.activity_create_payment);
 
+        //initialise db
+        db = FirebaseFirestore.getInstance();
+
+        //get locale of current user
+        locale = Locale.getDefault();
+
+        //recycler of users
+        searchRecycler = findViewById(R.id.user_recycler);
+        searchRecycler.setHasFixedSize(true);
+        searchRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+        //list all objects
+        mUsers = new ArrayList<>();
+
+        //list of users added to payment
+        addedUsers = new ArrayList<>();
+
+        //UI elements
+        priceInput = findViewById(R.id.priceLayout);
+        nameInput = findViewById(R.id.serviceNameLayout);
+        pricePP = findViewById(R.id.price_per_person);
+        progressBar = findViewById(R.id.progressBar1);
+
+        //back button onClick
         ImageButton backButton= findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
+        //Check box to indicated if user is included in price
         CheckBox included = findViewById(R.id.checkBox);
+        //if checkbox is changed format price accordingly
         included.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 includes = 1;
             } else {
                 includes = 0;
             }
-            String s = Objects.requireNonNull(priceInput.getEditText()).getText().toString();
-
-            String cleanString = s.replaceAll("[$,£€.]", "");
-
-            double parsed = Double.parseDouble(cleanString);
-            perPerson = parsed;
-
-            pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
-
-            String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));
-
-            current = formatted;
-            priceInput.getEditText().setText(formatted);
-            priceInput.getEditText().setSelection(formatted.length());
+            formatPrice();
         });
 
-        db = FirebaseFirestore.getInstance();
-
-        searchRecycler = findViewById(R.id.user_recycler);
-        searchRecycler.setHasFixedSize(true);
-        searchRecycler.setLayoutManager(new LinearLayoutManager(this));
-
-        priceInput = findViewById(R.id.priceLayout);
-        nameInput = findViewById(R.id.serviceNameLayout);
-
-        pricePP = findViewById(R.id.price_per_person);
-
-        progressBar = findViewById(R.id.progressBar1);
-
+        //set popup keyboard on price input to keypad
         Objects.requireNonNull(priceInput.getEditText()).setRawInputType(Configuration.KEYBOARD_12KEY);
+        //Text change listener
         Objects.requireNonNull(priceInput.getEditText()).addTextChangedListener(new TextWatcher(){
             @Override
+            //not required
             public void afterTextChanged(Editable s) {}
 
             @Override
+            //not required
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
+            //format the new price
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().equals(current)){
-                    priceInput.getEditText().removeTextChangedListener(this);
-
-                    String cleanString = s.toString().replaceAll("[$,£€.]", "");
-
-                    double parsed = Double.parseDouble(cleanString);
-                    perPerson = parsed;
-
-                    pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
-
-                    String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));
-
-                    current = formatted;
-                    priceInput.getEditText().setText(formatted);
-                    priceInput.getEditText().setSelection(formatted.length());
-                    priceInput.getEditText().addTextChangedListener(this);
+                if(!s.toString().equals(current)) {
+                    formatPrice();
                 }
             }
-
         });
 
+        //Create the group payment with selected name and local currency
         Button createPaymentButton= findViewById(R.id.create_payment_button);
         createPaymentButton.setOnClickListener(v -> {
             progressBar.setVisibility(View.VISIBLE);
@@ -155,28 +153,34 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
 
         });
 
-        mUsers = new ArrayList<>();
-        addedUsers = new ArrayList<>();
-        readUsers();
         MainActivity.checkInternetConnection(this);
+
+        //refresh users
+        readUsers();
     }
 
+    //Creates the individual document sfor each user
     private void createGroupPayment(String serviceName, Currency currency) {
         if (!validateNameForm(serviceName)) {
             return;
         }
+        //get prcie per person
         long price = Math.round((perPerson / (addedUsers.size() + includes)));
 
+        //check for valid price
         if (price >= 50 && addedUsers.size() != 0) {
+            //for each of the added user
             for (int i = 0; i < addedUsers.size(); i++) {
                 User user = addedUsers.get(i);
                 String uid = user.getId();
                 String name = user.getUsername();
                 String amount = String.valueOf(price);
 
+                //get current dateTime
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy\nHH:mm z");
                 String currentDateAndTime = sdf.format(new Date());
 
+                //create the payment data for teh document
                 Map<String, Object> paymentDetails = new HashMap<>();
                 paymentDetails.put("user_id", uid);
                 paymentDetails.put("user_name", name);
@@ -186,14 +190,17 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                 paymentDetails.put("active", true);
                 paymentDetails.put("date_created", currentDateAndTime);
 
-                db.collection("users").document(MainActivity.getCurrentUser().getId()).collection("incoming")
+                //add document to current users incoming collection
+                db.collection("users").document(currentUser.getId()).collection("incoming")
                         .document()
                         .set(paymentDetails)
                         .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
                         .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
             }
+            //once all documents are created end activity
             finish();
         } else {
+            //popup to indicate invalid price
             Snackbar.make(findViewById(android.R.id.content), "Price per person must be at least 0.50 and at least one user must be selected.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             progressBar.setVisibility(View.INVISIBLE);
@@ -201,30 +208,39 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
 
     }
 
+    //used to search for all users
     private void readUsers() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore.getInstance().collection("users").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        //clear the users list
                         mUsers.clear();
+                        //for each user document get the required info
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             String id = document.getId();
                             String username = document.getString("name");
                             String profile = document.getString("profileUrl");
                             Uri profileUrl = null;
+                            //only parse Uri if a profile picture has been set
                             if (profile != null) {
                                 profileUrl = Uri.parse(profile);
                             }
                             User user = new User(id, username, profileUrl);
+                            //if the user is the same as the current user, it should not be displayed
                             assert firebaseUser != null;
                             if (!user.getId().equals(firebaseUser.getUid())) {
                                 mUsers.add(user);
                             }
                         }
+                        //initialise user adapter with user list
                         userAdapter = new UserAdapter(this, mUsers, this);
+                        //set that adapter to recycler
                         searchRecycler.setAdapter(userAdapter);
                     } else {
-                        Log.w(TAG, "Error recieving document");
+                        //set error
+                        Log.w(TAG, "Error receiving document");
+                        //popup for failed document received
                         Snackbar.make(findViewById(android.R.id.content), "Receive Document Failed.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
@@ -246,13 +262,16 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
     }
 
     @Override
+    //when user is clicked, swap its isSelected
     public void onUserClick(int position) {
         mUsers.get(position).swapSelected();
         userAdapter = new UserAdapter(this, mUsers, this);
         searchRecycler.setAdapter(userAdapter);
+        //used to reset the users added list with newly added users
         countSelected();
     }
 
+    //counts the amount of users selected sets each users to the correct list
     private void countSelected() {
         addedUsers.clear();
         for (int i=0; i < mUsers.size(); i++) {
@@ -263,6 +282,27 @@ public class CreatePaymentActivity extends AppCompatActivity implements UserAdap
                 addedUsers.remove(user);
             }
         }
+        //format price to correct value
         pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
+    }
+
+    private void formatPrice() {
+        //get price
+        String s = Objects.requireNonNull(priceInput.getEditText()).getText().toString();
+        String cleanString = s.replaceAll("[$,£€.]", "");
+
+        //parse string
+        double parsed = Double.parseDouble(cleanString);
+        perPerson = parsed;
+
+        //convert to selected currency
+        pricePP.setText(String.format("%s%s", getResources().getString(R.string.pricePerP), NumberFormat.getCurrencyInstance().format((perPerson/ 100 / (addedUsers.size() + includes)))));
+
+        String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));
+
+        //set the new formated value
+        current = formatted;
+        priceInput.getEditText().setText(formatted);
+        priceInput.getEditText().setSelection(formatted.length());
     }
 }
