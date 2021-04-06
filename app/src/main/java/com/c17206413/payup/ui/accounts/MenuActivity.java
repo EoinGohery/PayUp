@@ -190,6 +190,7 @@ public class MenuActivity extends AppCompatActivity {
                                 if (document.exists()) {
                                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                                     currentUser.setAccount_id(document.getString("connected_account_id"));
+                                    updateUI();
                                 } else {
                                     Log.d(TAG, "No such document");
                                 }

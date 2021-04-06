@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK) {
+                    getUserProfile();
                     Snackbar.make(findViewById(android.R.id.content), "Expense created", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
