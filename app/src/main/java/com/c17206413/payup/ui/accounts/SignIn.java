@@ -271,7 +271,7 @@ public class SignIn extends AppCompatActivity {
             return true;
         } else {
             emailInput.setError(null);
-            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
         }
 
         //check password correctness
@@ -280,7 +280,7 @@ public class SignIn extends AppCompatActivity {
             return true;
         } else {
             passwordInput.setError(null);
-            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
         }
         return false;
     }

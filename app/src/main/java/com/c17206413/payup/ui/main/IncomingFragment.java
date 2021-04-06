@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.c17206413.payup.MainActivity;
 import com.c17206413.payup.R;
 import com.c17206413.payup.ui.adapter.PaymentAdapter;
 import com.c17206413.payup.ui.model.Payment;
@@ -65,7 +66,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
         //db initialization
         db = FirebaseFirestore.getInstance();
 
-        //due recycler initialization
+        //incoming recycler initialization
         recycler = root.findViewById(R.id.paymentRecycler);
         recycler.setHasFixedSize(true);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -78,6 +79,8 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
             pullToRefresh.setRefreshing(false);
         });
 
+        readPayments();
+
         return root;
     }
 
@@ -89,9 +92,10 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
     private void readPayments() {
         //clear current payments list
         mPayments.clear();
-        String uid = currentUser.getId();
+        String uid = MainActivity.getUser().getId();
         //only search for payments if user has logged in
         if ( uid != null) {
+            List<Payment> tempPayments = new ArrayList<>();
             //query to get objects that are incoming and unpaid
             db.collection("users").document(uid).collection("incoming")
                     .whereEqualTo("active", true)
@@ -114,20 +118,25 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                                 //create a payment object
                                 Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
                                 //add payment object to payments list
-                                mPayments.add(paymentDetails);
+                                tempPayments.add(paymentDetails);
                             }
                             //initialise payment adapter
-                            paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
+                            paymentAdapter = new PaymentAdapter(getActivity(), tempPayments, this);
                             //provide payments list to payments adapter
                             recycler.setAdapter(paymentAdapter);
+                            mPayments=tempPayments;
                         } else {
                             Log.d(TAG, "Failed to receive payments");
                             //getActivity() cannot be null
-                            Snackbar.make(getActivity().findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                            Snackbar.make(getActivity().findViewById(android.R.id.content), "Failed to receive payments incoming.", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
                     });
+        } else {
+            Snackbar.make(getActivity().findViewById(android.R.id.content), "Failed to get user.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
         }
+
     }
 
     //when user selects, this method launches the details screen
@@ -166,7 +175,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
 
     //onclick listener from adapter overwritten
     //when pay button on item is clicked
-    //payment is marked as recieved
+    //payment is marked as received
     @Override
     public void payButtonOnClick(View v, int adapterPosition) {
         //get selected payment
@@ -191,7 +200,7 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                 .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
 
-        //refresh paymetns list
+        //refresh payments list
         readPayments();
     }
 

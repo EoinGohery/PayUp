@@ -23,7 +23,6 @@ import com.c17206413.payup.ui.accounts.MenuActivity;
 import com.c17206413.payup.ui.accounts.SignIn;
 import com.c17206413.payup.ui.accounts.SripeOnboardingView;
 import com.c17206413.payup.ui.adapter.SectionsPagerAdapter;
-import com.c17206413.payup.ui.main.DueFragment;
 import com.c17206413.payup.ui.model.CurrentUser;
 import com.c17206413.payup.ui.payment.CreatePaymentActivity;
 import com.google.android.material.snackbar.Snackbar;
@@ -46,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
     //publicly available current User object
     public static final CurrentUser currentUser = new CurrentUser();
+
+    public static CurrentUser getUser() {
+        return currentUser;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     private void createPayment() {
         if (currentUser.getAccount_id()==null) {
             //no account, launch onboarding
-            openStripeOnbarding();
+            openStripeOnboarding();
         } else {
             //if account exists, launch create payment
             Intent intent = new Intent(this, CreatePaymentActivity.class);
@@ -130,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //open stripe Onboarding activity
-    private void openStripeOnbarding() {
+    private void openStripeOnboarding() {
         Intent openStripeIntent = new Intent(this, SripeOnboardingView.class);
         OnboardingResultLauncher.launch(openStripeIntent);
     }
@@ -173,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
     //onResume check internet and get profile data
     public void onResume() {
         super.onResume();
-        getUserProfile();
         checkInternetConnection(this);
     }
 
@@ -221,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
             if (info != null)
             {
-                //search for an internet conection status
+                //search for an internet connection status
                 for (NetworkInfo networkInfo : info) {
                     Log.i("Class", networkInfo.getState().toString());
                     if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
@@ -233,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    //set the naem once the user has set one
+    //set the name once the user has set one
     private void setName(String name) {
         if (name !=null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -285,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
-            //get the documetn of the user data
+            //get the document of the user data
             DocumentReference docRef = db.collection("users").document(uid);
             docRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {

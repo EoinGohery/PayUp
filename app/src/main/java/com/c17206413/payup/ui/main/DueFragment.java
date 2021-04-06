@@ -75,6 +75,8 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
             pullToRefresh.setRefreshing(false);
         });
 
+        readPayments();
+
         return root;
     }
 
@@ -83,12 +85,14 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
         readPayments();
     }
 
+
     private void readPayments() {
         //clear current payments list
         mPayments.clear();
         String uid = currentUser.getId();
         //only search for payments if user has logged in
         if ( uid != null) {
+            List<Payment> tempPayments = new ArrayList<>();
             //query to get objects that are due and unpaid
             db.collection("users").document(uid).collection("due")
                     .whereEqualTo("active", true)
@@ -111,12 +115,13 @@ public class DueFragment extends Fragment implements PaymentAdapter.PaymentListe
                                 //create a payment object
                                 Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", true, dateCreated, datePaid, paymentMethod);
                                 //add payment object to payments list
-                                mPayments.add(paymentDetails);
+                                tempPayments.add(paymentDetails);
                             }
                             //initialise payment adapter
-                            paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
+                            paymentAdapter = new PaymentAdapter(getActivity(), tempPayments, this);
                             //provide payments list to payments adapter
                             recycler.setAdapter(paymentAdapter);
+                            mPayments=tempPayments;
                         } else {
                             Log.d(TAG, "Failed to receive payments");
                             //getActivity() cannot be null

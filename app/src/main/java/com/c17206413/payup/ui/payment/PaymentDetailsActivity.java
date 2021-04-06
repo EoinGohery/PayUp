@@ -52,7 +52,7 @@ public class PaymentDetailsActivity extends AppCompatActivity {
         serviceName.setText(service);
         userIndicator.setText(extras.getString("user"));
 
-        //variable UI baised on Paid or Unpaid
+        //variable UI based on Paid or Unpaid
         if (!extras.getBoolean("active")) {
             isPaid.setText(R.string.paid);
             isPaid.setTextColor(getResources().getColor(R.color.colorSuccess));

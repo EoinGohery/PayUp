@@ -5,17 +5,17 @@ import java.util.Currency;
 public class Payment {
 
     //payment information required
-    private String serviceName;
-    private Currency currency;
-    private String username;
-    private String type;
-    private Double amount;
-    private String clientSecret;
-    private String id;
-    private String dateCreated;
-    private String paymentMethod;
-    private String datePaid;
-    private Boolean active;
+    private final String serviceName;
+    private final Currency currency;
+    private final String username;
+    private final String type;
+    private final Double amount;
+    private final String clientSecret;
+    private final String id;
+    private final String dateCreated;
+    private final String paymentMethod;
+    private final String datePaid;
+    private final Boolean active;
 
     //constructor
     public Payment(String id, String serviceName, Currency currency, String username, Double amount, String clientSecret, String type, Boolean active, String dateCreated, String datePaid, String paymentMethod) {
@@ -53,10 +53,6 @@ public class Payment {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getClientSecret() {
         return clientSecret;
     }
@@ -69,31 +65,15 @@ public class Payment {
         return active;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
     public String getDateCreated() {
         return dateCreated;
-    }
-
-    public void setDateCreated(String dateCreated) {
-        this.dateCreated = dateCreated;
     }
 
     public String getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
     public String getDatePaid() {
         return datePaid;
-    }
-
-    public void setDatePaid(String datePaid) {
-        this.datePaid = datePaid;
     }
 }

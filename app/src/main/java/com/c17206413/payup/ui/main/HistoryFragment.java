@@ -43,6 +43,9 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
     private RecyclerView recycler;
     private SwipeRefreshLayout pullToRefresh;
 
+    //payment adapter to list payments
+    private PaymentAdapter paymentAdapter;
+
     //create a new history fragment to be called by SectionsPageAdapter
     public static HistoryFragment newInstance() {
         return new HistoryFragment();
@@ -71,6 +74,8 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
             pullToRefresh.setRefreshing(false);
         });
 
+        readPayments();
+
         return root;
     }
 
@@ -85,6 +90,7 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
         String uid = currentUser.getId();
         //only search for payments if user has logged in
         if ( uid != null) {
+            List<Payment> tempPayments = new ArrayList<>();
             //query to get objects that are due and paid
             db.collection("users").document(uid).collection("due")
                     .whereEqualTo("active", false)
@@ -105,9 +111,9 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                                 String datePaid = document.getString("date_paid");
                                 String paymentMethod = document.getString("payment_method");
                                 //create a payment object
-                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
+                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "due", false, dateCreated, datePaid, paymentMethod);
                                 //add payment object to payments list
-                                addToRecycler(paymentDetails);
+                                tempPayments.add(paymentDetails);
                             }
 
                         } else {
@@ -137,26 +143,23 @@ public class HistoryFragment extends Fragment implements PaymentAdapter.PaymentL
                                 String datePaid = document.getString("date_paid");
                                 String paymentMethod = document.getString("payment_method");
                                 //create a payment object
-                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
+                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", false, dateCreated, datePaid, paymentMethod);
                                 //add payment object to payments list
-                                addToRecycler(paymentDetails);
+                                tempPayments.add(paymentDetails);
                             }
                         } else {
                             Log.d(TAG, "Failed to receive payments");
                             //getActivity() cannot be null
-                            Snackbar.make(getActivity().findViewById(android.R.id.content), "Failed to receive payments due.", Snackbar.LENGTH_LONG)
+                            Snackbar.make(getActivity().findViewById(android.R.id.content), "Failed to receive payments incoming.", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
+                        //initialise payment adapter
+                        paymentAdapter = new PaymentAdapter(getActivity(), tempPayments, this);
+                        //provide payments list to payments adapter
+                        recycler.setAdapter(paymentAdapter);
+                        mPayments=tempPayments;
                     });
         }
-    }
-
-    private void addToRecycler(Payment payment) {
-        mPayments.add(payment);
-        //initialise payment adapter
-        PaymentAdapter paymentAdapter = new PaymentAdapter(getActivity(), mPayments, this);
-        //provide payments list to payments adapter
-        recycler.setAdapter(paymentAdapter);
     }
 
     //when user selects, this method launches the details screen

@@ -13,6 +13,8 @@ import com.c17206413.payup.ui.main.DueFragment;
 import com.c17206413.payup.ui.main.HistoryFragment;
 import com.c17206413.payup.ui.main.IncomingFragment;
 
+import org.jetbrains.annotations.NotNull;
+
 //
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -25,12 +27,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         mContext = context;
     }
 
+    @NotNull
     @Override
     //Set teh fragments for each tab
     public Fragment getItem(int pos) {
         switch (pos) {
-            case 0:
-                return DueFragment.newInstance();
             case 1:
                 return IncomingFragment.newInstance();
             case 2:
