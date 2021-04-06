@@ -3,11 +3,13 @@ package com.c17206413.payup.ui.payment;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.c17206413.payup.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.NumberFormat;
 import java.util.Currency;
@@ -32,6 +34,8 @@ public class PaymentDetailsActivity extends AppCompatActivity {
         TextView isPaid = findViewById(R.id.is_paid);
         TextView userIndicator = findViewById(R.id.userDetail);
         TextView paymentMethod = findViewById(R.id.methodDetail);
+        LinearLayout dateLayout = findViewById(R.id.datePaidLayout);
+        LinearLayout methodLayout = findViewById(R.id.methodLayout);
 
         //get intent extras
         Bundle extras = getIntent().getExtras();
@@ -56,8 +60,8 @@ public class PaymentDetailsActivity extends AppCompatActivity {
         if (!extras.getBoolean("active")) {
             isPaid.setText(R.string.paid);
             isPaid.setTextColor(getResources().getColor(R.color.colorSuccess));
-            datePaid.setVisibility(View.INVISIBLE);
-            paymentMethod.setVisibility(View.INVISIBLE);
+            dateLayout.setVisibility(View.VISIBLE);
+            methodLayout.setVisibility(View.VISIBLE);
         }
     }
 }

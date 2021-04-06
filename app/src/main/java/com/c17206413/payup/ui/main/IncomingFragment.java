@@ -113,10 +113,8 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                                 Double amount = Double.parseDouble(Objects.requireNonNull(document.getString("amount"))) / 100;
                                 String id = document.getId();
                                 String dateCreated = document.getString("date_created");
-                                String datePaid = document.getString("date_paid");
-                                String paymentMethod = document.getString("payment_method");
                                 //create a payment object
-                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, datePaid, paymentMethod);
+                                Payment paymentDetails = new Payment(id, serviceName, currency, name, amount, clientSecret, "incoming", true, dateCreated, null, null);
                                 //add payment object to payments list
                                 tempPayments.add(paymentDetails);
                             }
@@ -132,20 +130,14 @@ public class IncomingFragment extends Fragment implements PaymentAdapter.Payment
                                     .setAction("Action", null).show();
                         }
                     });
-        } else {
-            Snackbar.make(getActivity().findViewById(android.R.id.content), "Failed to get user.", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
         }
-
     }
 
     //when user selects, this method launches the details screen
     private void viewPayment(Payment paymentDetail) {
         Intent intent = new Intent(getActivity(), PaymentDetailsActivity.class);
-        intent.putExtra("clientSecret", paymentDetail.getClientSecret());
         intent.putExtra("amount", paymentDetail.getAmount());
         intent.putExtra("serviceName", paymentDetail.getServiceName());
-        intent.putExtra("id", paymentDetail.getId());
         intent.putExtra("active", paymentDetail.getActive());
         intent.putExtra("user", paymentDetail.getUsername());
         intent.putExtra("currency", paymentDetail.getCurrency().getCurrencyCode());

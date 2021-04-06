@@ -190,7 +190,8 @@
             android:id="@+id/datePaidLayout"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="invisible">
 
             <Button
                 android:id="@+id/datePaidLabel"
@@ -229,7 +230,8 @@
             android:id="@+id/methodLayout"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="invisible">
 
             <Button
                 android:id="@+id/methodLabel"
