@@ -93,7 +93,8 @@ exports.authorizeStripeAccount = functions.https.onCall(async (data, context) =>
 });
 
 /**
- * When a payment document is written on the client, this function is triggered to create the PaymentIntent in Stripe.
+ * When a payment document is written on the client, 
+ * this function is triggered to create the PaymentIntent in Stripe.
  */
 exports.createStripePayment = functions.firestore
   .document('users/{userId}/incoming/{pushId}')
@@ -131,7 +132,8 @@ exports.createStripePayment = functions.firestore
       });
 
     } catch (error) {
-      // We want to capture errors and render them in a user-friendly way, while still logging an exception with StackDriver
+      // We want to capture errors and render them in a user-friendly way, 
+      //while still logging an exception with StackDriver
       console.log(error);
       await snap.ref.set({ error: userFacingMessage(error) }, { merge: true });
       await reportError(error, { user: context.params.userId });
