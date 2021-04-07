@@ -13,7 +13,7 @@ const stripe = require('stripe')(functions.config().stripe.secret, {
 });
 
 /**
- * When a user is created, create a Stripe customer object for them.
+ * When a user is created, create a Stripe customer object for them and add user to database.
  */
 exports.createUserDocument = functions.auth.user().onCreate(async (user) => {
   const customer = await stripe.customers.create({
@@ -21,6 +21,7 @@ exports.createUserDocument = functions.auth.user().onCreate(async (user) => {
     metadata: { firebaseUID: user.uid },
   });
 
+  //add to database
   await admin.firestore().collection('users').doc(user.uid).set({
     customer_id: customer.id,
     name: user.displayName,
@@ -58,6 +59,9 @@ exports.createEphemeralKey = functions.https.onCall(async (data, context) => {
   }
 });
 
+/**
+ * Autherize a stripe account during onboarding
+ */
 exports.authorizeStripeAccount = functions.https.onCall(async (data, context) => {
   // Checking that the user is authenticated.
   if (!context.auth) {
@@ -137,7 +141,6 @@ exports.createStripePayment = functions.firestore
 /**
  * When a user pays an Expense, mark the expense as paid for the benefactor
  */
-
   exports.markAsPaid = functions.firestore
     .document('users/{userId}/due/{pushId}')
     .onUpdate(async (change, context) => {
@@ -275,9 +278,11 @@ exports.dueDeleted = functions.firestore
 });
 
 function reportError(err, context = {}) {
-  // This is the name of the StackDriver log stream that will receive the log
-  // entry. This name can be any valid log stream name, but must contain "err"
-  // in order for the error to be picked up by StackDriver Error Reporting.
+  /**
+  * This is the name of the StackDriver log stream that will receive the log
+  * entry. This name can be any valid log stream name, but must contain "err"
+  * in order for the error to be picked up by StackDriver Error Reporting.
+  */
   const logName = 'errors';
   const log = logging.log(logName);
 
